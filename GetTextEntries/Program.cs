@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace GrabPokemonTextEntries
 {
@@ -15,7 +16,7 @@ namespace GrabPokemonTextEntries
         private static readonly byte StringPointer = 0x08;
         private static readonly int stringPointerInt = 0x08000000;
         private static readonly int backSearch = 300;
-        private static readonly int minStringLength = 1;
+        private static readonly int minStringLength = 1;        
         private static Dictionary<byte, String> translationTable;
         private static byte printableCharStart = 0xA1;
         private static byte printableCharEnd = 0xEE;
@@ -26,6 +27,7 @@ namespace GrabPokemonTextEntries
         private static int startPosition = 0x172255;
 
 
+        private static readonly Object foundPointersLockObject = new Object();
         private static Dictionary<Int32, List<Int32>> foundPointers = new Dictionary<Int32, List<Int32>>();
 
         static void Main(string[] args)
@@ -43,7 +45,7 @@ namespace GrabPokemonTextEntries
             Loadtable(tableFile);
 
             var romContents = new byte[romFile.Length];
-            using(var writer = new MemoryStream(romContents))
+            using (var writer = new MemoryStream(romContents))
             using (var reader = romFile.OpenRead())
             {
                 reader.CopyTo(writer);
@@ -51,19 +53,48 @@ namespace GrabPokemonTextEntries
 
             var sw = new Stopwatch();
             sw.Start();
-           
-            var length = startPosition + romContents.Length / 100;
 
+            var searchSpace = (romContents.Length - startPosition) / 4;
 
-            int prevEnd = startPosition;
-            for (int i = startPosition; i < length; i++)
+            var t1 = Task.Run(() => FindStrings(romContents, startPosition, searchSpace));
+            var t2 = Task.Run(() => FindStrings(romContents, startPosition + searchSpace, searchSpace * 2));
+            var t3 = Task.Run(() => FindStrings(romContents, startPosition + searchSpace * 2, searchSpace * 3));
+            var t4 = Task.Run(() => FindStrings(romContents, startPosition + searchSpace * 3, romContents.Length));
+            Task.WaitAll(t1, t2, t3, t4);
+            
+            sw.Stop();
+
+            Console.WriteLine("Processing {0} bytes took {1}", romContents.Length, sw.Elapsed);
+
+            sw.Reset();
+            sw.Start();
+            var outputFile = new FileInfo("FoundStrings.txt");
+            using (var writer = new StreamWriter(outputFile.OpenWrite(), Encoding.GetEncoding(1252)))
+            {
+                foreach (var pointer in foundPointers)
+                {
+                    var stringValue = GetTextAtPointer(romContents, pointer.Key);
+                    writer.WriteLine("{0:X6},{1:##}: {2}", pointer.Key, pointer.Value.Count, stringValue);
+                }
+            }
+            sw.Stop();
+
+            Console.WriteLine("Writing {0} lines took {1}", foundPointers.Count, sw.Elapsed);
+
+            Console.ReadLine();
+        }
+
+        private static void FindStrings(byte[] romContents, int from, int to)
+        {
+            int prevEnd = from;
+            for (int i = from; i < to ; i++)
             {
                 if (i % 100 == 0) Console.WriteLine("Processing byte {0}", i);
 
                 var readByte = romContents[i];
                 if (readByte == end)
                 {
-                    if (prevEnd != startPosition && i - prevEnd > minStringLength)
+                    if (prevEnd != from && i - prevEnd > minStringLength)
                     {
                         if (!FindTextPointers(romContents, prevEnd + 1))
                         {
@@ -102,28 +133,6 @@ namespace GrabPokemonTextEntries
                     prevEnd = i;
                 }
             }
-            sw.Stop();
-
-            Console.WriteLine("Processing {0} bytes took {1}", length, sw.Elapsed);
-
-            foundPointers.Add(1672260, new List<int>());
-
-            sw.Reset();
-            sw.Start();
-            var outputFile = new FileInfo("FoundStrings.txt");
-            using (var writer = new StreamWriter(outputFile.OpenWrite(), Encoding.GetEncoding(1252)))
-            {
-                foreach (var pointer in foundPointers)
-                {
-                    var stringValue = GetTextAtPointer(romContents, pointer.Key);
-                    writer.WriteLine("{0:X6},{1:##}: {2}", pointer.Key, pointer.Value.Count, stringValue);
-                }
-            }
-            sw.Stop();
-
-            Console.WriteLine("Writing {0} lines took {1}", foundPointers.Count, sw.Elapsed);
-
-            Console.ReadLine();
         }
 
         private static void Loadtable(FileInfo tableFile)
@@ -187,7 +196,10 @@ namespace GrabPokemonTextEntries
             
             if (result.Count > 0)
             {
-                foundPointers.Add(possibleStringStart, new List<int>(result.Select(l => (Int32)l)));
+                lock (foundPointersLockObject)
+                {
+                    foundPointers.Add(possibleStringStart, new List<int>(result.Select(l => (Int32)l)));
+                }
                 return true;
             }
 
