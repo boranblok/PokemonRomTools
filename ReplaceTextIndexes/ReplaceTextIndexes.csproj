@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{629A251A-B6A4-40A4-B0AA-9F9F6993C91A}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PkmnAdvanceTranslation</RootNamespace>
-    <AssemblyName>SharedLibrary</AssemblyName>
+    <ProjectGuid>{1931D8AE-5E74-40B0-BBD5-565DC0C2D2CF}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ReplaceTextIndexes</RootNamespace>
+    <AssemblyName>ReplaceTextIndexes</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -41,19 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoyerMoreBinarySearch.cs" />
-    <Compile Include="ByteBinarySearcher.cs" />
-    <Compile Include="DWordBinarySearcher.cs" />
-    <Compile Include="PointerText.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RomDataWrapper.cs" />
-    <Compile Include="TextHandler.cs" />
-    <Compile Include="WordBinarySearcher.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="table file.tbl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

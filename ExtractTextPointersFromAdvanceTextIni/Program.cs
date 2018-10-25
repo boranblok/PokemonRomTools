@@ -12,93 +12,60 @@ namespace PkmnAdvanceTranslation
 {
     class Program
     {
-        private static readonly byte end = 0xFF;
-        private static readonly byte StringPointer = 0x08;
-        private static readonly int stringPointerInt = 0x08000000;
-        private static readonly int backSearch = 300;
-        private static readonly int minStringLength = 1;
-
-        private static Dictionary<Int32, List<Int32>> foundPointers = new Dictionary<Int32, List<Int32>>();
-
         static void Main(string[] args)
         {
-            if (args.Length < 1)
-                throw new ArgumentException("Pass a rom file to parse.");
-            var romFile = new FileInfo(args[0]);
-            if (!romFile.Exists)
-                throw new Exception(String.Format("Rom file {0} does not exist.", args[0]));
+            if (args.Length < 2)
+                throw new ArgumentException("Pass a rom file and advance text ini to parse.");
 
-            var romContents = new byte[romFile.Length];
-            using (var writer = new MemoryStream(romContents))
-            using (var reader = romFile.OpenRead())
-            {
-                reader.CopyTo(writer);
-            }
+            var foundText = new Dictionary<Int32, PointerText>();
 
-            var bpre = new FileInfo(@"C:\Users\benb\Dropbox\Persoonlijk\Pokemon FireRed Translation project\AdvanceText\ini\BPRE.ini");
+            var rom = new RomDataWrapper(new FileInfo(args[0]));
+
+            var textHandler = new TextHandler(new FileInfo("table file.tbl"));
+
+            var bpre = new FileInfo(args[1]);
             String bpreContents;
             using (var reader = bpre.OpenText())
             {
                 bpreContents = reader.ReadToEnd();
-            }
+            }            
+
             var expr = new Regex("[0-9A-F]{6}");
             var exprMatches = expr.Matches(bpreContents);
-            var notFound = 0;
             var sw = new Stopwatch();
             sw.Start();
             foreach (Match match in exprMatches)
             {
-                //var endianSwappedMatch = match.Value.Substring(4) + match.Value.Substring(2, 2) + match.Value.Substring(0, 2);
-                if (int.TryParse(match.Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int intValue))
+                if (Int32.TryParse(match.Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int intValue))
                 {
-                    if (foundPointers.ContainsKey(intValue))
+                    if (foundText.ContainsKey(intValue))
                     {
-                        Console.WriteLine("Pointer {0:X6} appears multiple times in BPRE.", intValue);
+                        Console.WriteLine("Pointer {0:X6} appears multiple times in BPRE, will be skipped.", intValue);
                     }
                     else
                     {
-                        if (!FindTextPointers(romContents, intValue))
+                        var text = rom.GetTextAtPointer(intValue);
+                        if (text.AvailableLength > 0)
                         {
-                            Console.WriteLine("Pointer {0:X6} was not found in rom", intValue);
-                            notFound++;
+                            textHandler.Translate(text);
+                            foundText.Add(intValue, text);
                         }
                     }
                 }
             }
 
-            var multipleFound = 0;
-
-            foreach (var match in foundPointers)
+            var outputFile = new FileInfo("FoundStrings.txt");
+            using (var writer = new StreamWriter(outputFile.OpenWrite(), Encoding.GetEncoding(1252)))
             {
-                if (match.Value.Count != 1)
-                {
-                    Console.WriteLine("Pointer {0:X6} has {1} matches.", match.Key, match.Value.Count);
-                    multipleFound++;
+                foreach (var key in foundText.Keys)
+                {                    
+                    writer.WriteLine(foundText[key]);
                 }
             }
             sw.Stop();
-            Console.WriteLine("On {0} searches, {1} were not found and {2} had more than one match. Searching took {3}", exprMatches.Count, notFound, multipleFound, sw.Elapsed);
+
+            Console.WriteLine("On {0} searches searching took {1}", exprMatches.Count, sw.Elapsed);
             Console.ReadLine();
-        }
-
-        private static Boolean FindTextPointers(byte[] romContents, int possibleStringStart)
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-            var textPointerValue = stringPointerInt + possibleStringStart;
-            var textPointerBytes = BitConverter.GetBytes(textPointerValue);
-            //var searcher = new BoyerMooreBinarySearch(textPointerBytes);
-            //var result = searcher.GetMatchIndexes(romContents);
-            var result = ByteBinarySearcher.FindMatches(textPointerBytes, romContents);
-            sw.Stop();
-
-            if (result.Count > 0)
-            {
-                foundPointers.Add(possibleStringStart, new List<int>(result.Select(l => (Int32)l)));
-                return true;
-            }
-
-            return false;
         }
     }
 }
