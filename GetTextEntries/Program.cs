@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace GrabPokemonTextEntries
+namespace PkmnAdvanceTranslation
 {
     class Program
     {
@@ -89,7 +89,7 @@ namespace GrabPokemonTextEntries
             int prevEnd = from;
             for (int i = from; i < to ; i++)
             {
-                if (i % 100 == 0) Console.WriteLine("Processing byte {0}", i);
+                if (i % 100 == 0) Console.WriteLine("Processing byte {0}, {1}% done", i, ((i - from) / (to -from))*100);
 
                 var readByte = romContents[i];
                 if (readByte == end)

@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace GrabPokemonTextEntries
+namespace PkmnAdvanceTranslation
 {
     /// <summary>
     /// Uses the Boyer-Moore algorithm to perform binary searches.

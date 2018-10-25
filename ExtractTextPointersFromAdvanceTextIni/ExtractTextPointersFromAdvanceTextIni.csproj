@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5E36A284-D00D-4DB9-B8D3-4BD78897A229}</ProjectGuid>
+    <ProjectGuid>{47FE0A74-57BE-4246-A8B6-56670291EAD9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>PkmnAdvanceTranslation</RootNamespace>
-    <AssemblyName>GetTextEntries</AssemblyName>
+    <AssemblyName>ExtractTextPointersFromAdvanceTextIni</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
