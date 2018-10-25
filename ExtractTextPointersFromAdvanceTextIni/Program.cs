@@ -12,6 +12,7 @@ namespace PkmnAdvanceTranslation
 {
     class Program
     {
+        private static readonly Boolean test = false;
         static void Main(string[] args)
         {
             if (args.Length < 2)
@@ -48,6 +49,21 @@ namespace PkmnAdvanceTranslation
                         if (text.AvailableLength > 0)
                         {
                             textHandler.Translate(text);
+                            if (test)
+                            {
+                                var bytes = new List<Byte>(text.TextBytes);
+                                var textValue = text.Text;
+                                text.Text = null;
+                                text.Text = textValue;
+                                textHandler.Translate(text);
+                                var bytes2 = new List<Byte>(text.TextBytes);
+                                Debug.Assert(bytes.Count == bytes2.Count, "Roundtrip byte translation failed, arrays are different length.");
+                                for (int i = 0; i < bytes.Count; i++)
+                                {
+                                    Debug.Assert(bytes[i] == bytes2[i], "Roundtrip byte translation failed, arrays have different content.",
+                                        "byte[{0}] has value {1:X2} and byte2[{0}] has value {2:X2}.", i, bytes[i], bytes2[i]);
+                                }
+                            }
                             foundText.Add(intValue, text);
                         }
                     }

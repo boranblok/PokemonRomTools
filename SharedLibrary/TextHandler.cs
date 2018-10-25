@@ -67,7 +67,7 @@ namespace PkmnAdvanceTranslation
                     builder.AppendFormat("[x{0:X2}]", b);
                 }
             }
-            text.Text = builder.ToString();
+            text.SetTranslatedText(builder.ToString());
         }
 
         public void TranslateStringToBinary(PointerText text)
@@ -82,7 +82,7 @@ namespace PkmnAdvanceTranslation
                         var endIndex = text.Text.IndexOf(']', i + 1);
                         if (endIndex < 0)
                             throw new Exception(String.Format("The text {0} has an open escape sequence [ without ]", text));
-                        searchValue = text.Text.Substring(i, endIndex);
+                        searchValue = text.Text.Substring(i, endIndex - i + 1);
                         i = endIndex;
                         break;
                     case ']':
@@ -111,7 +111,7 @@ namespace PkmnAdvanceTranslation
                         throw new Exception(String.Format("The text {0} cannot be found in the table mapping and is no hex value. Full text: {1}", searchValue, text));
                 }
             }
-            text.TextBytes = bytes.AsReadOnly();
+            text.SetTranslatedBytes(bytes.AsReadOnly());
         }
     }
 }

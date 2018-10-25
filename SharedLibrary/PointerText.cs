@@ -11,19 +11,33 @@ namespace PkmnAdvanceTranslation
     public class PointerText
     {
         private string _text;
+        private ReadOnlyCollection<byte> _textBytes;
 
         public Int32 Position { get; set; }
         public Int32 ReferenceCount { get; set; }
         public String Text
         {
             get => _text;
-            set { _text = value; TextBytes = null; }
+            set { _text = value; _textBytes = null; }
         }
-        public ReadOnlyCollection<Byte> TextBytes { get; set; }
+        public ReadOnlyCollection<Byte> TextBytes {
+            get => _textBytes;
+            set { _textBytes = value; _text = null; HasHex = false; }
+        }
         public Boolean HasHex { get; set; }
         public Int32 AvailableLength { get; set; }
 
         public Boolean MustRepointReference { get; set; }
+
+        internal void SetTranslatedText(String translatedText)
+        {
+            _text = translatedText;
+        }
+
+        internal void SetTranslatedBytes(ReadOnlyCollection<Byte> translatedBytes)
+        {
+            _textBytes = translatedBytes;
+        }
 
         public Boolean CanRepointReference
         {
@@ -69,7 +83,7 @@ namespace PkmnAdvanceTranslation
             else
                 throw new Exception(String.Format("{0} is not a valid integer. {1} is not valid", parts[2], pointerTextString));
 
-            switch(parts[3])
+            switch (parts[3])
             {
                 case "0":
                     result.HasHex = false;
