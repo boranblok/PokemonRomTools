@@ -189,6 +189,7 @@ namespace PkmnAdvanceTranslation
                                 {
                                     log.Error("Translation will not continue and perform a Dry-Run instead.");
                                     Console.WriteLine("Translation will not continue and perform a Dry-Run instead.");
+                                    isDryrun = true;
                                 }
                                 break; //Breaks out of the while, this line will not be repointed.
                             }

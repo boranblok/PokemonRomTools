@@ -61,7 +61,7 @@ namespace PkmnAdvanceTranslation
 
         public override String ToString()
         {
-            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}", Address, ReferenceCount, AvailableLength, 0, Text);
+            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}", Address, ReferenceCount, AvailableLength, ForceRepointReference ? 1 : 0, Text);
         }
 
         public static PointerText FromString(String pointerTextString)
