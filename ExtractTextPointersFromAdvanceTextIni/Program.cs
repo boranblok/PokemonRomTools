@@ -15,8 +15,12 @@ namespace PkmnAdvanceTranslation
         private static readonly Boolean test = false;
         static void Main(string[] args)
         {
-            if (args.Length < 2)
-                throw new ArgumentException("Pass a rom file and advance text ini to parse.");
+            if (args.Length < 3)
+                throw new ArgumentException("Pass a rom file, advance text ini to parse and output file.");
+
+            var outputFile = new FileInfo(args[2]);
+            if (outputFile.Exists)
+                throw new Exception("Output file already exists. Please specify another name.");
 
             var foundText = new Dictionary<Int32, PointerText>();
 
@@ -46,7 +50,7 @@ namespace PkmnAdvanceTranslation
                     else
                     {
                         var text = rom.GetTextAtPointer(intValue);
-                        if (text.AvailableLength > 0)
+                        //if (text.AvailableLength > 0)
                         {
                             textHandler.Translate(text);
                             if (test)
@@ -70,7 +74,6 @@ namespace PkmnAdvanceTranslation
                 }
             }
 
-            var outputFile = new FileInfo("FoundStrings.txt");
             using (var writer = new StreamWriter(outputFile.OpenWrite(), Encoding.GetEncoding(1252)))
             {
                 foreach (var key in foundText.Keys)
@@ -81,7 +84,6 @@ namespace PkmnAdvanceTranslation
             sw.Stop();
 
             Console.WriteLine("On {0} searches searching took {1}", exprMatches.Count, sw.Elapsed);
-            Console.ReadLine();
         }
     }
 }

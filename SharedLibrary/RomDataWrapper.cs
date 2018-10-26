@@ -36,8 +36,8 @@ namespace PkmnAdvanceTranslation
         public PointerText GetTextAtPointer(Int32 textPointer)
         {
             var result = new PointerText();
-            result.Position = textPointer;
-            result.ReferenceCount = FindTextReferences(textPointer).Count;
+            result.Address = textPointer;            
+            result.References = FindTextReferences(textPointer);
 
             bool endFound = false;
             int overFlowProtection = 1000; //Max string length of 1000 to prevent an overflow into binary data.

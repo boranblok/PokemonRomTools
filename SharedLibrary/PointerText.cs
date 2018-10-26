@@ -12,19 +12,23 @@ namespace PkmnAdvanceTranslation
     {
         private string _text;
         private ReadOnlyCollection<byte> _textBytes;
+        private List<int> _references;
 
-        public Int32 Position { get; set; }
+        public Int32 Address { get; set; }
+
+        public List<Int32> References { get => _references; set { _references = value; ReferenceCount = value.Count;  } }
         public Int32 ReferenceCount { get; set; }
         public String Text
         {
             get => _text;
             set { _text = value; _textBytes = null; }
         }
-        public ReadOnlyCollection<Byte> TextBytes {
+        public ReadOnlyCollection<Byte> TextBytes
+        {
             get => _textBytes;
-            set { _textBytes = value; _text = null; HasHex = false; }
+            set { _textBytes = value; _text = null; }
         }
-        public Boolean HasHex { get; set; }
+        public Boolean ForceRepointReference { get; set; }
         public Int32 AvailableLength { get; set; }
 
         public Boolean MustRepointReference { get; set; }
@@ -57,7 +61,7 @@ namespace PkmnAdvanceTranslation
 
         public override String ToString()
         {
-            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}", Position, ReferenceCount, AvailableLength, HasHex ? 1 : 0, Text);
+            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}", Address, ReferenceCount, AvailableLength, 0, Text);
         }
 
         public static PointerText FromString(String pointerTextString)
@@ -68,8 +72,8 @@ namespace PkmnAdvanceTranslation
             if (parts.Length != 5)
                 throw new Exception(String.Format("A PointerText value has 5 segments separated by a | char. {0} is not valid", pointerTextString));
 
-            if (Int32.TryParse(parts[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var position))
-                result.Position = position;
+            if (Int32.TryParse(parts[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var address))
+                result.Address = address;
             else
                 throw new Exception(String.Format("{0} is not a valid hexadecimal integer. {1} is not valid.", parts[0], pointerTextString));
 
@@ -86,10 +90,10 @@ namespace PkmnAdvanceTranslation
             switch (parts[3])
             {
                 case "0":
-                    result.HasHex = false;
+                    result.ForceRepointReference = false;
                     break;
                 case "1":
-                    result.HasHex = true;
+                    result.ForceRepointReference = true;
                     break;
                 default:
                     throw new Exception(String.Format("{0} is not a valid boolean. {1} is not valid", parts[3], pointerTextString));

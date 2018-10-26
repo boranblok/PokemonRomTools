@@ -63,7 +63,6 @@ namespace PkmnAdvanceTranslation
                 }
                 else
                 {
-                    text.HasHex = true;
                     builder.AppendFormat("[x{0:X2}]", b);
                 }
             }

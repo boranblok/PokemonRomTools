@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLibrary", "SharedLibr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReplaceTextIndexes", "ReplaceTextIndexes\ReplaceTextIndexes.csproj", "{1931D8AE-5E74-40B0-BBD5-565DC0C2D2CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplyTranslationsToRom", "ApplyTranslationsToRom\ApplyTranslationsToRom.csproj", "{2CE7B0ED-A1C8-448D-BFD3-79106CFEEFF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{1931D8AE-5E74-40B0-BBD5-565DC0C2D2CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1931D8AE-5E74-40B0-BBD5-565DC0C2D2CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1931D8AE-5E74-40B0-BBD5-565DC0C2D2CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CE7B0ED-A1C8-448D-BFD3-79106CFEEFF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CE7B0ED-A1C8-448D-BFD3-79106CFEEFF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CE7B0ED-A1C8-448D-BFD3-79106CFEEFF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CE7B0ED-A1C8-448D-BFD3-79106CFEEFF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
