@@ -1,6 +1,9 @@
 ﻿using log4net;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,17 +17,20 @@ namespace PkmnAdvanceTranslation
         private static readonly ILog log = LogManager.GetLogger("Translator");
         private static readonly char[] hexChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f' };
         private static Boolean isDryrun = true;
+        private static Boolean forceRepointing = false;
 
 
         private static int PrintUsage()
         {
             Console.WriteLine("Usage:");
-            Console.WriteLine("{0} TranslationFile.txt RomToTranslate.gba TranslatedRom.gba Execute", Assembly.GetEntryAssembly().CodeBase);
+            Console.WriteLine("{0} TranslationFile.txt RomToTranslate.gba TranslatedRom.gba Execute Force", Assembly.GetEntryAssembly().CodeBase);
             Console.WriteLine();
             Console.WriteLine("The Translation file format is explained in TranslationFileFormat.txt");
             Console.WriteLine("The RomToTranslate is a GBA rom, this file will NOT be modified, only read.");
             Console.WriteLine("The TranslatedRom is the output GBA rom, this file may not exist yet.");
             Console.WriteLine("Execute is literally the word \"Execute\", if this is not specified a Dry-Run is performed and no output is actually generated.");
+            Console.WriteLine("Force is literally the word \"Force\" if this is specified ALL text that needs to be repointed is repointed.");
+            Console.WriteLine("Careful with this as unintended pointers could be modified. If possible please avoid this and only use manual overrides.");
             return 1;
         }
 
@@ -41,13 +47,13 @@ namespace PkmnAdvanceTranslation
             if (translationBaseLines == null)
                 return PrintUsage();
 
-            if (args.Length == 4 && args[3].Equals("Execute", StringComparison.InvariantCultureIgnoreCase))
+            var outputRom = new FileInfo(args[2]);
+            
+            if (args.Length > 3 && args[3].Equals("Execute", StringComparison.InvariantCultureIgnoreCase))
                 isDryrun = false;
 
-            //If we want to repoint as few lines as possible we must process lines bottom up.
-            //This way if a line needs to be repointed, but fits due to the line afterwards being repointed already
-            //the line can extend into the space previously occupied by the already repointed line.
-            translationBaseLines = translationBaseLines.OrderByDescending(t => t.Address).ToList();
+            if (args.Length > 4 && args[4].Equals("Force", StringComparison.InvariantCultureIgnoreCase))
+                forceRepointing = true;
 
             log.Info("Re - fetching text references and available length from rom file.");
             Console.WriteLine("Re-fetching text references and available length from rom file.");
@@ -56,7 +62,10 @@ namespace PkmnAdvanceTranslation
 
             log.Info("Searching lines that need repointing.");
             Console.WriteLine("Searching lines that need repointing.");
-
+            //If we want to repoint as few lines as possible we must process lines bottom up.
+            //This way if a line needs to be repointed, but fits due to the line afterwards being repointed already
+            //the line can extend into the space previously occupied by the already repointed line.
+            translatedLines = translatedLines.OrderByDescending(t => t.Address).ToList();
             //find lines that need repointing
             RepointLinesIfRequired(translatedLines);
 
@@ -70,7 +79,32 @@ namespace PkmnAdvanceTranslation
                 Console.WriteLine(translatedLine);
             }
 
+            ApplyTranslation(rom, translatedLines);
+
+            if(!isDryrun)
+            {
+                rom.WriteRomToFile(outputRom);
+            }
+
             return 0;
+        }
+
+        private static void ApplyTranslation(RomDataWrapper rom, List<PointerText> translatedLines)
+        {
+            var repointLocation = Int32.Parse(ConfigurationManager.AppSettings["EmptySpacestart"], NumberStyles.HexNumber);
+
+            foreach(var translatedLine in translatedLines.Where(l => l.MustRepointReference))
+            {
+                rom.ClearByteRange(translatedLine.Address, translatedLine.AvailableLength);
+                rom.WriteBytes(repointLocation, translatedLine.TextBytes.ToArray());
+                rom.ModifyTextReferences(repointLocation, translatedLine.References);
+                repointLocation += translatedLine.TextBytes.Count + 1;
+            }
+            foreach(var translatedLine in translatedLines.Where(l => !l.MustRepointReference))
+            {
+                rom.WriteBytes(translatedLine.Address, translatedLine.TextBytes.ToArray());
+                rom.ClearByteRange(translatedLine.Address + translatedLine.TextBytes.Count, translatedLine.AvailableLength - translatedLine.TextBytes.Count);
+            }
         }
 
         private static List<PointerText> LoadTranslationBaseLines(String translationFileName)
@@ -100,22 +134,45 @@ namespace PkmnAdvanceTranslation
 
         private static List<PointerText> MergeTranslatedLinesWithOriginals(RomDataWrapper rom, TextHandler textHandler, List<PointerText> translationBaseLines)
         {
+            var sw = new Stopwatch();
+            sw.Start();
             var translatedLines = new List<PointerText>();
-            var index = 0;
-            foreach (var baseLine in translationBaseLines)
+            var lockObject = new Object();
+            var numThreads = Environment.ProcessorCount;
+            var numPerThread = translationBaseLines.Count / numThreads;
+            var tasks = new List<Task>();
+            for(int i = 0; i < numThreads - 1; i++)
             {
-                if (index++ % 100 == 0)
-                {
-                    Console.Write("\rProgress: {0:##0}%   ", ((Decimal)index / translationBaseLines.Count) * 100);
-                }
+                var baseLinesToHandle = translationBaseLines.Skip(i * numPerThread).Take(numPerThread);
+                tasks.Add(Task.Run(() => MergeTranslatedLinesWithOriginalTask(rom, textHandler, baseLinesToHandle, translatedLines, lockObject, translationBaseLines.Count)));
+            }
+            var finalBaseLinesToHandle = translationBaseLines.Skip((numThreads - 1) * numPerThread);
+            tasks.Add(Task.Run(() => MergeTranslatedLinesWithOriginalTask(rom, textHandler, finalBaseLinesToHandle, translatedLines, lockObject, translationBaseLines.Count)));
+
+            Task.WaitAll(tasks.ToArray());
+
+            sw.Stop();
+            return translatedLines;
+        }
+
+        private static void MergeTranslatedLinesWithOriginalTask(RomDataWrapper rom, TextHandler textHandler, 
+            IEnumerable<PointerText> translatedBaseLines, List<PointerText> translatedLines, Object lockObject, Int32 totalCount)
+        {
+            foreach (var baseLine in translatedBaseLines)
+            {
                 var originalLine = rom.GetTextAtPointer(baseLine.Address);
                 originalLine.Text = baseLine.Text;
                 originalLine.ForceRepointReference = baseLine.ForceRepointReference;
                 textHandler.Translate(originalLine);
-                translatedLines.Add(originalLine);
+                lock(lockObject)
+                {
+                    translatedLines.Add(originalLine);
+                    if (translatedLines.Count % 100 == 0)
+                    {
+                        Console.Write("\rProgress: {0:##0}%   ", ((Decimal)translatedLines.Count / totalCount) * 100);
+                    }
+                }
             }
-
-            return translatedLines;
         }
 
         private static void RepointLinesIfRequired(List<PointerText> translatedLines)
@@ -144,8 +201,9 @@ namespace PkmnAdvanceTranslation
                 }
                 else
                 {
-                    if (translatedLine.ForceRepointReference)
+                    if (translatedLine.ForceRepointReference || forceRepointing)
                     {
+                        translatedLine.ForceRepointReference = true; //in case the global forcerepoint was set, this way we can identify the lines that were forced to repoint later on.
                         var currentPointerValue = String.Format("{0:X6}", translatedLine.Address);
                         currentPointerValue = currentPointerValue.Substring(4) + currentPointerValue.Substring(2, 2) + currentPointerValue.Substring(0, 2) + "08";
 

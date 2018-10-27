@@ -33,6 +33,17 @@ namespace PkmnAdvanceTranslation
             }
         }
 
+        public void WriteRomToFile(FileInfo file)
+        {
+            if (file.Exists)
+                throw new Exception(String.Format("Rom file {0} already not exist.", file.FullName));
+            using (var reader = new MemoryStream(RomContents))
+            using (var writer = file.OpenWrite())
+            {
+                reader.CopyTo(writer);
+            }
+        }
+
         public PointerText GetTextAtPointer(Int32 textPointer)
         {
             var result = new PointerText();
@@ -61,6 +72,24 @@ namespace PkmnAdvanceTranslation
             return result;
         }
 
+        public void WriteBytes(Int32 index, Byte[] bytesToWrite)
+        {
+            for (int i = 0; i < bytesToWrite.Length; i++)
+            {
+                RomContents[i+index] = bytesToWrite[i];
+            }
+        }
+
+        public void ModifyTextReferences(Int32 newTextPointer, List<Int32> references)
+        {
+            var newTextPointerValue = stringPointerInt + newTextPointer;
+            var newTextPointerValueBytes = BitConverter.GetBytes(newTextPointerValue);
+            foreach(var reference in references)
+            {
+                WriteBytes(reference, newTextPointerValueBytes);
+            }
+        }
+
         public Int32 GetAvailableTextLength(Int32 textPointer)
         {
             var byteLength = 0;
@@ -84,6 +113,14 @@ namespace PkmnAdvanceTranslation
             var textPointerBytes = BitConverter.GetBytes(textPointerValue);
             var result = ByteBinarySearcher.FindMatches(textPointerBytes, RomContents);
             return result;
+        }
+
+        public void ClearByteRange(Int32 start, Int32 length)
+        {
+            for(int i = start; i < start + length; i++)
+            {
+                RomContents[i] = end;
+            }
         }
     }
 }

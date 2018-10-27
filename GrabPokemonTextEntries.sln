@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetTextEntries", "GetTextEntries\GetTextEntries.csproj", "{5E36A284-D00D-4DB9-B8D3-4BD78897A229}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetMissingTextEntries", "GetTextEntries\GetMissingTextEntries.csproj", "{5E36A284-D00D-4DB9-B8D3-4BD78897A229}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractTextPointersFromAdvanceTextIni", "ExtractTextPointersFromAdvanceTextIni\ExtractTextPointersFromAdvanceTextIni.csproj", "{47FE0A74-57BE-4246-A8B6-56670291EAD9}"
 EndProject
