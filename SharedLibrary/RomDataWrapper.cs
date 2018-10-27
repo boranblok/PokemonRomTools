@@ -115,6 +115,13 @@ namespace PkmnAdvanceTranslation
             return result;
         }
 
+        public Boolean IsTextReference(Int32 textPointer)
+        {
+            var textPointerValue = stringPointerInt + textPointer;
+            var textPointerBytes = BitConverter.GetBytes(textPointerValue);
+            return ByteBinarySearcher.HasMatch(textPointerBytes, RomContents);
+        }
+
         public void ClearByteRange(Int32 start, Int32 length)
         {
             for(int i = start; i < start + length; i++)

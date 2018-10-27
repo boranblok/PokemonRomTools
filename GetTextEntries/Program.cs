@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -13,11 +14,9 @@ namespace PkmnAdvanceTranslation
     class Program
     {
         private static readonly byte end = 0xFF;
-        private static readonly byte StringPointer = 0x08;
-        private static readonly int stringPointerInt = 0x08000000;
         private static readonly int backSearch = 300;
-        private static readonly int minStringLength = 1;        
-        private static Dictionary<byte, String> translationTable;
+        private static readonly int minStringLength = 1;
+        private static readonly char[] hexChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f' };
         private static byte printableCharStart = 0xA1;
         private static byte printableCharEnd = 0xEE;
         private static int successiveNPCCutoff = 3;
@@ -25,85 +24,182 @@ namespace PkmnAdvanceTranslation
         private static byte fc = 0xFC;
         private static byte fd = 0xFD;
         private static int startPosition = 0x172255;
+        //TODO: will we skip this empty block?
+        private static int skipBlockStart = 0x71A232;
+        private static int skipBlockEnd = 0xCFFFFF;
 
+        private static List<Int32> existingtranslationLines;
+        private static readonly Object newTranslationLinesLockObject = new object();
+        private static List<Int32> newTranslationLines = new List<Int32>();        
 
-        private static readonly Object foundPointersLockObject = new Object();
-        private static Dictionary<Int32, List<Int32>> foundPointers = new Dictionary<Int32, List<Int32>>();
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern EXECUTION_STATE SetThreadExecutionState(EXECUTION_STATE esFlags);
+
+        [FlagsAttribute]
+        public enum EXECUTION_STATE : uint
+        {
+            ES_AWAYMODE_REQUIRED = 0x00000040,
+            ES_CONTINUOUS = 0x80000000,
+            ES_DISPLAY_REQUIRED = 0x00000002,
+            ES_SYSTEM_REQUIRED = 0x00000001
+        }
 
         static void Main(string[] args)
         {
-            if (args.Length < 2)
-                throw new ArgumentException("Pass a rom file and translation table to parse.");
-            var romFile = new FileInfo(args[0]);
-            if (!romFile.Exists)
-                throw new Exception(String.Format("Rom file {0} does not exist.", args[0]));
+            if (args.Length < 3)
+                throw new ArgumentException("Pass a rom file, an existing translation file and an output file.");
+            var rom = new RomDataWrapper(new FileInfo(args[0]));
 
-            var tableFile = new FileInfo(args[1]);
-            if (!tableFile.Exists)
-                throw new Exception(String.Format("Table file {0} does not exist.", args[1]));
+            var textHandler = new TextHandler(new FileInfo("table file.tbl"));
 
-            Loadtable(tableFile);
+            existingtranslationLines = LoadTranslationBaseLines(args[1]);
+            if (existingtranslationLines == null)
+                existingtranslationLines = new List<Int32>();
 
-            var romContents = new byte[romFile.Length];
-            using (var writer = new MemoryStream(romContents))
-            using (var reader = romFile.OpenRead())
-            {
-                reader.CopyTo(writer);
-            }
+            var outputFile = new FileInfo(args[2]);
+            if (outputFile.Exists)
+                throw new Exception(String.Format("The output file {0} already exists.", args[2]));
 
             var sw = new Stopwatch();
             sw.Start();
 
-            var searchSpace = (romContents.Length - startPosition) / 4;
+            var numThreads = Environment.ProcessorCount;
+            var numPerThread = (rom.RomContents.Length - startPosition) / numThreads;
+            var tasks = new List<Task>();
+            for (int i = 0; i < numThreads - 1; i++)
+            {
+                var name = "FT" + (i + 1);
+                var from = startPosition + numPerThread * i;
+                var to = startPosition + numPerThread * (i + 1);
+                tasks.Add(Task.Run(() => FindStringPointers(name, rom, from, to)));
+            }
+            tasks.Add(Task.Run(() => FindStringPointers("FT" + numThreads, rom, startPosition + numPerThread * (numThreads - 1), rom.RomContents.Length)));
+            Task.WaitAll(tasks.ToArray());
 
-            var t1 = Task.Run(() => FindStrings(romContents, startPosition, searchSpace));
-            var t2 = Task.Run(() => FindStrings(romContents, startPosition + searchSpace, searchSpace * 2));
-            var t3 = Task.Run(() => FindStrings(romContents, startPosition + searchSpace * 2, searchSpace * 3));
-            var t4 = Task.Run(() => FindStrings(romContents, startPosition + searchSpace * 3, romContents.Length));
-            Task.WaitAll(t1, t2, t3, t4);
-            
             sw.Stop();
 
-            Console.WriteLine("Processing {0} bytes took {1}", romContents.Length, sw.Elapsed);
+            Console.WriteLine("Finding text in {0} bytes took {1}", rom.RomContents.Length, sw.Elapsed);
 
-            sw.Reset();
-            sw.Start();
-            var outputFile = new FileInfo("FoundStrings.txt");
+            var translatedLines = LoadNewTranslationLines(rom, textHandler);
+
+            Console.Write("\rReading progress: 100%   ");
+            Console.WriteLine();
+
+            Console.WriteLine("Writing missed text entries to file.");
+
+
             using (var writer = new StreamWriter(outputFile.OpenWrite(), Encoding.GetEncoding(1252)))
             {
-                foreach (var pointer in foundPointers)
+                foreach (var line in translatedLines.OrderBy(l => l.Address))
                 {
-                    var stringValue = GetTextAtPointer(romContents, pointer.Key);
-                    writer.WriteLine("{0:X6},{1:##}: {2}", pointer.Key, pointer.Value.Count, stringValue);
+                    writer.WriteLine(line);
                 }
             }
-            sw.Stop();
 
-            Console.WriteLine("Writing {0} lines took {1}", foundPointers.Count, sw.Elapsed);
-
+            Console.WriteLine("Done, press any key to continue...");
             Console.ReadLine();
         }
 
-        private static void FindStrings(byte[] romContents, int from, int to)
+        private static List<PointerText> LoadNewTranslationLines(RomDataWrapper rom, TextHandler textHandler)
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+            var translatedLines = new List<PointerText>();
+            var lockObject = new Object();
+            var numThreads = Environment.ProcessorCount;
+            var numPerThread = newTranslationLines.Count / numThreads;
+            var tasks = new List<Task>();
+            for (int i = 0; i < numThreads - 1; i++)
+            {
+                var linesToHandle = newTranslationLines.Skip(i * numPerThread).Take(numPerThread);
+                tasks.Add(Task.Run(() => LoadNewTranslationLinesTask(rom, textHandler, linesToHandle, translatedLines, lockObject, newTranslationLines.Count)));
+            }
+            var finalLinesToHandle = newTranslationLines.Skip((numThreads - 1) * numPerThread);
+            tasks.Add(Task.Run(() => LoadNewTranslationLinesTask(rom, textHandler, finalLinesToHandle, translatedLines, lockObject, newTranslationLines.Count)));
+
+            Task.WaitAll(tasks.ToArray());
+
+            sw.Stop();
+            return translatedLines;
+        }
+
+        private static void LoadNewTranslationLinesTask(RomDataWrapper rom, TextHandler textHandler,
+           IEnumerable<Int32> linesToGet, List<PointerText> linestotranslate, Object lockObject, Int32 totalCount)
+        {
+            foreach (var line in linesToGet)
+            {
+                var lineTotranslate = rom.GetTextAtPointer(line);
+                textHandler.Translate(lineTotranslate);
+                lock (lockObject)
+                {
+                    linestotranslate.Add(lineTotranslate);
+                    if (linestotranslate.Count % 100 == 0)
+                    {
+                        Console.Write("\rReading progress: {0:##0}%   ", ((Decimal)linestotranslate.Count / totalCount) * 100);
+                    }
+                }
+            }
+        }
+
+        private static List<Int32> LoadTranslationBaseLines(String translationFileName)
+        {
+            var translationBaseLines = new List<Int32>();
+            var translationSourceFile = new FileInfo(translationFileName);
+            if (!translationSourceFile.Exists)
+            {
+                Console.WriteLine("Translation source file {0} does not exist", translationFileName);
+                return null;
+            }
+            using (var sourceReader = new StreamReader(translationSourceFile.OpenRead(), Encoding.GetEncoding(1252)))
+            {
+                var sourceLine = sourceReader.ReadLine();
+                while (sourceLine != null)
+                {
+                    if (sourceLine.Length > 5 && hexChars.Contains(sourceLine[0]))
+                    {
+                        translationBaseLines.Add(PointerText.FromString(sourceLine).Address);
+                    }
+                    sourceLine = sourceReader.ReadLine();
+                }
+            }
+            return translationBaseLines;
+        }
+
+        private static void FindStringPointers(String threadName, RomDataWrapper rom, int from, int to)
         {
             int prevEnd = from;
             for (int i = from; i < to ; i++)
             {
-                if (i % 100 == 0) Console.WriteLine("Processing byte {0}, {1}% done", i, ((i - from) / (to -from))*100);
+                if (i % 10000 == 0)
+                {
+                    SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS); //Prevent system sleep.
+                    Console.WriteLine("Finding thread {0} {1:#0}% done", threadName, ((Decimal)(i - from) / (to - from)) * 100);
+                }
 
-                var readByte = romContents[i];
+                var readByte = rom.RomContents[i];
                 if (readByte == end)
                 {
                     if (prevEnd != from && i - prevEnd > minStringLength)
                     {
-                        if (!FindTextPointers(romContents, prevEnd + 1))
+                        var possibleTxt = prevEnd + 1;
+                        if (existingtranslationLines.Contains(possibleTxt))
+                            continue;                            
+
+                        if(rom.IsTextReference(possibleTxt))
+                        { 
+                            lock (newTranslationLinesLockObject)
+                            {
+                                newTranslationLines.Add(possibleTxt);
+                            }
+                        }
+                        else
                         {
                             var backSearchLimit = (i - prevEnd < backSearch) ? i - prevEnd : backSearch;
                             var successiveNPC = 0;
                             var totalNPC = 0;
                             for (int j = i - 1; j > (i - backSearchLimit + 1); j--)
                             {
-                                byte value = romContents[j];
+                                byte value = rom.RomContents[j];
                                 if (value != fc && value != fd && (value < printableCharStart || value > printableCharEnd))
                                 {
                                     successiveNPC++;
@@ -125,85 +221,20 @@ namespace PkmnAdvanceTranslation
                                             break;
                                     }
                                 }
-                                if (FindTextPointers(romContents, j))
+                                if (rom.IsTextReference(j))
+                                {
+                                    lock (newTranslationLinesLockObject)
+                                    {
+                                        newTranslationLines.Add(j);
+                                    }
                                     break; //we stop after first found pointer.
+                                }
                             }
                         }
                     }
                     prevEnd = i;
                 }
             }
-        }
-
-        private static void Loadtable(FileInfo tableFile)
-        {
-            translationTable = new Dictionary<byte, string>();
-            String table = File.ReadAllText(tableFile.FullName, Encoding.GetEncoding(1252));
-            var lines = table.Split( new char[] { '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries );
-            foreach(var line in lines)
-            {
-                Int32 indexOfEquals = line.IndexOf('=');
-                if(indexOfEquals == 2)
-                {
-                    if (Byte.TryParse(line.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte byteValue))
-                    {
-                        var value = line.Substring(3);
-                        translationTable.Add(byteValue, value);                        
-                    }
-                }
-            }
-        }
-
-        private static String GetTextAtPointer(byte[] romContents, int stringStart)
-        {
-            var builder = new StringBuilder();
-            bool endFound = false;
-            int overFlowProtection = 1000;
-            int index = stringStart;
-            while(!endFound && overFlowProtection-- > 0 && index < romContents.Length)
-            {
-                var value = romContents[index];
-                if(value == end)
-                {
-                    endFound = true;
-                }
-                else
-                {
-                    if(translationTable.ContainsKey(value))
-                    {
-                        builder.Append(translationTable[value]);
-                    }
-                    else
-                    {
-                        builder.AppendFormat("{0:X2}", value);
-                    }
-                }
-                index++;
-            }
-            return builder.ToString();
-        }
-
-        private static Boolean FindTextPointers(byte[] romContents, int possibleStringStart)
-        {
-            var sw = new Stopwatch();
-            sw.Start();
-            var textPointerValue = stringPointerInt + possibleStringStart;
-            var textPointerBytes = BitConverter.GetBytes(textPointerValue);
-            //var searcher = new BoyerMooreBinarySearch(textPointerBytes);
-            //var result = searcher.GetMatchIndexes(romContents);
-            var result = ByteBinarySearcher.FindMatches(textPointerBytes, romContents);
-            sw.Stop();
-            
-            if (result.Count > 0)
-            {
-                lock (foundPointersLockObject)
-                {
-                    foundPointers.Add(possibleStringStart, new List<int>(result.Select(l => (Int32)l)));
-                }
-                return true;
-            }
-
-            return false;
         }
     }
 }

@@ -17,5 +17,17 @@ namespace PkmnAdvanceTranslation
             }
             return matches;
         }
+
+        public static Boolean HasMatch(byte[] needle, byte[] haystack)
+        {
+            for (int i = 0; i + 3 < haystack.Length; i++)
+            {
+                if (haystack[i] == needle[0] && haystack[i + 1] == needle[1] && haystack[i + 2] == needle[2] && haystack[i + 3] == needle[3])
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
