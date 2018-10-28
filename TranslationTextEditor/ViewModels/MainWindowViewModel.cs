@@ -17,6 +17,7 @@ namespace PkmnAdvanceTranslation
         private IOService _ioService;
         private ObservableCollection<TranslationItemViewModel> _translationLines;
         private ICollectionView _translationLinesView;
+        private FileInfo translationFile;
         protected TextHandler _textHandler;
 
         public MainWindowViewModel(IOService ioService, TextHandler textHandler)
@@ -83,7 +84,8 @@ namespace PkmnAdvanceTranslation
             var fileName = _ioService.OpenFileDialog(null, "Open a translation file to modify.");
             if(fileName != null && File.Exists(fileName))
             {
-                LoadtranslationFile(new FileInfo(fileName));
+                translationFile = new FileInfo(fileName);
+                LoadtranslationFile(translationFile);
             }
         }
 
@@ -100,6 +102,49 @@ namespace PkmnAdvanceTranslation
                         TranslationLines.Add(new TranslationItemViewModel(sourceLine, _textHandler));
                     }
                     sourceLine = sourceReader.ReadLine();
+                }
+            }
+        }
+
+        public RelayCommand SaveTranslationFileCommand
+        {
+            get
+            {
+                return new RelayCommand(param => SavetranslationFile(), param => CanSaveTranslationFile() );
+            }
+        }
+
+        public RelayCommand SaveTranslationFileAsCommand
+        {
+            get
+            {
+                return new RelayCommand(param => SavetranslationFileAs(), param => CanSaveTranslationFile() );
+            }
+        }
+
+        private void SavetranslationFileAs()
+        {
+            var proposedName = String.Format("Translation_{0:yyyy-MM-dd_HH:mm}.txt", DateTime.Now);
+            var newFileName = _ioService.SaveFileDialog(null, proposedName, "Select where to save the translation file.", "*.txt");
+        }
+
+        private void SavetranslationFile()
+        {
+            WriteTranslationFile(translationFile);
+        }
+
+        private bool CanSaveTranslationFile()
+        {
+            return translationFile != null;
+        }
+
+        private void WriteTranslationFile(FileInfo outputFile)
+        {
+            using (var writer = new StreamWriter(outputFile.Open(FileMode.Create), Encoding.GetEncoding(1252)))
+            {
+                foreach (var line in TranslationLines.OrderBy(l => l.Address))
+                {
+                    writer.WriteLine(line.PointerText);
                 }
             }
         }

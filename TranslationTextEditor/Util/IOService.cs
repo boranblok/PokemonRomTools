@@ -10,5 +10,7 @@ namespace PkmnAdvanceTranslation.Util
     public interface IOService
     {
         String OpenFileDialog(String defaultPath, String title);
+
+        String SaveFileDialog(String defaultPath, String defaultName, String title, String defaultEx);
     }
 }

@@ -12,5 +12,10 @@ namespace PkmnAdvanceTranslation.Util.Mocks
         {
             return defaultPath;
         }
+
+        public String SaveFileDialog(String defaultPath, String defaultName, String title, String defaultEx)
+        {
+            return defaultPath;
+        }
     }
 }

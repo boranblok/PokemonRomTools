@@ -9,13 +9,14 @@
         d:DataContext="{d:DesignInstance dvm:MainWindowViewModelDesign, IsDesignTimeCreatable=True}"
         Title="Pokémon Translation editor" Height="450" Width="800">
     <DockPanel>
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Header="_File">
-                    <MenuItem Header="_Open" Command="{Binding OpenTranslationFileCommand}"/>
-                    <MenuItem Header="_Save"/>
-                    <MenuItem Header="_Close"/>
-                </MenuItem>
-            </Menu>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Command="{Binding OpenTranslationFileCommand}"/>
+                <MenuItem Header="_Save" Command="{Binding SaveTranslationFileCommand}"/>
+                <MenuItem Header="Save _As" Command="{Binding SaveTranslationFileAsCommand}"/>
+                <MenuItem Header="_Close" Click="CloseMenuItem_Click"/>
+            </MenuItem>
+        </Menu>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -24,11 +25,19 @@
             </Grid.RowDefinitions>
             <DataGrid 
                 Grid.Row="1" 
-                ItemsSource="{Binding Path=TranslationLinesView}"
+                ItemsSource="{Binding TranslationLinesView}"
                 IsSynchronizedWithCurrentItem="True" 
                 SelectedItem="{Binding CurrentTranslationItem}" 
-                CanUserDeleteRows="False" 
-                CanUserAddRows="False" >
+                CanUserDeleteRows="True"                 
+                CanUserAddRows="False"
+                AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Addr." Binding="{Binding Address}"/>
+                    <DataGridTextColumn Header="Ref#" Binding="{Binding ReferenceCount}" ElementStyle="{StaticResource AlignRight}"/>
+                    <DataGridTextColumn Header="Avail." Binding="{Binding AvailableLength}" ElementStyle="{StaticResource AlignRight}"/>
+                    <DataGridTextColumn Header="Remain." Binding="{Binding RemainingLength}" ElementStyle="{StaticResource AlignRight}"/>
+                    <DataGridTextColumn Header="Single line text representation" Binding="{Binding Text}"/>
+                </DataGrid.Columns>
             </DataGrid>
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -36,7 +45,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="1" Text="{Binding Path=CurrentTranslationItem.Text}"/>
+                <TextBox Grid.Column="1" Text="{Binding CurrentTranslationItem.Text}"/>
             </Grid>
         </Grid>
     </DockPanel>

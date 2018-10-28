@@ -34,21 +34,41 @@ namespace PkmnAdvanceTranslation
 
         public String OpenFileDialog(String defaultPath, String title)
         {
-            var dialog = new OpenFileDialog();
+            var dialog = new OpenFileDialog();            
             if (!String.IsNullOrWhiteSpace(defaultPath) && Directory.Exists(defaultPath))
-            {
                 dialog.InitialDirectory = defaultPath;
-            }
-            if (!string.IsNullOrWhiteSpace(title))
-            {
+            if (!String.IsNullOrWhiteSpace(title))
                 dialog.Title = title;
-            }
             var result = dialog.ShowDialog(this);
             if(result == true && File.Exists(dialog.FileName))
             {
                 return dialog.FileName;
             }
             return null;
+        }
+
+        public String SaveFileDialog(String defaultPath, String defaultName, String title, String defaultEx)
+        {
+            var dialog = new SaveFileDialog();
+            if (!String.IsNullOrWhiteSpace(defaultPath) && Directory.Exists(defaultPath))
+                dialog.InitialDirectory = defaultPath;
+            if (!String.IsNullOrWhiteSpace(defaultName))
+                dialog.FileName = defaultName;
+            if (!String.IsNullOrWhiteSpace(title))
+                dialog.Title = title;
+            if (!String.IsNullOrWhiteSpace(defaultEx))
+                dialog.DefaultExt = defaultEx;
+            var result = dialog.ShowDialog();
+            if(result == true)
+            {
+                return dialog.FileName;
+            }
+            return null;
+        }
+
+        private void CloseMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

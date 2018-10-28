@@ -9,20 +9,21 @@ namespace PkmnAdvanceTranslation
 {
     public class TranslationItemViewModel : ViewModelBase
     {
-        private PointerText _pointerText;
+        public PointerText PointerText { get; private set; }
         private TextHandler _textHandler;
+
         public TranslationItemViewModel(String translationFileLine, TextHandler textHandler)
         {
             _textHandler = textHandler;
-            _pointerText = PointerText.FromString(translationFileLine);
-            _textHandler.Translate(_pointerText);
+            PointerText = PointerText.FromString(translationFileLine);
+            _textHandler.Translate(PointerText);
         }
 
         public String Address
         {
             get
             {
-                return _pointerText.Address.ToString("X6");
+                return PointerText.Address.ToString("X6");
             }
         }
 
@@ -30,7 +31,7 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return _pointerText.ReferenceCount;
+                return PointerText.ReferenceCount;
             }
         }
 
@@ -38,7 +39,7 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return _pointerText.AvailableLength;
+                return PointerText.AvailableLength;
             }
         }
 
@@ -46,7 +47,7 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return _pointerText.AvailableLength - _pointerText.TextBytes.Count;
+                return PointerText.AvailableLength - PointerText.TextBytes.Count;
             }
         }
 
@@ -54,13 +55,13 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return _pointerText.Text;
+                return PointerText.Text;
             }
             set
             {
-                _pointerText.Text = value;
+                PointerText.Text = value;
                 OnPropertyChanged("RemainingLength");
             }
-        }
+        }        
     }
 }
