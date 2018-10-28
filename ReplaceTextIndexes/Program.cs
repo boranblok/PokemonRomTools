@@ -36,7 +36,7 @@ namespace ReplaceTextIndexes
                     var targetLine = targetReader.ReadLine();
                     if (sourceLine != null && targetLine != null && sourceLine.Length > 5 && targetLine.Length > 5)
                     {
-                        writer.WriteLine(sourceLine.Substring(0, 6) + targetLine.Substring(6));
+                        writer.WriteLine(sourceLine.Substring(0, 14) + targetLine.Substring(14));
                     }
                     else
                     {

@@ -13,6 +13,11 @@ namespace PkmnAdvanceTranslation
         private static Dictionary<Byte, String> translationTable;
         private static Dictionary<String, Byte> reverseTranslationTable;
 
+        public TextHandler() : this(new FileInfo("table file.tbl"))
+        {
+
+        }
+
         public TextHandler(FileInfo tableFile)
         {
             Loadtable(tableFile);
@@ -43,7 +48,7 @@ namespace PkmnAdvanceTranslation
 
         public void Translate(PointerText text)
         {
-            if(!text.IsTranslated)
+            if(!text.IsBinaryTranslated)
             {
                 if (text.Text == null)
                     TranslateBinaryToString(text);

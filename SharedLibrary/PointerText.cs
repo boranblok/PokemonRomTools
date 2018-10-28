@@ -10,6 +10,7 @@ namespace PkmnAdvanceTranslation
 {
     public class PointerText
     {
+        public static readonly Char[] HexChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f' };
         private string _text;
         private ReadOnlyCollection<byte> _textBytes;
         private List<int> _references;
@@ -51,7 +52,7 @@ namespace PkmnAdvanceTranslation
             }
         }
 
-        public Boolean IsTranslated
+        public Boolean IsBinaryTranslated
         {
             get
             {

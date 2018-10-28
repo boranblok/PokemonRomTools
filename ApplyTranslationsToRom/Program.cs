@@ -14,8 +14,7 @@ namespace PkmnAdvanceTranslation
 {
     class Program
     {
-        private static readonly ILog log = LogManager.GetLogger("Translator");
-        private static readonly char[] hexChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f' };
+        private static readonly ILog log = LogManager.GetLogger("Translator");        
         private static Boolean isDryrun = true;
         private static Boolean forceRepointing = false;
 
@@ -122,7 +121,7 @@ namespace PkmnAdvanceTranslation
                 var sourceLine = sourceReader.ReadLine();
                 while (sourceLine != null)
                 {
-                    if (sourceLine.Length > 5 && hexChars.Contains(sourceLine[0]))
+                    if (sourceLine.Length > 5 && PointerText.HexChars.Contains(sourceLine[0]))
                     {
                         translationBaseLines.Add(PointerText.FromString(sourceLine));
                     }

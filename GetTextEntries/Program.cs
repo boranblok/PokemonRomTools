@@ -15,8 +15,7 @@ namespace PkmnAdvanceTranslation
     {
         private static readonly byte end = 0xFF;
         private static readonly int backSearch = 300;
-        private static readonly int minStringLength = 1;
-        private static readonly char[] hexChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f' };
+        private static readonly int minStringLength = 1;        
         private static byte printableCharStart = 0xA1;
         private static byte printableCharEnd = 0xEE;
         private static int successiveNPCCutoff = 3;
@@ -155,7 +154,7 @@ namespace PkmnAdvanceTranslation
                 var sourceLine = sourceReader.ReadLine();
                 while (sourceLine != null)
                 {
-                    if (sourceLine.Length > 5 && hexChars.Contains(sourceLine[0]))
+                    if (sourceLine.Length > 5 && PointerText.HexChars.Contains(sourceLine[0]))
                     {
                         translationBaseLines.Add(PointerText.FromString(sourceLine).Address);
                     }
