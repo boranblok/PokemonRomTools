@@ -49,8 +49,6 @@ namespace PkmnAdvanceTranslation
                 throw new ArgumentException("Pass a rom file, an existing translation file and an output file.");
             var rom = new RomDataWrapper(new FileInfo(args[0]));
 
-            var textHandler = new TextHandler(new FileInfo("table file.tbl"));
-
             existingtranslationLines = LoadTranslationBaseLines(args[1]);
             if (existingtranslationLines == null)
                 existingtranslationLines = new List<Int32>();
@@ -79,7 +77,7 @@ namespace PkmnAdvanceTranslation
 
             Console.WriteLine("Finding text in {0} bytes took {1}", rom.RomContents.Length, sw.Elapsed);
 
-            var translatedLines = LoadNewTranslationLines(rom, textHandler);
+            var translatedLines = LoadNewTranslationLines(rom);
 
             Console.Write("\rReading progress: 100%   ");
             Console.WriteLine();
@@ -99,7 +97,7 @@ namespace PkmnAdvanceTranslation
             Console.ReadLine();
         }
 
-        private static List<PointerText> LoadNewTranslationLines(RomDataWrapper rom, TextHandler textHandler)
+        private static List<PointerText> LoadNewTranslationLines(RomDataWrapper rom)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -111,10 +109,10 @@ namespace PkmnAdvanceTranslation
             for (int i = 0; i < numThreads - 1; i++)
             {
                 var linesToHandle = newTranslationLines.Skip(i * numPerThread).Take(numPerThread);
-                tasks.Add(Task.Run(() => LoadNewTranslationLinesTask(rom, textHandler, linesToHandle, translatedLines, lockObject, newTranslationLines.Count)));
+                tasks.Add(Task.Run(() => LoadNewTranslationLinesTask(rom, linesToHandle, translatedLines, lockObject, newTranslationLines.Count)));
             }
             var finalLinesToHandle = newTranslationLines.Skip((numThreads - 1) * numPerThread);
-            tasks.Add(Task.Run(() => LoadNewTranslationLinesTask(rom, textHandler, finalLinesToHandle, translatedLines, lockObject, newTranslationLines.Count)));
+            tasks.Add(Task.Run(() => LoadNewTranslationLinesTask(rom, finalLinesToHandle, translatedLines, lockObject, newTranslationLines.Count)));
 
             Task.WaitAll(tasks.ToArray());
 
@@ -122,13 +120,13 @@ namespace PkmnAdvanceTranslation
             return translatedLines;
         }
 
-        private static void LoadNewTranslationLinesTask(RomDataWrapper rom, TextHandler textHandler,
+        private static void LoadNewTranslationLinesTask(RomDataWrapper rom,
            IEnumerable<Int32> linesToGet, List<PointerText> linestotranslate, Object lockObject, Int32 totalCount)
         {
             foreach (var line in linesToGet)
             {
                 var lineTotranslate = rom.GetTextAtPointer(line);
-                textHandler.Translate(lineTotranslate);
+                TextHandler.TranslateBinaryToString(lineTotranslate);
                 lock (lockObject)
                 {
                     linestotranslate.Add(lineTotranslate);

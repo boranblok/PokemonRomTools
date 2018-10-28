@@ -40,7 +40,6 @@ namespace PkmnAdvanceTranslation
                 return PrintUsage();
 
             var rom = new RomDataWrapper(new FileInfo(args[0]));
-            var textHandler = new TextHandler(new FileInfo("table file.tbl"));
 
             var translationBaseLines = LoadTranslationBaseLines(args[1]);
             if (translationBaseLines == null)
@@ -56,7 +55,7 @@ namespace PkmnAdvanceTranslation
 
             log.Info("Re - fetching text references and available length from rom file.");
             Console.WriteLine("Re-fetching text references and available length from rom file.");
-            List<PointerText> translatedLines = MergeTranslatedLinesWithOriginals(rom, textHandler, translationBaseLines);
+            List<PointerText> translatedLines = MergeTranslatedLinesWithOriginals(rom, translationBaseLines);
             Console.WriteLine();
 
             log.Info("Searching lines that need repointing.");
@@ -131,7 +130,7 @@ namespace PkmnAdvanceTranslation
             return translationBaseLines;
         }
 
-        private static List<PointerText> MergeTranslatedLinesWithOriginals(RomDataWrapper rom, TextHandler textHandler, List<PointerText> translationBaseLines)
+        private static List<PointerText> MergeTranslatedLinesWithOriginals(RomDataWrapper rom, List<PointerText> translationBaseLines)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -143,10 +142,10 @@ namespace PkmnAdvanceTranslation
             for(int i = 0; i < numThreads - 1; i++)
             {
                 var baseLinesToHandle = translationBaseLines.Skip(i * numPerThread).Take(numPerThread);
-                tasks.Add(Task.Run(() => MergeTranslatedLinesWithOriginalTask(rom, textHandler, baseLinesToHandle, translatedLines, lockObject, translationBaseLines.Count)));
+                tasks.Add(Task.Run(() => MergeTranslatedLinesWithOriginalTask(rom, baseLinesToHandle, translatedLines, lockObject, translationBaseLines.Count)));
             }
             var finalBaseLinesToHandle = translationBaseLines.Skip((numThreads - 1) * numPerThread);
-            tasks.Add(Task.Run(() => MergeTranslatedLinesWithOriginalTask(rom, textHandler, finalBaseLinesToHandle, translatedLines, lockObject, translationBaseLines.Count)));
+            tasks.Add(Task.Run(() => MergeTranslatedLinesWithOriginalTask(rom, finalBaseLinesToHandle, translatedLines, lockObject, translationBaseLines.Count)));
 
             Task.WaitAll(tasks.ToArray());
 
@@ -154,15 +153,15 @@ namespace PkmnAdvanceTranslation
             return translatedLines;
         }
 
-        private static void MergeTranslatedLinesWithOriginalTask(RomDataWrapper rom, TextHandler textHandler, 
+        private static void MergeTranslatedLinesWithOriginalTask(RomDataWrapper rom,
             IEnumerable<PointerText> translatedBaseLines, List<PointerText> translatedLines, Object lockObject, Int32 totalCount)
         {
             foreach (var baseLine in translatedBaseLines)
             {
                 var originalLine = rom.GetTextAtPointer(baseLine.Address);
-                originalLine.Text = baseLine.Text;
+                originalLine.SingleLineText = baseLine.SingleLineText;
                 originalLine.ForceRepointReference = baseLine.ForceRepointReference;
-                textHandler.Translate(originalLine);
+                TextHandler.TranslateStringToBinary(originalLine);
                 lock(lockObject)
                 {
                     translatedLines.Add(originalLine);

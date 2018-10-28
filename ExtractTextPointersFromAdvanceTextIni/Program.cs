@@ -26,8 +26,6 @@ namespace PkmnAdvanceTranslation
 
             var rom = new RomDataWrapper(new FileInfo(args[0]));
 
-            var textHandler = new TextHandler(new FileInfo("table file.tbl"));
-
             var bpre = new FileInfo(args[1]);
             String bpreContents;
             using (var reader = bpre.OpenText())
@@ -52,14 +50,14 @@ namespace PkmnAdvanceTranslation
                         var text = rom.GetTextAtPointer(intValue);
                         //if (text.AvailableLength > 0)
                         {
-                            textHandler.Translate(text);
+                            TextHandler.TranslateBinaryToString(text);
                             if (test)
                             {
                                 var bytes = new List<Byte>(text.TextBytes);
-                                var textValue = text.Text;
-                                text.Text = null;
-                                text.Text = textValue;
-                                textHandler.Translate(text);
+                                var textValue = text.SingleLineText;
+                                text.SingleLineText = null;
+                                text.SingleLineText = textValue;
+                                TextHandler.TranslateStringToBinary(text);
                                 var bytes2 = new List<Byte>(text.TextBytes);
                                 Debug.Assert(bytes.Count == bytes2.Count, "Roundtrip byte translation failed, arrays are different length.");
                                 for (int i = 0; i < bytes.Count; i++)

@@ -11,7 +11,7 @@ namespace PkmnAdvanceTranslation
     public class PointerText
     {
         public static readonly Char[] HexChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f' };
-        private string _text;
+        private string _singleLineText;
         private ReadOnlyCollection<byte> _textBytes;
         private List<int> _references;
 
@@ -19,27 +19,29 @@ namespace PkmnAdvanceTranslation
 
         public List<Int32> References { get => _references; set { _references = value; ReferenceCount = value.Count;  } }
         public Int32 ReferenceCount { get; set; }
-        public String Text
+        public String SingleLineText
         {
-            get => _text;
-            set { _text = value; _textBytes = null; }
+            get => _singleLineText;
+            set { _singleLineText = value; _textBytes = null; }
         }
         public ReadOnlyCollection<Byte> TextBytes
         {
             get => _textBytes;
-            set { _textBytes = value; _text = null; }
+            set { _textBytes = value; _singleLineText = null; }
         }
         public Boolean ForceRepointReference { get; set; }
         public Int32 AvailableLength { get; set; }
 
         public Boolean MustRepointReference { get; set; }
+        public Boolean IsTranslated { get; set; }
+        public TextMode TextMode { get; set; }
 
-        internal void SetTranslatedText(String translatedText)
+        internal void SetSingleLineText(String translatedText)
         {
-            _text = translatedText;
+            _singleLineText = translatedText;
         }
 
-        internal void SetTranslatedBytes(ReadOnlyCollection<Byte> translatedBytes)
+        internal void SetTextBytes(ReadOnlyCollection<Byte> translatedBytes)
         {
             _textBytes = translatedBytes;
         }
@@ -52,17 +54,10 @@ namespace PkmnAdvanceTranslation
             }
         }
 
-        public Boolean IsBinaryTranslated
-        {
-            get
-            {
-                return Text != null && TextBytes != null;
-            }
-        }
-
         public override String ToString()
         {
-            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}", Address, ReferenceCount, AvailableLength, ForceRepointReference ? 1 : 0, Text);
+            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}|{5}|{6}", 
+                Address, ReferenceCount, AvailableLength, ForceRepointReference ? 1 : 0, IsTranslated ? "Y" : "N", TextMode.ToString()[0], SingleLineText);
         }
 
         public static PointerText FromString(String pointerTextString)
@@ -70,8 +65,8 @@ namespace PkmnAdvanceTranslation
             var result = new PointerText();
 
             var parts = pointerTextString.Split('|');
-            if (parts.Length != 5)
-                throw new Exception(String.Format("A PointerText value has 5 segments separated by a | char. {0} is not valid", pointerTextString));
+            if (parts.Length != 7)
+                throw new Exception(String.Format("A PointerText value has 7 segments separated by a | char. {0} is not valid", pointerTextString));
 
             if (Int32.TryParse(parts[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var address))
                 result.Address = address;
@@ -100,7 +95,31 @@ namespace PkmnAdvanceTranslation
                     throw new Exception(String.Format("{0} is not a valid boolean. {1} is not valid", parts[3], pointerTextString));
             }
 
-            result.Text = parts[4];
+            switch (parts[4])
+            {
+                case "N":
+                    result.IsTranslated = false;
+                    break;
+                case "T":
+                    result.IsTranslated = true;
+                    break;
+                default:
+                    throw new Exception(String.Format("{0} is not a valid translated Value, expected Y or N. {1} is not valid", parts[4], pointerTextString));
+            }
+
+            switch (parts[5])
+            {
+                case "I":
+                    result.TextMode = TextMode.Into;
+                    break;
+                case "D":
+                    result.TextMode = TextMode.Dialog;
+                    break;
+                default:
+                    throw new Exception(String.Format("{0} is not a valid textmode Value, expected I or N. {1} is not valid", parts[5], pointerTextString));
+            }
+
+            result.SingleLineText = parts[6];
 
             return result;
         }

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PkmnAdvanceTranslation"
+        xmlns:util="clr-namespace:PkmnAdvanceTranslation.Util"
         xmlns:dvm="clr-namespace:PkmnAdvanceTranslation.ViewModels.Design"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance dvm:MainWindowViewModelDesign, IsDesignTimeCreatable=True}"
@@ -14,7 +15,7 @@
                 <MenuItem Header="_Open" Command="{Binding OpenTranslationFileCommand}"/>
                 <MenuItem Header="_Save" Command="{Binding SaveTranslationFileCommand}"/>
                 <MenuItem Header="Save _As" Command="{Binding SaveTranslationFileAsCommand}"/>
-                <MenuItem Header="_Close" Click="CloseMenuItem_Click"/>
+                <MenuItem Header="E_xit" Click="CloseMenuItem_Click"/>
             </MenuItem>
         </Menu>
         <Grid>
@@ -23,7 +24,7 @@
                 <RowDefinition Height="2*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <DataGrid 
+            <DataGrid
                 Grid.Row="1" 
                 ItemsSource="{Binding TranslationLinesView}"
                 IsSynchronizedWithCurrentItem="True" 
@@ -32,11 +33,17 @@
                 CanUserAddRows="False"
                 AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Addr." Binding="{Binding Address}"/>
-                    <DataGridTextColumn Header="Ref#" Binding="{Binding ReferenceCount}" ElementStyle="{StaticResource AlignRight}"/>
-                    <DataGridTextColumn Header="Avail." Binding="{Binding AvailableLength}" ElementStyle="{StaticResource AlignRight}"/>
-                    <DataGridTextColumn Header="Remain." Binding="{Binding RemainingLength}" ElementStyle="{StaticResource AlignRight}"/>
-                    <DataGridTextColumn Header="Single line text representation" Binding="{Binding Text}"/>
+                    <DataGridTextColumn Width="Auto" Header="Addr." Binding="{Binding Address}"/>
+                    <DataGridTextColumn Width="Auto" Header="Ref#" Binding="{Binding ReferenceCount}" ElementStyle="{StaticResource AlignRight}"/>
+                    <DataGridTextColumn Width="Auto" Header="Avail." Binding="{Binding AvailableLength}" ElementStyle="{StaticResource AlignRight}"/>
+                    <DataGridTextColumn Width="Auto" Header="Remain." Binding="{Binding RemainingLength}" ElementStyle="{StaticResource AlignRight}"/>
+                    <DataGridTemplateColumn Width="*" Header="Single line text representation">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding SingleLineText}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
             <Grid Grid.Row="2">
@@ -45,7 +52,11 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="1" Text="{Binding CurrentTranslationItem.Text}"/>
+                <TextBox Grid.Column="1" AcceptsReturn="True" Text="{Binding CurrentTranslationItem.MultiLineText, UpdateSourceTrigger=PropertyChanged}"/>
+                <StackPanel Grid.Column="2" Orientation="Vertical">
+                    <CheckBox Content="Special Dialog" IsChecked="{Binding CurrentTranslationItem.IsSpecialDialog}"/>
+                    <Button Content="Save" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}"/>
+                </StackPanel>
             </Grid>
         </Grid>
     </DockPanel>

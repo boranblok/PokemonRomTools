@@ -18,12 +18,10 @@ namespace PkmnAdvanceTranslation
         private ObservableCollection<TranslationItemViewModel> _translationLines;
         private ICollectionView _translationLinesView;
         private FileInfo translationFile;
-        protected TextHandler _textHandler;
 
-        public MainWindowViewModel(IOService ioService, TextHandler textHandler)
+        public MainWindowViewModel(IOService ioService)
         {
             _ioService = ioService;
-            _textHandler = textHandler;
         }
 
 
@@ -99,7 +97,7 @@ namespace PkmnAdvanceTranslation
                 {
                     if (sourceLine.Length > 5 && PointerText.HexChars.Contains(sourceLine[0]))
                     {
-                        TranslationLines.Add(new TranslationItemViewModel(sourceLine, _textHandler));
+                        TranslationLines.Add(new TranslationItemViewModel(sourceLine));
                     }
                     sourceLine = sourceReader.ReadLine();
                 }
@@ -124,8 +122,15 @@ namespace PkmnAdvanceTranslation
 
         private void SavetranslationFileAs()
         {
-            var proposedName = String.Format("Translation_{0:yyyy-MM-dd_HH:mm}.txt", DateTime.Now);
+            var proposedName = String.Format("Translation_{0:yyyy-MM-dd_HH-mm}.txt", DateTime.Now);
             var newFileName = _ioService.SaveFileDialog(null, proposedName, "Select where to save the translation file.", "*.txt");
+            if(!String.IsNullOrWhiteSpace(newFileName))
+            {
+                var newFile = new FileInfo(newFileName);
+                WriteTranslationFile(newFile);
+                if (newFile.Exists)
+                    translationFile = newFile;
+            }
         }
 
         private void SavetranslationFile()

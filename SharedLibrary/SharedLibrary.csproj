@@ -44,6 +44,7 @@
     <Compile Include="BoyerMoreBinarySearch.cs" />
     <Compile Include="ByteBinarySearcher.cs" />
     <Compile Include="DWordBinarySearcher.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="PointerText.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RomDataWrapper.cs" />

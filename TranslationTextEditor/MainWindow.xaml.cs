@@ -25,8 +25,7 @@ namespace PkmnAdvanceTranslation
     {
         public MainWindow()
         {
-            var textHandler = new TextHandler();
-            var vm = new MainWindowViewModel(this, textHandler);
+            var vm = new MainWindowViewModel(this);
             DataContext = vm;
 
             InitializeComponent();

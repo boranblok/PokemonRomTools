@@ -10,13 +10,12 @@ namespace PkmnAdvanceTranslation
     public class TranslationItemViewModel : ViewModelBase
     {
         public PointerText PointerText { get; private set; }
-        private TextHandler _textHandler;
+        private String editedMultiLineText;
 
-        public TranslationItemViewModel(String translationFileLine, TextHandler textHandler)
+        public TranslationItemViewModel(String translationFileLine)
         {
-            _textHandler = textHandler;
             PointerText = PointerText.FromString(translationFileLine);
-            _textHandler.Translate(PointerText);
+            TextHandler.TranslateStringToBinary(PointerText);
         }
 
         public String Address
@@ -51,17 +50,77 @@ namespace PkmnAdvanceTranslation
             }
         }
 
-        public String Text
+        public String SingleLineText
         {
             get
             {
-                return PointerText.Text;
+                return PointerText.SingleLineText;
             }
             set
             {
-                PointerText.Text = value;
+                PointerText.SingleLineText = value;
+                TextHandler.TranslateStringToBinary(PointerText);
+                OnPropertyChanged("SingleLineText");
                 OnPropertyChanged("RemainingLength");
             }
-        }        
+        }
+
+        public Boolean IsSpecialDialog
+        {
+            get
+            {
+                return PointerText.TextMode == TextMode.Into;
+            }
+            set
+            {
+                if (value)
+                    PointerText.TextMode = TextMode.Into;
+                else
+                    PointerText.TextMode = TextMode.Dialog;
+            }
+        }
+
+        public Boolean HasUnsavedChanges
+        {
+            get
+            {
+                return editedMultiLineText != null;
+            }
+        }
+
+        public String MultiLineText
+        {
+            get
+            {
+                if(editedMultiLineText == null)
+                    return TextHandler.FormatEditString(SingleLineText);
+                return editedMultiLineText;
+            }
+            set
+            {
+                editedMultiLineText = value;
+                OnPropertyChanged("HasUnsavedChanges");
+            }
+        }
+
+        public RelayCommand SaveMultiLineTextCommand
+        {
+            get
+            {
+                return new RelayCommand(param => SaveMultiLineText(), param => CanSaveMultiLineText());
+            }
+        }
+
+        private Boolean CanSaveMultiLineText()
+        {
+            return HasUnsavedChanges;
+        }
+
+        private void SaveMultiLineText()
+        {
+            SingleLineText = TextHandler.EditStringToSingleLine(editedMultiLineText, IsSpecialDialog);
+            editedMultiLineText = null;
+            OnPropertyChanged("MultiLineText");
+        }
     }
 }
