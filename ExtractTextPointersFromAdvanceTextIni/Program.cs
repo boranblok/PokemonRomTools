@@ -12,7 +12,7 @@ namespace PkmnAdvanceTranslation
 {
     class Program
     {
-        private static readonly Boolean test = false;
+        private static readonly Boolean test = true;
         static void Main(string[] args)
         {
             if (args.Length < 3)
@@ -36,7 +36,7 @@ namespace PkmnAdvanceTranslation
             var expr = new Regex("[0-9A-F]{6}");
             var exprMatches = expr.Matches(bpreContents);
             var sw = new Stopwatch();
-            sw.Start();
+            sw.Start();            
             foreach (Match match in exprMatches)
             {
                 if (Int32.TryParse(match.Value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int intValue))
@@ -48,26 +48,24 @@ namespace PkmnAdvanceTranslation
                     else
                     {
                         var text = rom.GetTextAtPointer(intValue);
-                        //if (text.AvailableLength > 0)
+                        TextHandler.TranslateBinaryToString(text);
+                        text.Group = FindGroup(bpreContents, match.Index);
+                        if (test)
                         {
-                            TextHandler.TranslateBinaryToString(text);
-                            if (test)
+                            var bytes = new List<Byte>(text.TextBytes);
+                            var textValue = text.SingleLineText;
+                            text.SingleLineText = null;
+                            text.SingleLineText = textValue;
+                            TextHandler.TranslateStringToBinary(text);
+                            var bytes2 = new List<Byte>(text.TextBytes);
+                            Debug.Assert(bytes.Count == bytes2.Count, "Roundtrip byte translation failed, arrays are different length.");
+                            for (int i = 0; i < bytes.Count; i++)
                             {
-                                var bytes = new List<Byte>(text.TextBytes);
-                                var textValue = text.SingleLineText;
-                                text.SingleLineText = null;
-                                text.SingleLineText = textValue;
-                                TextHandler.TranslateStringToBinary(text);
-                                var bytes2 = new List<Byte>(text.TextBytes);
-                                Debug.Assert(bytes.Count == bytes2.Count, "Roundtrip byte translation failed, arrays are different length.");
-                                for (int i = 0; i < bytes.Count; i++)
-                                {
-                                    Debug.Assert(bytes[i] == bytes2[i], "Roundtrip byte translation failed, arrays have different content.",
-                                        "byte[{0}] has value {1:X2} and byte2[{0}] has value {2:X2}.", i, bytes[i], bytes2[i]);
-                                }
+                                Debug.Assert(bytes[i] == bytes2[i], "Roundtrip byte translation failed, arrays have different content.",
+                                    "byte[{0}] has value {1:X2} and byte2[{0}] has value {2:X2}.", i, bytes[i], bytes2[i]);
                             }
-                            foundText.Add(intValue, text);
                         }
+                        foundText.Add(intValue, text);
                     }
                 }
             }
@@ -76,6 +74,20 @@ namespace PkmnAdvanceTranslation
             sw.Stop();
 
             Console.WriteLine("On {0} searches searching took {1}", exprMatches.Count, sw.Elapsed);
+        }
+
+        private static String FindGroup(String bpreContents, Int32 matchIndex)
+        {
+            var previousBracketIndex = bpreContents.LastIndexOf('[', matchIndex);
+            if (previousBracketIndex < 0)
+                return null;
+            var nextBracketIndex = bpreContents.IndexOf(']', previousBracketIndex, 100);
+            if (nextBracketIndex < 0)
+                return null;
+            var group = bpreContents.Substring(previousBracketIndex + 1, nextBracketIndex - previousBracketIndex - 1);
+            if (group.Length > 40)
+                return group.Substring(0, 40);
+            return group;
         }
     }
 }

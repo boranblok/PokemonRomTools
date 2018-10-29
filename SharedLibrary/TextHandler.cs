@@ -178,9 +178,9 @@ namespace PkmnAdvanceTranslation
         };
         private static readonly Dictionary<String, Byte> byteTransTblreversed;
 
-        private static readonly Dictionary<String, String> editTransTbl = new Dictionary<String, String>()
+        private static readonly Dictionary<String, String> stringTransTbl = new Dictionary<String, String>()
         {
-            //{"[nb2]", "\r\n\r\n" }, //BLB: newline handling is a bit of a special case, this only goes into one direction.
+            //{"[nb2]", "\r\n\r\n" }, //BLB: newline handling is not handled by this
             //{"[br]", "\r\n" }, 
             //{"[nb]", "\r\n" },
             {"[FD]À", "[PLAYER]" },
@@ -188,10 +188,59 @@ namespace PkmnAdvanceTranslation
             {"[FD]Á", "[var1]" },
             {"[FD]Â", "[var2]" },
             {"[FD]Ç", "[var3]" },
+            {"[FD][x1F]", "[FD1F]" },
+            {"[FD] ", "[FD00]" },
+            {"[FD]È", "[FD05]" },
+            {"[FD]Ê", "[FD07]" },
+            {"[FD]Ë", "[FD08]" },
+            {"[FD]Ì", "[FD09]" },
+            {"[FD]Î", "[FD0B]" },
+            {"[FD]Ï", "[FD0C]" },
+            {"[FD]Ò", "[FD0D]" },
+            {"[FD]Ó", "[FD0E]" },
+            {"[FD]Ô", "[FD0F]" },
+            {"[FD]Œ", "[FD10]" },
+            {"[FD]Ù", "[FD11]" },
+            {"[FD]Ú", "[FD12]" },
+            {"[FD]Û", "[FD13]" },
+            {"[FD]Ñ", "[FD14]" },
+            {"[FD]ß", "[FD15]" },
+            {"[FD]à", "[FD16]" },
+            {"[FD]á", "[FD17]" },
+            {"[FD]ç", "[FD19]" },
+            {"[FD]è", "[FD1A]" },
+            {"[FD]é", "[FD1B]" },
+            {"[FD]ê", "[FD1C]" },
+            {"[FD]ë", "[FD1D]" },
+            {"[FD]ì", "[FD1E]" },
+            {"[FD]î", "[FD20]" },
+            {"[FD]ï", "[FD21]" },
+            {"[FD]ò", "[FD22]" },
+            {"[FD]ó", "[FD23]" },
+            {"[FD]ô", "[FD24]" },
+            {"[FD]œ", "[FD25]" },
+            {"[FD]ù", "[FD26]" },
+            {"[FD]ú", "[FD27]" },
+            {"[FD]û", "[FD28]" },
+            {"[FD]ñ", "[FD29]" },
+            {"[FD]º", "[FD2A]" },
+
+            {"[FC]À", "[clrT]" },
+            {"[FC]Á", "[clrH]" },
+            {"[FC]Â", "[clrShd]" },
+            {"[FC]Ç", "[clrTH]" },
             {"[FC]ÉÁ", "[small]" },
             {"[FC]É ", "[smllat]" },
-            {"[FC]ß", "[BIG]" },
-            {"[FC]à", "[reg]" }
+            {"[FC]É", "[fnt]" },    //BLB: Important that this is handled AFTER the previous.
+            {"[FC]Ë", "[pausTim]" },
+            {"[FC]Ì", "[pausBtn]" },
+            {"[FC]Ï", "[\\]" },     //careful only [\] in reality
+            {"[FC]Ò", "[shift]" },
+            {"[FC]Œ", "[music]" },
+            {"[FC]ß", "[jFnt]" },
+            {"[FC]à", "[iFnt]" },            
+            {"[FC]á", "[pMus]" },
+            {"[FC][x18]", "[rMus]" }
         };
 
         static TextHandler()
@@ -206,10 +255,6 @@ namespace PkmnAdvanceTranslation
         public static String FormatEditString(String singleLineText)
         {
             var formatted = singleLineText;
-            foreach(var key in editTransTbl.Keys)
-            {
-                formatted = formatted.Replace(key, editTransTbl[key]);
-            }
             formatted = formatted.Replace("[nb2]", "\r\n\r\n");
             formatted = formatted.Replace("[nb]", "\r\n");
             formatted = formatted.Replace("[br]", "\r\n");
@@ -219,10 +264,6 @@ namespace PkmnAdvanceTranslation
         public static String EditStringToSingleLine(String editString, Boolean specialDialog)
         {
             var formatted = editString;
-            foreach (var key in editTransTbl.Keys)
-            {
-                formatted = formatted.Replace(editTransTbl[key], key);
-            }
             if(specialDialog)
             {
                 formatted = formatted.Replace("\r\n", "[br]");
@@ -260,28 +301,37 @@ namespace PkmnAdvanceTranslation
                     builder.AppendFormat("[x{0:X2}]", b);
                 }
             }
+            foreach (var key in stringTransTbl.Keys)
+            {
+                builder.Replace(key, stringTransTbl[key]);
+            }
             text.SetSingleLineText(builder.ToString());
         }
 
         public static void TranslateStringToBinary(PointerText text)
         {
+            var textToWrite = text.SingleLineText;
+            foreach (var key in stringTransTbl.Keys)
+            {
+                textToWrite = textToWrite.Replace(stringTransTbl[key], key);
+            }
             var bytes = new List<Byte>();
-            for (int i = 0; i < text.SingleLineText.Length; i++)
+            for (int i = 0; i < textToWrite.Length; i++)
             {
                 String searchValue;
-                switch (text.SingleLineText[i])
+                switch (textToWrite[i])
                 {
                     case '[':
-                        var endIndex = text.SingleLineText.IndexOf(']', i + 1);
+                        var endIndex = textToWrite.IndexOf(']', i + 1);
                         if (endIndex < 0)
-                            throw new Exception(String.Format("The text {0} has an open escape sequence [ without ]", text));
-                        searchValue = text.SingleLineText.Substring(i, endIndex - i + 1);
+                            throw new Exception(String.Format("The text {0} has an open escape sequence [ without ]", textToWrite));
+                        searchValue = textToWrite.Substring(i, endIndex - i + 1);
                         i = endIndex;
                         break;
                     case ']':
-                        throw new Exception(String.Format("The text {0} has an open escape sequence ] without [", text));
+                        throw new Exception(String.Format("The text {0} has an open escape sequence ] without [", textToWrite));
                     default:
-                        searchValue = text.SingleLineText[i].ToString();
+                        searchValue = textToWrite[i].ToString();
                         break;
                 }
                 if (byteTransTblreversed.ContainsKey(searchValue))
@@ -301,7 +351,7 @@ namespace PkmnAdvanceTranslation
                     }
 
                     if (!isHex)
-                        throw new Exception(String.Format("The text {0} cannot be found in the table mapping and is no hex value. Full text: {1}", searchValue, text));
+                        throw new Exception(String.Format("The text {0} cannot be found in the table mapping and is no hex value. Full text: {1}", searchValue, textToWrite));
                 }
             }
             text.SetTextBytes(bytes.AsReadOnly());

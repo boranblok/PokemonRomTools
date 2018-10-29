@@ -87,7 +87,7 @@ namespace PkmnAdvanceTranslation
 
         public override String ToString()
         {
-            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}|{5}|{6,15}|{7}", 
+            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}|{5}|{6,-40}|{7}", 
                 Address, ReferenceCount, AvailableLength, ForceRepointReference ? 1 : 0, IsTranslated ? "Y" : "N", TextMode.ToString()[0], Group, SingleLineText);
         }
 
@@ -150,7 +150,7 @@ namespace PkmnAdvanceTranslation
                     throw new Exception(String.Format("{0} is not a valid textmode Value, expected I or N. {1} is not valid", parts[5], pointerTextString));
             }
 
-            result.Group = parts[6];
+            result.Group = parts[6].Trim();
 
             result.SingleLineText = parts[7];
 
