@@ -72,13 +72,7 @@ namespace PkmnAdvanceTranslation
                 }
             }
 
-            using (var writer = new StreamWriter(outputFile.OpenWrite(), Encoding.GetEncoding(1252)))
-            {
-                foreach (var key in foundText.Keys)
-                {                    
-                    writer.WriteLine(foundText[key]);
-                }
-            }
+            PointerText.WritePointersToFile(outputFile, foundText.Values);
             sw.Stop();
 
             Console.WriteLine("On {0} searches searching took {1}", exprMatches.Count, sw.Elapsed);

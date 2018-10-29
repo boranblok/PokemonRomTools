@@ -77,21 +77,14 @@ namespace PkmnAdvanceTranslation
 
             Console.WriteLine("Finding text in {0} bytes took {1}", rom.RomContents.Length, sw.Elapsed);
 
-            var translatedLines = LoadNewTranslationLines(rom);
+            var linesToTranslate = LoadNewTranslationLines(rom);
 
             Console.Write("\rReading progress: 100%   ");
             Console.WriteLine();
 
             Console.WriteLine("Writing missed text entries to file.");
 
-
-            using (var writer = new StreamWriter(outputFile.OpenWrite(), Encoding.GetEncoding(1252)))
-            {
-                foreach (var line in translatedLines.OrderBy(l => l.Address))
-                {
-                    writer.WriteLine(line);
-                }
-            }
+            PointerText.WritePointersToFile(outputFile, linesToTranslate);
 
             Console.WriteLine("Done, press any key to continue...");
             Console.ReadLine();
@@ -140,26 +133,13 @@ namespace PkmnAdvanceTranslation
 
         private static List<Int32> LoadTranslationBaseLines(String translationFileName)
         {
-            var translationBaseLines = new List<Int32>();
             var translationSourceFile = new FileInfo(translationFileName);
             if (!translationSourceFile.Exists)
             {
                 Console.WriteLine("Translation source file {0} does not exist", translationFileName);
                 return null;
             }
-            using (var sourceReader = new StreamReader(translationSourceFile.OpenRead(), Encoding.GetEncoding(1252)))
-            {
-                var sourceLine = sourceReader.ReadLine();
-                while (sourceLine != null)
-                {
-                    if (sourceLine.Length > 5 && PointerText.HexChars.Contains(sourceLine[0]))
-                    {
-                        translationBaseLines.Add(PointerText.FromString(sourceLine).Address);
-                    }
-                    sourceLine = sourceReader.ReadLine();
-                }
-            }
-            return translationBaseLines;
+            return PointerText.ReadPointersFromFile(translationSourceFile).Select(l => l.Address).ToList();
         }
 
         private static void FindStringPointers(String threadName, RomDataWrapper rom, int from, int to)

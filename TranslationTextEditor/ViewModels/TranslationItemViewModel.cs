@@ -12,9 +12,9 @@ namespace PkmnAdvanceTranslation
         public PointerText PointerText { get; private set; }
         private String editedMultiLineText;
 
-        public TranslationItemViewModel(String translationFileLine)
+        public TranslationItemViewModel(PointerText pointerText)
         {
-            PointerText = PointerText.FromString(translationFileLine);
+            PointerText = pointerText;
             TextHandler.TranslateStringToBinary(PointerText);
         }
 

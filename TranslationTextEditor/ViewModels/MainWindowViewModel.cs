@@ -90,17 +90,9 @@ namespace PkmnAdvanceTranslation
         private void LoadtranslationFile(FileInfo translationSourceFile)
         {
             TranslationLines.Clear();
-            using (var sourceReader = new StreamReader(translationSourceFile.OpenRead(), Encoding.GetEncoding(1252)))
+            foreach(var line in PointerText.ReadPointersFromFile(translationSourceFile))
             {
-                var sourceLine = sourceReader.ReadLine();
-                while (sourceLine != null)
-                {
-                    if (sourceLine.Length > 5 && PointerText.HexChars.Contains(sourceLine[0]))
-                    {
-                        TranslationLines.Add(new TranslationItemViewModel(sourceLine));
-                    }
-                    sourceLine = sourceReader.ReadLine();
-                }
+                TranslationLines.Add(new TranslationItemViewModel(line));
             }
         }
 

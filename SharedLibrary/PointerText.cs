@@ -2,14 +2,44 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PkmnAdvanceTranslation
-{
+{  
     public class PointerText
     {
+        public static List<PointerText> ReadPointersFromFile(FileInfo file)
+        {
+            var lines = new List<PointerText>();
+            using (var sourceReader = new StreamReader(file.OpenRead(), Encoding.GetEncoding(1252)))
+            {
+                var sourceLine = sourceReader.ReadLine();
+                while (sourceLine != null)
+                {
+                    if (sourceLine.Length > 5 && PointerText.HexChars.Contains(sourceLine[0]))
+                    {
+                        lines.Add(PointerText.FromString(sourceLine));
+                    }
+                    sourceLine = sourceReader.ReadLine();
+                }
+            }
+            return lines;
+        }
+
+        public static void WritePointersToFile(FileInfo file, IEnumerable<PointerText> lines)
+        {
+            using (var writer = new StreamWriter(file.Open(FileMode.Create), Encoding.GetEncoding(1252)))
+            {
+                foreach (var line in lines.OrderBy(l => l.Address))
+                {
+                    writer.WriteLine(line);
+                }
+            }
+        }
+
         public static readonly Char[] HexChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f' };
         private string _singleLineText;
         private ReadOnlyCollection<byte> _textBytes;
