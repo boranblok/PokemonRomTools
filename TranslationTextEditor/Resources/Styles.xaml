@@ -39,7 +39,7 @@
     </Style>
 
     <Style TargetType="{x:Type TextBox}" x:Key="MainTextEditBox" BasedOn="{StaticResource TextBoxMargin}">
-        <Setter Property="FontFamily" Value="{StaticResource pokemonDS}"/>
+        <Setter Property="FontFamily" Value="{StaticResource ichoseYou}"/>
         <Setter Property="FontSize" Value="24" />
         <Setter Property="AcceptsReturn" Value="True"/>
         <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
