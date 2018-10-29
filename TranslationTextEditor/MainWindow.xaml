@@ -21,6 +21,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="3*" />
                 <RowDefinition Height="2*" />
             </Grid.RowDefinitions>
@@ -31,21 +32,37 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="Group:"/>                
+                <ComboBox Grid.Column="1" Width="150"  ItemsSource="{Binding Groups}" SelectedItem="{Binding GroupFilter}" />
+                <Label Grid.Column="2" Content="Address:"/>
+                <TextBox Grid.Column="3" Style="{StaticResource AddressBox}" MaxLength="6" Text="{Binding AddressFilter, UpdateSourceTrigger=PropertyChanged}" />
+                <Label Grid.Column="4" Content="Contains:"/>
+                <TextBox Grid.Column="5" Style="{StaticResource TextBoxMargin}" Text="{Binding ContentFilter, UpdateSourceTrigger=PropertyChanged}" />                
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Group:"/>
+                <Label Grid.Column="0" Content="Group grid:" />
                 <CheckBox Grid.Column="1" IsChecked="{Binding GroupItems}" />
-                <ComboBox Grid.Column="2" Width="150"  ItemsSource="{Binding Groups}" SelectedItem="{Binding GroupFilter}" />
-                <Label Grid.Column="3" Content="Address:"/>
-                <TextBox Grid.Column="4" Style="{StaticResource AddressBox}" MaxLength="6" Text="{Binding AddressFilter, UpdateSourceTrigger=PropertyChanged}" />
-                <Label Grid.Column="5" Content="Contains:"/>
-                <TextBox Grid.Column="6" Style="{StaticResource TextBoxMargin}" Text="{Binding ContentFilter, UpdateSourceTrigger=PropertyChanged}" />
+                <Label Grid.Column="3" Content="Filter Translated:" />
+                <CheckBox Grid.Column="4" IsChecked="{Binding TranslatedFilter}" IsThreeState="True"/>
+                <Label Grid.Column="5" Content="Filter Unsaved:" />
+                <CheckBox Grid.Column="6" IsChecked="{Binding UnsavedFilter}" IsThreeState="True"/>
                 <Button Grid.Column="7" Content="Clear all filters" Command="{Binding ClearFilterCommand}" />
             </Grid>
             <DataGrid
-                Grid.Row="1" 
+                VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                Grid.Row="2" 
                 ItemsSource="{Binding TranslationLinesView}"
                 SelectedItem="{Binding CurrentTranslationItem}" 
                 CanUserDeleteRows="True"                 
@@ -53,11 +70,32 @@
                 HorizontalScrollBarVisibility="Hidden"
                 AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Width="Auto" Header="Addr." Binding="{Binding Address}" ElementStyle="{StaticResource AddressCell}"/>
-                    <DataGridTextColumn Width="Auto" Header="Ref#" Binding="{Binding ReferenceCount}" ElementStyle="{StaticResource AlignRight}"/>
-                    <DataGridTextColumn Width="Auto" Header="Avail." Binding="{Binding AvailableLength}" ElementStyle="{StaticResource AlignRight}"/>
-                    <DataGridTextColumn Width="Auto" Header="Remain." Binding="{Binding RemainingLength}" ElementStyle="{StaticResource AlignRight}"/>
-                    <!--<DataGridCheckBoxColumn Width="Auto" Header="Translated" Binding="{Binding Tra}"-->
+                    <DataGridTextColumn Width="Auto" Header="Address" Binding="{Binding Address}" ElementStyle="{StaticResource AddressCell}"/>
+                    <DataGridTextColumn Width="Auto" Binding="{Binding ReferenceCount}" ElementStyle="{StaticResource AlignRight}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="Ref#" ToolTip="Number of references" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="Auto" Binding="{Binding AvailableLength}" ElementStyle="{StaticResource AlignRight}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="Avl." ToolTip="Available bytes" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="Auto" Binding="{Binding RemainingLength}" ElementStyle="{StaticResource AlignRight}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="Rem." ToolTip="Remaining bytes" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridCheckBoxColumn Width="Auto" Binding="{Binding IsTranslated}">
+                        <DataGridCheckBoxColumn.Header>
+                            <TextBlock Text="Tr." ToolTip="Translated"/>
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
+                    <DataGridCheckBoxColumn Width="Auto" Binding="{Binding HasUnsavedChanges, Mode=OneWay}">
+                        <DataGridCheckBoxColumn.Header>
+                            <TextBlock Text="Ch." ToolTip="Has unsaved changes"/>
+                        </DataGridCheckBoxColumn.Header>
+                    </DataGridCheckBoxColumn>
                     <DataGridTemplateColumn Width="*" Header="Single line text representation" SortMemberPath="SingleLineText">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -76,7 +114,7 @@
                     </GroupStyle>
                 </DataGrid.GroupStyle>
             </DataGrid>
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="340"/>

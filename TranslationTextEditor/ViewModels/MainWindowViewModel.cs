@@ -25,6 +25,8 @@ namespace PkmnAdvanceTranslation
         private String _groupFilter;
         private String _addressFilter;
         private String _contentFilter;
+        private Nullable<Boolean> _translatedFilter;
+        private Nullable<Boolean> _unsavedFilter;
 
         private Dispatcher dispatcher;
         private DateTime filterStart;
@@ -94,12 +96,44 @@ namespace PkmnAdvanceTranslation
         {
             if (translationLine == null)
                 return false;
-            return (String.IsNullOrWhiteSpace(GroupFilter) || translationLine.Group == GroupFilter)
+            return (!TranslatedFilter.HasValue || translationLine.IsTranslated == TranslatedFilter.Value)
+                && (!UnsavedFilter.HasValue || translationLine.HasUnsavedChanges == UnsavedFilter.Value)
+                && (String.IsNullOrWhiteSpace(GroupFilter) || translationLine.Group == GroupFilter)
                 && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
                 && (String.IsNullOrWhiteSpace(ContentFilter) || translationLine.SingleLineText.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) >= 0)
                 ;
 
             //TODO: Later we apply filters here.
+        }
+
+        public Nullable<Boolean> TranslatedFilter
+        {
+            get
+            {
+                return _translatedFilter;
+            }
+            set
+            {
+                if (value == _translatedFilter)
+                    return;
+                _translatedFilter = value;
+                TranslationLinesView.Refresh();
+            }
+        }
+
+        public Nullable<Boolean> UnsavedFilter
+        {
+            get
+            {
+                return _unsavedFilter;
+            }
+            set
+            {
+                if (value == _unsavedFilter)
+                    return;
+                _unsavedFilter = value;
+                TranslationLinesView.Refresh();
+            }
         }
 
         public String GroupFilter
@@ -195,6 +229,8 @@ namespace PkmnAdvanceTranslation
 
         private void ClearFilter()
         {
+            _translatedFilter = null;
+            _unsavedFilter = null;
             _groupFilter = _addressFilter = _contentFilter = null;
             TranslationLinesView.Refresh();
         }
