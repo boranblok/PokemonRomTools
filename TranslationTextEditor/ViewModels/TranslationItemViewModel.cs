@@ -50,6 +50,19 @@ namespace PkmnAdvanceTranslation
             }
         }
 
+        public Boolean IsTranslated
+        {
+            get
+            {
+                return PointerText.IsTranslated;
+            }
+            set
+            {
+                PointerText.IsTranslated = value;
+                OnPropertyChanged("IsTranslated");
+            }
+        }
+
         public String Group
         {
             get
@@ -59,6 +72,7 @@ namespace PkmnAdvanceTranslation
             set
             {
                 PointerText.Group = value;
+                OnPropertyChanged("Group");
             }
         }
 
@@ -89,6 +103,7 @@ namespace PkmnAdvanceTranslation
                     PointerText.TextMode = TextMode.Into;
                 else
                     PointerText.TextMode = TextMode.Dialog;
+                OnPropertyChanged("IsSpecialDialog");
             }
         }
 
@@ -111,6 +126,7 @@ namespace PkmnAdvanceTranslation
             set
             {
                 editedMultiLineText = value;
+                OnPropertyChanged("MultiLineText");
                 OnPropertyChanged("HasUnsavedChanges");
             }
         }

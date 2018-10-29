@@ -8,7 +8,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace PkmnAdvanceTranslation
 {
@@ -16,12 +18,40 @@ namespace PkmnAdvanceTranslation
     {
         private IOService _ioService;
         private ObservableCollection<TranslationItemViewModel> _translationLines;
+        private ObservableCollection<String> _groups;
         private ICollectionView _translationLinesView;
         private FileInfo translationFile;
+        private Boolean _groupItems;
+        private String _groupFilter;
+        private String _addressFilter;
+        private String _contentFilter;
+
+        private Dispatcher dispatcher;
+        private DateTime filterStart;
+        private Timer filterDelayTimer;
 
         public MainWindowViewModel(IOService ioService)
         {
             _ioService = ioService;
+
+            filterDelayTimer = new Timer();
+            filterDelayTimer.Interval = 50;
+            filterDelayTimer.AutoReset = true;
+            filterDelayTimer.Elapsed += new ElapsedEventHandler(filterDelayTimer_Elapsed);
+
+            dispatcher = Dispatcher.CurrentDispatcher;
+        }
+
+        public ObservableCollection<String> Groups
+        {
+            get
+            {
+                if(_groups == null)
+                {
+                    _groups = new ObservableCollection<String>();
+                }
+                return _groups;
+            }
         }
 
 
@@ -45,11 +75,6 @@ namespace PkmnAdvanceTranslation
                 {
                     _translationLinesView = CollectionViewSource.GetDefaultView(TranslationLines);
                     _translationLinesView.Filter = (e => MatchesFilter(e as TranslationItemViewModel));
-                    if (_translationLinesView != null && _translationLinesView.CanGroup == true)
-                    {
-                        _translationLinesView.GroupDescriptions.Clear();
-                        _translationLinesView.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
-                    }
                 }
                 return _translationLinesView;
             }
@@ -69,9 +94,114 @@ namespace PkmnAdvanceTranslation
         {
             if (translationLine == null)
                 return false;
-            return true;
+            return (String.IsNullOrWhiteSpace(GroupFilter) || translationLine.Group == GroupFilter)
+                && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
+                && (String.IsNullOrWhiteSpace(ContentFilter) || translationLine.SingleLineText.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                ;
 
             //TODO: Later we apply filters here.
+        }
+
+        public String GroupFilter
+        {
+            get
+            {
+                return _groupFilter;
+            }
+            set
+            {
+                if (value == _groupFilter)
+                    return;
+
+                _groupFilter = value;
+                TranslationLinesView.Refresh();
+            }
+        }
+
+        public String AddressFilter
+        {
+            get { return _addressFilter; }
+            set
+            {
+                if (value == _addressFilter)
+                    return;
+
+                _addressFilter = value;
+                OnPropertyChanged("AddressFilter");
+                FilterChangedAsync();
+            }
+        }
+
+        public String ContentFilter
+        {
+            get { return _contentFilter; }
+            set
+            {
+                if (value == _contentFilter)
+                    return;
+
+                _contentFilter = value;
+                OnPropertyChanged("ContentFilter");
+                FilterChangedAsync();
+            }
+        }
+
+        private void FilterChangedAsync()
+        {
+            filterStart = DateTime.Now;
+
+            if (!filterDelayTimer.Enabled)
+            {
+                filterDelayTimer.Enabled = true;
+                filterDelayTimer.Start();
+            }
+        }
+
+        private void filterDelayTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if ((DateTime.Now - filterStart).TotalSeconds > .3)
+            {
+                dispatcher.BeginInvoke((Action)delegate ()
+                {
+                    filterDelayTimer.Stop();
+                    TranslationLinesView.Refresh();
+                });
+            }
+        }
+
+        public Boolean GroupItems
+        {
+            get
+            {
+                return _groupItems;
+            }
+            set
+            {
+                if (_groupItems && !value)
+                    TranslationLinesView.GroupDescriptions.Clear();
+                else if(!_groupItems && value)
+                    TranslationLinesView.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
+                _groupItems = value;
+            }
+        }
+
+        public RelayCommand ClearFilterCommand
+        {
+            get
+            {
+                return new RelayCommand(param => ClearFilter(), param => CanClearFilter());
+            }
+        }
+
+        private void ClearFilter()
+        {
+            _groupFilter = _addressFilter = _contentFilter = null;
+            TranslationLinesView.Refresh();
+        }
+
+        private bool CanClearFilter()
+        {
+            return GroupFilter != null || !String.IsNullOrWhiteSpace(AddressFilter) || !String.IsNullOrWhiteSpace(ContentFilter);
         }
 
         public RelayCommand OpenTranslationFileCommand
@@ -97,6 +227,8 @@ namespace PkmnAdvanceTranslation
             TranslationLines.Clear();
             foreach(var line in PointerText.ReadPointersFromFile(translationSourceFile))
             {
+                if (!Groups.Contains(line.Group))
+                    Groups.Add(line.Group);
                 TranslationLines.Add(new TranslationItemViewModel(line));
             }
         }

@@ -21,24 +21,43 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="3*" />
                 <RowDefinition Height="2*" />
-                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Content="Group:"/>
+                <CheckBox Grid.Column="1" IsChecked="{Binding GroupItems}" />
+                <ComboBox Grid.Column="2" Width="150"  ItemsSource="{Binding Groups}" SelectedItem="{Binding GroupFilter}" />
+                <Label Grid.Column="3" Content="Address:"/>
+                <TextBox Grid.Column="4" Style="{StaticResource AddressBox}" MaxLength="6" Text="{Binding AddressFilter, UpdateSourceTrigger=PropertyChanged}" />
+                <Label Grid.Column="5" Content="Contains:"/>
+                <TextBox Grid.Column="6" Style="{StaticResource TextBoxMargin}" Text="{Binding ContentFilter, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Grid.Column="7" Content="Clear all filters" Command="{Binding ClearFilterCommand}" />
+            </Grid>
             <DataGrid
                 Grid.Row="1" 
                 ItemsSource="{Binding TranslationLinesView}"
-                IsSynchronizedWithCurrentItem="True" 
                 SelectedItem="{Binding CurrentTranslationItem}" 
                 CanUserDeleteRows="True"                 
                 CanUserAddRows="False"
+                HorizontalScrollBarVisibility="Hidden"
                 AutoGenerateColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn Width="35" Header="GRP" SortMemberPath="Group">
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Width="Auto" Header="Addr." Binding="{Binding Address}"/>
+                    <DataGridTextColumn Width="Auto" Header="Addr." Binding="{Binding Address}" ElementStyle="{StaticResource AddressCell}"/>
                     <DataGridTextColumn Width="Auto" Header="Ref#" Binding="{Binding ReferenceCount}" ElementStyle="{StaticResource AlignRight}"/>
                     <DataGridTextColumn Width="Auto" Header="Avail." Binding="{Binding AvailableLength}" ElementStyle="{StaticResource AlignRight}"/>
                     <DataGridTextColumn Width="Auto" Header="Remain." Binding="{Binding RemainingLength}" ElementStyle="{StaticResource AlignRight}"/>
+                    <!--<DataGridCheckBoxColumn Width="Auto" Header="Translated" Binding="{Binding Tra}"-->
                     <DataGridTemplateColumn Width="*" Header="Single line text representation" SortMemberPath="SingleLineText">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -60,11 +79,13 @@
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="340"/>
+                    <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="1" AcceptsReturn="True" Text="{Binding CurrentTranslationItem.MultiLineText, UpdateSourceTrigger=PropertyChanged}"/>
-                <StackPanel Grid.Column="2" Orientation="Vertical">
+                <Rectangle Grid.Column="1" Style="{StaticResource MainTextEditOverlay}" />
+                <TextBox Style="{StaticResource MainTextEditBox}" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding CurrentTranslationItem.MultiLineText, UpdateSourceTrigger=PropertyChanged}"/>
+                <StackPanel Grid.Column="3" Orientation="Vertical">
                     <CheckBox Content="Special Dialog" IsChecked="{Binding CurrentTranslationItem.IsSpecialDialog}"/>
                     <Button Content="Save" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}"/>
                 </StackPanel>

@@ -1,7 +1,48 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style TargetType="{x:Type CheckBox}">
+        <Setter Property="Margin" Value="5" />
+    </Style>
+
+    <Style TargetType="{x:Type ComboBox}">
+        <Setter Property="Margin" Value="5" />
+    </Style>    
+
+    <Style TargetType="{x:Type Button}">
+        <Setter Property="Margin" Value="3,6,3,6" />
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}" x:Key="TextBoxMargin">
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="Padding" Value="2" />
+    </Style>
+
+    <Style TargetType="{x:Type Rectangle}" x:Key="MainTextEditOverlay">
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="Fill" Value="#2000FF00" />
+        <Setter Property="Panel.ZIndex" Value="1000" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+    </Style>
+
     <Style TargetType="{x:Type TextBlock}" x:Key="AlignRight">
         <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}" x:Key="AddressCell">
+        <Setter Property="FontFamily" Value="Consolas"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}" x:Key="AddressBox" BasedOn="{StaticResource TextBoxMargin}">
+        <Setter Property="FontFamily" Value="Consolas"/>
+        <Setter Property="Width" Value="55" />
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}" x:Key="MainTextEditBox" BasedOn="{StaticResource TextBoxMargin}">
+        <Setter Property="FontFamily" Value="{StaticResource pokemonDS}"/>
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="AcceptsReturn" Value="True"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
     </Style>
 
     <Style x:Key="GroupHeaderStyle" TargetType="{x:Type GroupItem}">
@@ -11,9 +52,9 @@
                     <Expander x:Name="exp" IsExpanded="true"
                               Background="#DDCCEAFF"
                               Foreground="Black">
-                        <Expander.Padding>
+                        <Expander.Margin>
                             <Thickness Left="1" Top="1" Bottom="1" />
-                        </Expander.Padding>
+                        </Expander.Margin>
                         <Expander.Header>
                             <TextBlock Text="{Binding Name}"/>
                         </Expander.Header>
@@ -25,6 +66,7 @@
     </Style>
     
     <Style TargetType="DataGrid">
+        <Setter Property="Margin" Value="0,5,0,5" />
         <!-- Make the border and grid lines a little less imposing -->
         <Setter Property="BorderBrush" Value="#DDDDDD" />
         <Setter Property="HorizontalGridLinesBrush" Value="#DDDDDD" />
