@@ -118,15 +118,15 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="347"/>
-                    <ColumnDefinition Width="100"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="150"/>
                 </Grid.ColumnDefinitions>
-                <Rectangle Grid.Column="1" Style="{StaticResource MainTextEditOverlay}" />
-                <TextBox Style="{StaticResource MainTextEditBox}" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding CurrentTranslationItem.MultiLineText, UpdateSourceTrigger=PropertyChanged}"/>
-                <StackPanel Grid.Column="3" Orientation="Vertical">
+                <StackPanel Grid.Column="0" Orientation="Vertical">
                     <CheckBox Content="Special Dialog" IsChecked="{Binding CurrentTranslationItem.IsSpecialDialog}"/>
                     <Button Content="Save" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}"/>
                 </StackPanel>
+                <Rectangle Grid.Column="1" Style="{StaticResource MainTextEditOverlay}" />
+                <TextBox Style="{StaticResource MainTextEditBox}" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding CurrentTranslationItem.MultiLineText, UpdateSourceTrigger=PropertyChanged}"/>
+
             </Grid>
         </Grid>
     </DockPanel>
