@@ -50,6 +50,18 @@ namespace PkmnAdvanceTranslation
             }
         }
 
+        public String Group
+        {
+            get
+            {
+                return PointerText.Group;
+            }
+            set
+            {
+                PointerText.Group = value;
+            }
+        }
+
         public String SingleLineText
         {
             get

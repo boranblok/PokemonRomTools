@@ -33,11 +33,13 @@
                 CanUserAddRows="False"
                 AutoGenerateColumns="False">
                 <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="35" Header="GRP" SortMemberPath="Group">
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Width="Auto" Header="Addr." Binding="{Binding Address}"/>
                     <DataGridTextColumn Width="Auto" Header="Ref#" Binding="{Binding ReferenceCount}" ElementStyle="{StaticResource AlignRight}"/>
                     <DataGridTextColumn Width="Auto" Header="Avail." Binding="{Binding AvailableLength}" ElementStyle="{StaticResource AlignRight}"/>
                     <DataGridTextColumn Width="Auto" Header="Remain." Binding="{Binding RemainingLength}" ElementStyle="{StaticResource AlignRight}"/>
-                    <DataGridTemplateColumn Width="*" Header="Single line text representation">
+                    <DataGridTemplateColumn Width="*" Header="Single line text representation" SortMemberPath="SingleLineText">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding SingleLineText}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
@@ -45,6 +47,15 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
+                <DataGrid.GroupStyle>
+                    <GroupStyle ContainerStyle="{StaticResource GroupHeaderStyle}">
+                        <GroupStyle.Panel>
+                            <ItemsPanelTemplate>
+                                <DataGridRowsPresenter />
+                            </ItemsPanelTemplate>
+                        </GroupStyle.Panel>
+                    </GroupStyle>
+                </DataGrid.GroupStyle>
             </DataGrid>
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>

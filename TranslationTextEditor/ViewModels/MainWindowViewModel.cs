@@ -45,6 +45,11 @@ namespace PkmnAdvanceTranslation
                 {
                     _translationLinesView = CollectionViewSource.GetDefaultView(TranslationLines);
                     _translationLinesView.Filter = (e => MatchesFilter(e as TranslationItemViewModel));
+                    if (_translationLinesView != null && _translationLinesView.CanGroup == true)
+                    {
+                        _translationLinesView.GroupDescriptions.Clear();
+                        _translationLinesView.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
+                    }
                 }
                 return _translationLinesView;
             }

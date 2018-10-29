@@ -65,6 +65,7 @@ namespace PkmnAdvanceTranslation
         public Boolean MustRepointReference { get; set; }
         public Boolean IsTranslated { get; set; }
         public TextMode TextMode { get; set; }
+        public String Group { get; set; }
 
         internal void SetSingleLineText(String translatedText)
         {
@@ -86,8 +87,8 @@ namespace PkmnAdvanceTranslation
 
         public override String ToString()
         {
-            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}|{5}|{6}", 
-                Address, ReferenceCount, AvailableLength, ForceRepointReference ? 1 : 0, IsTranslated ? "Y" : "N", TextMode.ToString()[0], SingleLineText);
+            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}|{5}|{6,15}|{7}", 
+                Address, ReferenceCount, AvailableLength, ForceRepointReference ? 1 : 0, IsTranslated ? "Y" : "N", TextMode.ToString()[0], Group, SingleLineText);
         }
 
         public static PointerText FromString(String pointerTextString)
@@ -95,8 +96,8 @@ namespace PkmnAdvanceTranslation
             var result = new PointerText();
 
             var parts = pointerTextString.Split('|');
-            if (parts.Length != 7)
-                throw new Exception(String.Format("A PointerText value has 7 segments separated by a | char. {0} is not valid", pointerTextString));
+            if (parts.Length != 8)
+                throw new Exception(String.Format("A PointerText value has 8 segments separated by a | char. {0} is not valid", pointerTextString));
 
             if (Int32.TryParse(parts[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var address))
                 result.Address = address;
@@ -149,7 +150,9 @@ namespace PkmnAdvanceTranslation
                     throw new Exception(String.Format("{0} is not a valid textmode Value, expected I or N. {1} is not valid", parts[5], pointerTextString));
             }
 
-            result.SingleLineText = parts[6];
+            result.Group = parts[6];
+
+            result.SingleLineText = parts[7];
 
             return result;
         }
