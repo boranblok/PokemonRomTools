@@ -117,15 +117,23 @@
             <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="347"/>
                     <ColumnDefinition Width="150"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Vertical">
-                    <CheckBox Content="Special Dialog" IsChecked="{Binding CurrentTranslationItem.IsSpecialDialog}"/>
-                    <Button Content="Save" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}"/>
-                </StackPanel>
-                <Rectangle Grid.Column="1" Style="{StaticResource MainTextEditOverlay}" />
-                <TextBox Style="{StaticResource MainTextEditBox}" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding CurrentTranslationItem.MultiLineText, UpdateSourceTrigger=PropertyChanged}"/>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <CheckBox Grid.Row="0" Content="Special Dialog" IsChecked="{Binding CurrentTranslationItem.IsSpecialDialog}"/>
+                    <Button Grid.Row="2" Content="Restore" Command="{Binding CurrentTranslationItem.RestoreMultiLineTextCommand}"/>
+                    <Button Grid.Row="3" Content="Save" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}"/>
+                </Grid>
+                <Rectangle Grid.Column="2" Style="{StaticResource MainTextEditOverlay}" />
+                <TextBox Grid.Column="2" Style="{StaticResource MainTextEditBox}" Grid.ColumnSpan="2" Text="{Binding CurrentTranslationItem.MultiLineText, UpdateSourceTrigger=PropertyChanged}"/>
 
             </Grid>
         </Grid>

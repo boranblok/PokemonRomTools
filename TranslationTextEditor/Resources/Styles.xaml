@@ -38,7 +38,8 @@
         <Setter Property="Width" Value="55" />
     </Style>
 
-    <Style TargetType="{x:Type TextBox}" x:Key="MainTextEditBox" BasedOn="{StaticResource TextBoxMargin}">
+    <Style TargetType="{x:Type TextBox}" x:Key="MainTextEditBox">
+        <Setter Property="Margin" Value="5,5,0,5" />
         <Setter Property="FontFamily" Value="{StaticResource ichoseYou}"/>
         <Setter Property="FontSize" Value="24" />
         <Setter Property="AcceptsReturn" Value="True"/>

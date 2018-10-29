@@ -131,6 +131,25 @@ namespace PkmnAdvanceTranslation
             }
         }
 
+        public RelayCommand RestoreMultiLineTextCommand
+        {
+            get
+            {
+                return new RelayCommand(param => RestoreMultiLineText(), param => CanRestoreMultiLineText());
+            }
+        }
+
+        private Boolean CanRestoreMultiLineText()
+        {
+            return HasUnsavedChanges;
+        }
+
+        private void RestoreMultiLineText()
+        {
+            editedMultiLineText = null;
+            OnPropertyChanged("MultiLineText");
+        }
+
         public RelayCommand SaveMultiLineTextCommand
         {
             get
