@@ -2,6 +2,7 @@
 using PkmnAdvanceTranslation.Util;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,9 +24,10 @@ namespace PkmnAdvanceTranslation
     /// </summary>
     public partial class MainWindow : Window, IOService
     {
+        MainWindowViewModel vm;
         public MainWindow()
         {
-            var vm = new MainWindowViewModel(this);
+            vm = new MainWindowViewModel(this);
             DataContext = vm;
 
             InitializeComponent();
@@ -68,6 +70,44 @@ namespace PkmnAdvanceTranslation
         private void CloseMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {            
+            
+            var unsavedLineCount = vm.TranslationLines.Count(l => l.HasUnsavedChanges);
+            if(unsavedLineCount > 0)
+            {
+                var message = String.Format("There are {0} lines still being edited on, do you want to save these?", unsavedLineCount);
+                var result = MessageBox.Show(this, message, "Save edited lines?", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
+                switch(result)
+                {
+                    case MessageBoxResult.Cancel:
+                        e.Cancel = true;
+                        return;
+                    case MessageBoxResult.No:
+                        vm.DiscardEditedLines();
+                        break;
+                    case MessageBoxResult.Yes:
+                        vm.SaveEditedLines();
+                        break;
+                }
+            }
+            var changedLineCount = vm.TranslationLines.Count(l => l.HasChangesInMemory);
+            if (changedLineCount > 0)
+            {
+                var message = String.Format("Save changes to \"{0}\"?", vm.TranslationFile.FullName);
+                var result = MessageBox.Show(this, message,  "Save changes?", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Yes);
+                switch(result)
+                {
+                    case MessageBoxResult.Cancel:
+                        e.Cancel = true;
+                        return;
+                    case MessageBoxResult.Yes:
+                        vm.SaveTranslationFileCommand.Execute(null);
+                        break;
+                }
+            }
         }
     }
 }

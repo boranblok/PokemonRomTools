@@ -11,11 +11,24 @@ namespace PkmnAdvanceTranslation
     {
         public PointerText PointerText { get; private set; }
         private String editedMultiLineText;
+        private Boolean _hasChangesInMemory;
 
         public TranslationItemViewModel(PointerText pointerText)
         {
             PointerText = pointerText;
             TextHandler.TranslateStringToBinary(PointerText);
+        }
+
+        public Boolean HasChangesInMemory
+        {
+            get
+            {
+                return _hasChangesInMemory;
+            }
+            set
+            {
+                _hasChangesInMemory = value;
+            }
         }
 
         public String Address
@@ -146,8 +159,7 @@ namespace PkmnAdvanceTranslation
 
         private void RestoreMultiLineText()
         {
-            editedMultiLineText = null;
-            OnPropertyChanged("MultiLineText");
+            MultiLineText = null;
         }
 
         public RelayCommand SaveMultiLineTextCommand
@@ -164,10 +176,10 @@ namespace PkmnAdvanceTranslation
         }
 
         private void SaveMultiLineText()
-        {
+        {            
             SingleLineText = TextHandler.EditStringToSingleLine(editedMultiLineText, IsSpecialDialog);
-            editedMultiLineText = null;
-            OnPropertyChanged("MultiLineText");
+            MultiLineText = null;
+            HasChangesInMemory = true;
         }
     }
 }

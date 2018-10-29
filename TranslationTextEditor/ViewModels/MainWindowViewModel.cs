@@ -20,7 +20,8 @@ namespace PkmnAdvanceTranslation
         private ObservableCollection<TranslationItemViewModel> _translationLines;
         private ObservableCollection<String> _groups;
         private ICollectionView _translationLinesView;
-        private FileInfo translationFile;
+        private FileInfo _translationFile;
+
         private Boolean _groupItems;
         private String _groupFilter;
         private String _addressFilter;
@@ -102,8 +103,22 @@ namespace PkmnAdvanceTranslation
                 && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
                 && (String.IsNullOrWhiteSpace(ContentFilter) || translationLine.SingleLineText.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) >= 0)
                 ;
+        }
 
-            //TODO: Later we apply filters here.
+        internal void SaveEditedLines()
+        {
+            foreach (var editedLine in TranslationLines.Where(l => l.HasUnsavedChanges))
+            {
+                editedLine.SaveMultiLineTextCommand.Execute(null);
+            }
+        }
+
+        internal void DiscardEditedLines()
+        {
+            foreach(var editedLine in TranslationLines.Where(l => l.HasUnsavedChanges))
+            {
+                editedLine.RestoreMultiLineTextCommand.Execute(null);
+            }
         }
 
         public Nullable<Boolean> TranslatedFilter
@@ -253,8 +268,8 @@ namespace PkmnAdvanceTranslation
             var fileName = _ioService.OpenFileDialog(null, "Open a translation file to modify.");
             if(fileName != null && File.Exists(fileName))
             {
-                translationFile = new FileInfo(fileName);
-                LoadtranslationFile(translationFile);
+                TranslationFile = new FileInfo(fileName);
+                LoadtranslationFile(TranslationFile);
             }
         }
 
@@ -285,6 +300,18 @@ namespace PkmnAdvanceTranslation
             }
         }
 
+        public FileInfo TranslationFile {
+            get
+            {
+                return _translationFile;
+            }
+            set
+            {
+                _translationFile = value;
+                OnPropertyChanged("TranslationFile");
+            }
+        }
+
         private void SavetranslationFileAs()
         {
             var proposedName = String.Format("Translation_{0:yyyy-MM-dd_HH-mm}.txt", DateTime.Now);
@@ -294,18 +321,18 @@ namespace PkmnAdvanceTranslation
                 var newFile = new FileInfo(newFileName);
                 WriteTranslationFile(newFile);
                 if (newFile.Exists)
-                    translationFile = newFile;
+                    TranslationFile = newFile;
             }
         }
 
         private void SavetranslationFile()
         {
-            WriteTranslationFile(translationFile);
+            WriteTranslationFile(TranslationFile);
         }
 
         private bool CanSaveTranslationFile()
         {
-            return translationFile != null;
+            return TranslationFile != null;
         }
 
         private void WriteTranslationFile(FileInfo outputFile)

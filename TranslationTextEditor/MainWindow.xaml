@@ -13,8 +13,8 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding OpenTranslationFileCommand}"/>
-                <MenuItem Header="_Save" Command="{Binding SaveTranslationFileCommand}"/>
-                <MenuItem Header="Save _As" Command="{Binding SaveTranslationFileAsCommand}"/>
+                <MenuItem Header="_Save to disk" Command="{Binding SaveTranslationFileCommand}"/>
+                <MenuItem Header="Save to disk _As" Command="{Binding SaveTranslationFileAsCommand}"/>
                 <MenuItem Header="E_xit" Click="CloseMenuItem_Click"/>
             </MenuItem>
         </Menu>
@@ -130,7 +130,7 @@
                     </Grid.RowDefinitions>
                     <CheckBox Grid.Row="0" Content="Special Dialog" IsChecked="{Binding CurrentTranslationItem.IsSpecialDialog}"/>
                     <Button Grid.Row="2" Content="Restore" Command="{Binding CurrentTranslationItem.RestoreMultiLineTextCommand}"/>
-                    <Button Grid.Row="3" Content="Save" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}"/>
+                    <Button Grid.Row="3" Content="Save to memory" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}"/>
                 </Grid>
                 <Rectangle Grid.Column="2" Style="{StaticResource MainTextEditOverlay}" />
                 <TextBox Grid.Column="2" Style="{StaticResource MainTextEditBox}" Grid.ColumnSpan="2" Text="{Binding CurrentTranslationItem.MultiLineText, UpdateSourceTrigger=PropertyChanged}"/>
