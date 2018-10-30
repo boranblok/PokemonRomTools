@@ -30,6 +30,10 @@
         <Setter Property="HorizontalAlignment" Value="Right" />
     </Style>
 
+    <Style TargetType="{x:Type TextBlock}" x:Key="TextBlockMargin">
+        <Setter Property="Margin" Value="5" />
+    </Style>
+
     <Style TargetType="{x:Type TextBlock}" x:Key="AddressCell">
         <Setter Property="FontFamily" Value="Consolas"/>
     </Style>

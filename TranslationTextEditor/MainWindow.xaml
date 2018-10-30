@@ -10,7 +10,7 @@
         xmlns:dvm="clr-namespace:PkmnAdvanceTranslation.ViewModels.Design"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance dvm:MainWindowViewModelDesign, IsDesignTimeCreatable=True}"
-        Title="{Binding Title}" Height="450" Width="1150" MinWidth="1150" MinHeight="450">
+        Title="{Binding Title}" Height="500" Width="1150" MinWidth="1150" MinHeight="500">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
@@ -23,6 +23,7 @@
                 <MenuItem Header="Save all edits to _memory" Command="{Binding SaveEditedLinesCommand}"/>
                 <MenuItem Header="_Discard current edit(s)" Command="{Binding DiscardEditedLinesCommand}"/>
                 <MenuItem Header="_Change group" Command="{Binding ChangeLinesGroupCommand}"/>
+                <MenuItem Header="Copy untranslated" Command="{Binding CopyUntranslatedToTranslatedLinesCommand}"/>
             </MenuItem>
         </Menu>
         <Grid>
@@ -163,13 +164,15 @@
                 <Grid Grid.Column="3" Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>                        
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <CheckBox Grid.Row="0" Content="Special Dialog" IsChecked="{Binding CurrentTranslationItem.IsSpecialDialog}" IsEnabled="{Binding HasCurrentTranslationItem}"/>
-                    <Button Grid.Row="2" Content="Restore" Command="{Binding CurrentTranslationItem.RestoreMultiLineTextCommand}"/>
-                    <Button Grid.Row="3" Content="Save to memory" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}"/>
+                    <Button Grid.Row="1" Content=">> Copy >>" Command="{Binding CurrentTranslationItem.CopyUntranslatedToTranslatedCommand}" IsEnabled="{Binding HasCurrentTranslationItem}"/>
+                    <Button Grid.Row="3" Content="Restore" Command="{Binding CurrentTranslationItem.RestoreMultiLineTextCommand}" IsEnabled="{Binding HasCurrentTranslationItem}"/>
+                    <Button Grid.Row="4" Content="Save to memory" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}" IsEnabled="{Binding HasCurrentTranslationItem}"/>
                 </Grid>
                 <Label Grid.Column="4" Grid.Row="0" Content="Translated text"/>
                 <Rectangle Grid.Column="4" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />

@@ -386,6 +386,35 @@ namespace PkmnAdvanceTranslation.ViewModels
             return SelectedTranslationLines.Count > 0;
         }
 
+        public RelayCommand CopyUntranslatedToTranslatedLinesCommand
+        {
+            get
+            {
+                return new RelayCommand(CopyUntranslatedToTranslatedLines, CanCopyUntranslatedToTranslatedLines);
+            }
+        }
+
+        private void CopyUntranslatedToTranslatedLines()
+        {
+            var message = String.Format("Are you sure you want to copy {0} untranslated entries overwriting the translated lines?", SelectedTranslationLines.Count);
+            var vm = new ConfirmationDialogViewModel("Are you sure?", message);
+            DialogViewModel = vm;
+            DialogViewModel.ShowDialog = true;
+            if (vm.Confirmed)
+            {
+                foreach (var line in SelectedTranslationLines)
+                {
+                    line.CopyUntranslatedToTranslatedCommand.Execute(null);
+                    line.SaveMultiLineTextCommand.Execute(null);
+                }
+            }           
+        }
+
+        private bool CanCopyUntranslatedToTranslatedLines()
+        {
+            return SelectedTranslationLines.Count > 0;
+        }
+
         public RelayCommand SaveEditedLinesCommand
         {
             get

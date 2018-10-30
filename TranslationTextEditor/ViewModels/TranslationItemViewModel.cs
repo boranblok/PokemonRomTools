@@ -154,7 +154,18 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
+        public RelayCommand CopyUntranslatedToTranslatedCommand
+        {
+            get
+            {
+                return new RelayCommand(CopyUntranslatedToTranslated);
+            }
+        }
 
+        private void CopyUntranslatedToTranslated()
+        {
+            TranslatedMultiLine = UnTranslatedSingleLine;
+        }
 
         public RelayCommand RestoreMultiLineTextCommand
         {
