@@ -14,6 +14,7 @@ namespace PkmnAdvanceTranslation.ViewModels
     {
         private ObservableCollection<String> _groups;
         private String _selectedGroup;
+        public String _newGroup;
 
         public ChangeGroupViewModel()
         {
@@ -49,15 +50,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             set
             {
-                if (SelectedGroup != null)
-                {
-                    return;
-                }
-                if (!String.IsNullOrEmpty(value))
-                {
-                    Groups.Add(value);
-                    SelectedGroup = value;
-                }
+                _newGroup = value;                
             }
         }
 
@@ -73,6 +66,11 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private void Confirm()
         {
+            if (!String.IsNullOrEmpty(_newGroup))
+            {
+                Groups.Add(_newGroup);
+                SelectedGroup = _newGroup;
+            }
             Confirmed = true;
             ShowDialog = false;
         }
