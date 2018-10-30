@@ -12,7 +12,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 {
     public class ChangeGroupViewModel : DialogViewModelBase
     {
-        private ObservableCollection<String> _groups;
+        private ObservableCollection<GroupViewModel> _groups;
         private String _selectedGroup;
         public String _newGroup;
 
@@ -21,13 +21,13 @@ namespace PkmnAdvanceTranslation.ViewModels
             Title = "Select new group for selected lines";
         }
 
-        public ObservableCollection<String> Groups
+        public ObservableCollection<GroupViewModel> Groups
         {
             get
             {
                 if (_groups == null)
                 {
-                    _groups = new ObservableCollection<String>();
+                    _groups = new ObservableCollection<GroupViewModel>();
                 }
                 return _groups;
             }
@@ -68,7 +68,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             if (!String.IsNullOrEmpty(_newGroup))
             {
-                Groups.Add(_newGroup);
+                Groups.Add(new GroupViewModel(_newGroup, _newGroup));
                 SelectedGroup = _newGroup;
             }
             Confirmed = true;

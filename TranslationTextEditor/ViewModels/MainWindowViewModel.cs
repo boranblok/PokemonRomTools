@@ -23,12 +23,12 @@ namespace PkmnAdvanceTranslation.ViewModels
         private ObservableCollection<TranslationItemViewModel> _selectedTranslationLines;
         private TranslationItemViewModel _currentTranslationLineItem;
 
-        private ObservableCollection<String> _groups;
+        private ObservableCollection<GroupViewModel> _groups;
         private ICollectionView _translationLinesView;
         private FileInfo _translationFile;
 
         private Boolean _groupItems;
-        private String _groupFilter;
+        private GroupViewModel _groupFilter;
         private String _addressFilter;
         private String _contentFilter;
         private Nullable<Boolean> _translatedFilter;
@@ -51,13 +51,13 @@ namespace PkmnAdvanceTranslation.ViewModels
             dispatcher = Dispatcher.CurrentDispatcher;
         }
 
-        public ObservableCollection<String> Groups
+        public ObservableCollection<GroupViewModel> Groups
         {
             get
             {
                 if(_groups == null)
                 {
-                    _groups = new ObservableCollection<String>();
+                    _groups = new ObservableCollection<GroupViewModel>();
                 }
                 return _groups;
             }
@@ -118,7 +118,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 return false;
             return (!TranslatedFilter.HasValue || translationLine.IsTranslated == TranslatedFilter.Value)
                 && (!UnsavedFilter.HasValue || translationLine.HasUnsavedChanges == UnsavedFilter.Value)
-                && (String.IsNullOrWhiteSpace(GroupFilter) || translationLine.Group == GroupFilter)
+                && (GroupFilter == null || String.IsNullOrWhiteSpace(GroupFilter.Value) || translationLine.Group == GroupFilter.Value)
                 && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
                 && (String.IsNullOrWhiteSpace(ContentFilter) || translationLine.SingleLineText.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) >= 0)
                 ;
@@ -154,7 +154,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        public String GroupFilter
+        public GroupViewModel GroupFilter
         {
             get
             {
@@ -364,7 +364,9 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             _translatedFilter = null;
             _unsavedFilter = null;
-            _groupFilter = _addressFilter = _contentFilter = null;
+            _groupFilter = null;
+            _addressFilter = null;
+            _contentFilter = null;
             TranslationLinesView.Refresh();
         }
 
@@ -394,10 +396,12 @@ namespace PkmnAdvanceTranslation.ViewModels
         private void LoadtranslationFile(FileInfo translationSourceFile)
         {
             TranslationLines.Clear();
-            foreach(var line in PointerText.ReadPointersFromFile(translationSourceFile))
+            Groups.Clear();
+            Groups.Add(new GroupViewModel("<ALL>", ""));
+            foreach (var line in PointerText.ReadPointersFromFile(translationSourceFile))
             {
-                if (!Groups.Contains(line.Group))
-                    Groups.Add(line.Group);
+                if (!Groups.Any(g => g.Value == line.Group))
+                    Groups.Add(new GroupViewModel(line.Group, line.Group));
                 TranslationLines.Add(new TranslationItemViewModel(line));
             }
         }

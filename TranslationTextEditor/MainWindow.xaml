@@ -42,7 +42,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Group:"/>                
-                <ComboBox Grid.Column="1" Width="150"  ItemsSource="{Binding Groups}" SelectedItem="{Binding GroupFilter}" />
+                <ComboBox Grid.Column="1" Width="150"  ItemsSource="{Binding Groups}" SelectedItem="{Binding GroupFilter}" DisplayMemberPath="Title" />
                 <Label Grid.Column="2" Content="Address:"/>
                 <TextBox Grid.Column="3" Style="{StaticResource AddressBox}" MaxLength="6" Text="{Binding AddressFilter, UpdateSourceTrigger=PropertyChanged}" />
                 <Label Grid.Column="4" Content="Contains:"/>

@@ -10,10 +10,10 @@ namespace PkmnAdvanceTranslation.ViewModels.Design
     {
         public ChangeGroupViewModelDesign()
         {
-            Groups.Add("Group 1");
-            Groups.Add("Group 2");
-            Groups.Add("Group 3");
-            Groups.Add("Group 4");
+            Groups.Add(new GroupViewModel("Group 1", "Group 1"));
+            Groups.Add(new GroupViewModel("Group 2", "Group 2"));
+            Groups.Add(new GroupViewModel("Group 3", "Group 3"));
+            Groups.Add(new GroupViewModel("Group 4", "Group 4"));
         }
     }
 }
