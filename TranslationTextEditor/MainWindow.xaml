@@ -10,7 +10,7 @@
         xmlns:dvm="clr-namespace:PkmnAdvanceTranslation.ViewModels.Design"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance dvm:MainWindowViewModelDesign, IsDesignTimeCreatable=True}"
-        Title="{Binding Title}" Height="450" Width="800">
+        Title="{Binding Title}" Height="450" Width="1150" MinWidth="1150" MinHeight="450">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
@@ -90,17 +90,17 @@
                             <TextBlock Text="Ref#" ToolTip="Number of references" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Width="Auto" Binding="{Binding AvailableLength}" ElementStyle="{StaticResource AlignRight}">
+                    <DataGridTextColumn Width="Auto" Binding="{Binding AvailableLength, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
                         <DataGridTextColumn.Header>
                             <TextBlock Text="Avl." ToolTip="Available bytes" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Width="Auto" Binding="{Binding RemainingLength}" ElementStyle="{StaticResource AlignRight}">
+                    <DataGridTextColumn Width="Auto" Binding="{Binding RemainingLength, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
                         <DataGridTextColumn.Header>
                             <TextBlock Text="Rem." ToolTip="Remaining bytes" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
-                    <DataGridCheckBoxColumn Width="Auto" Binding="{Binding IsTranslated}">
+                    <DataGridCheckBoxColumn Width="Auto" Binding="{Binding IsTranslated, Mode=OneWay}">
                         <DataGridCheckBoxColumn.Header>
                             <TextBlock Text="Tr." ToolTip="Translated"/>
                         </DataGridCheckBoxColumn.Header>
@@ -110,17 +110,17 @@
                             <TextBlock Text="Ch." ToolTip="Has unsaved changes"/>
                         </DataGridCheckBoxColumn.Header>
                     </DataGridCheckBoxColumn>
-                    <DataGridTemplateColumn Width="*" Header="Original text" SortMemberPath="TranslatedMultiLine">
+                    <DataGridTemplateColumn Width="*" Header="Original text" SortMemberPath="UnTranslatedSingleLine">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding TranslatedMultiLine}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
+                                <TextBlock Text="{Binding UnTranslatedSingleLine, Mode=OneWay}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Width="*" Header="Translated text" SortMemberPath="UnTranslatedMultiLine">
+                    <DataGridTemplateColumn Width="*" Header="Translated text" SortMemberPath="TranslatedSingleLine">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding UnTranslatedMultiLine}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
+                                <TextBlock Text="{Binding TranslatedSingleLine}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -137,12 +137,27 @@
             </DataGrid>
             <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="347"/>
+                    <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="347"/>
                     <ColumnDefinition Width="150"/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Grid.Row="0" Content="Original text"/>
+                <Rectangle Grid.Column="0" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
+                <TextBox 
+                    Grid.Column="0" 
+                    Grid.Row="1" 
+                    Grid.ColumnSpan="2" 
+                    Style="{StaticResource MainTextEditBox}" 
+                    Text="{Binding CurrentTranslationItem.UnTranslatedMultiLine, Mode=OneWay}" 
+                    IsReadOnly="True" IsReadOnlyCaretVisible="True"/>
+                <Grid Grid.Column="3" Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
@@ -153,8 +168,9 @@
                     <Button Grid.Row="2" Content="Restore" Command="{Binding CurrentTranslationItem.RestoreMultiLineTextCommand}"/>
                     <Button Grid.Row="3" Content="Save to memory" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}"/>
                 </Grid>
-                <Rectangle Grid.Column="2" Style="{StaticResource MainTextEditOverlay}" />
-                <TextBox Grid.Column="2" Style="{StaticResource MainTextEditBox}" Grid.ColumnSpan="2" Text="{Binding CurrentTranslationItem.MultiLineText, UpdateSourceTrigger=PropertyChanged}"/>
+                <Label Grid.Column="4" Grid.Row="0" Content="Translated text"/>
+                <Rectangle Grid.Column="4" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
+                <TextBox Grid.Column="4" Grid.Row="1" Style="{StaticResource MainTextEditBox}" Grid.ColumnSpan="2" Text="{Binding CurrentTranslationItem.TranslatedMultiLine, UpdateSourceTrigger=PropertyChanged}"/>
             </Grid>
             <util:BindableDialog DataContext="{Binding Path=DialogViewModel}"
                             Title="{Binding Path=Title}" 

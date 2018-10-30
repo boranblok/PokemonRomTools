@@ -98,6 +98,38 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
+        public String TranslatedMultiLine
+        {
+            get
+            {
+                if (editedMultiLineText == null)
+                    return TextHandler.FormatEditString(TranslatedSingleLine);
+                return editedMultiLineText;
+            }
+            set
+            {
+                editedMultiLineText = value;
+                OnPropertyChanged("TranslatedMultiLine");
+                OnPropertyChanged("HasUnsavedChanges");
+            }
+        }
+
+        public String UnTranslatedSingleLine
+        {
+            get
+            {
+                return PointerText.UntranslatedSingleLine;
+            }
+        }
+
+        public String UnTranslatedMultiLine
+        {
+            get
+            {
+                return TextHandler.FormatEditString(PointerText.UntranslatedSingleLine);
+            }
+        }
+
         public Boolean IsSpecialDialog
         {
             get
@@ -122,29 +154,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        public String TranslatedMultiLine
-        {
-            get
-            {
-                if(editedMultiLineText == null)
-                    return TextHandler.FormatEditString(TranslatedSingleLine);
-                return editedMultiLineText;
-            }
-            set
-            {
-                editedMultiLineText = value;
-                OnPropertyChanged("TranslatedMultiLine");
-                OnPropertyChanged("HasUnsavedChanges");
-            }
-        }
 
-        public String UnTranslatedMultiLine
-        {
-            get
-            {
-                return TextHandler.FormatEditString(PointerText.UntranslatedSingleLine);
-            }
-        }
 
         public RelayCommand RestoreMultiLineTextCommand
         {
