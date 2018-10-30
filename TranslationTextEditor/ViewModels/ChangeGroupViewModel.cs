@@ -1,4 +1,5 @@
-﻿using PkmnAdvanceTranslation.Util;
+﻿using GalaSoft.MvvmLight.CommandWpf;
+using PkmnAdvanceTranslation.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -62,7 +63,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             get
             {
-                return new RelayCommand(param => Confirm());
+                return new RelayCommand(Confirm);
             }
         }
 
@@ -76,7 +77,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             get
             {
-                return new RelayCommand(param => Cancel());
+                return new RelayCommand(Cancel);
             }
         }
 

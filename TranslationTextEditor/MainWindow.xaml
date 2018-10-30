@@ -4,6 +4,7 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:command="http://www.galasoft.ch/mvvmlight"
         xmlns:local="clr-namespace:PkmnAdvanceTranslation"
         xmlns:util="clr-namespace:PkmnAdvanceTranslation.Util"
         xmlns:dvm="clr-namespace:PkmnAdvanceTranslation.ViewModels.Design"
@@ -21,7 +22,7 @@
             <MenuItem Header="_Bulk operations">
                 <MenuItem Header="Save all edits to _memory" Command="{Binding SaveEditedLinesCommand}"/>
                 <MenuItem Header="_Discard current edit(s)" Command="{Binding DiscardEditedLinesCommand}"/>
-                <MenuItem Header="_Change group"/>
+                <MenuItem Header="_Change group" Command="{Binding ChangeLinesGroupCommand}"/>
             </MenuItem>
         </Menu>
         <Grid>
@@ -71,11 +72,17 @@
                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                 Grid.Row="2" 
                 ItemsSource="{Binding TranslationLinesView}"
-                SelectedItem="{Binding CurrentTranslationItem}" 
                 CanUserDeleteRows="False"                 
                 CanUserAddRows="False"
                 HorizontalScrollBarVisibility="Hidden"
                 AutoGenerateColumns="False">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <command:EventToCommand
+                            Command="{Binding SelectionChangedCommand}"
+                            CommandParameter="{Binding SelectedItems, ElementName=TranslationLinesGrid}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="Auto" Header="Address" Binding="{Binding Address}" ElementStyle="{StaticResource AddressCell}"/>
                     <DataGridTextColumn Width="Auto" Binding="{Binding ReferenceCount}" ElementStyle="{StaticResource AlignRight}">

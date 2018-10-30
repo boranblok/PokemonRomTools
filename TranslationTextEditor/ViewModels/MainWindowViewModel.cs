@@ -1,6 +1,8 @@
-﻿using Microsoft.Win32;
+﻿using GalaSoft.MvvmLight.CommandWpf;
+using Microsoft.Win32;
 using PkmnAdvanceTranslation.Util;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -17,8 +19,9 @@ namespace PkmnAdvanceTranslation
     public class MainWindowViewModel : ViewModelBase
     {
         private IOService _ioService;
-        private ObservableCollection<TranslationItemViewModel> _translationLines;
+        private ObservableCollection<TranslationItemViewModel> _translationLines;        
         private ObservableCollection<TranslationItemViewModel> _selectedTranslationLines;
+        private TranslationItemViewModel _currentTranslationLineItem;
 
         private ObservableCollection<String> _groups;
         private ICollectionView _translationLinesView;
@@ -88,10 +91,13 @@ namespace PkmnAdvanceTranslation
 
         public TranslationItemViewModel CurrentTranslationItem
         {
-            get { return TranslationLinesView.CurrentItem as TranslationItemViewModel; }
+            get
+            {
+                return _currentTranslationLineItem;
+            }
             set
             {
-                TranslationLinesView.MoveCurrentTo(value);
+                _currentTranslationLineItem = value;
                 OnPropertyChanged("CurrentTranslationItem");
             }
         }
@@ -245,24 +251,33 @@ namespace PkmnAdvanceTranslation
             }
         }
 
-        public RelayCommand SelectionChangedCommand
+        public RelayCommand<IList> SelectionChangedCommand
         {
             get
             {
-                return new RelayCommand(param => ChangeSelectedItems(param));
+                return new RelayCommand<IList>(items => ChangeSelectedItems(items));
             }
         }
 
-        private void ChangeSelectedItems(Object param)
+        private void ChangeSelectedItems(IList items)
         {
-            throw new NotImplementedException();
+            SelectedTranslationLines.Clear();
+            foreach (var item in items) SelectedTranslationLines.Add((TranslationItemViewModel)item);
+            if(SelectedTranslationLines.Count == 1)
+            {
+                CurrentTranslationItem = SelectedTranslationLines[0];
+            }
+            else
+            {
+                CurrentTranslationItem = null;
+            }
         }
 
         public RelayCommand ChangeLinesGroupCommand
         {
             get
             {
-                return new RelayCommand(param => ChangeLinesGroup(), param => CanChangeLinesGroup());
+                return new RelayCommand(ChangeLinesGroup, CanChangeLinesGroup);
             }
         }
 
@@ -273,14 +288,14 @@ namespace PkmnAdvanceTranslation
 
         private bool CanChangeLinesGroup()
         {
-            return false;
+            return SelectedTranslationLines.Count > 0;
         }
 
         public RelayCommand SaveEditedLinesCommand
         {
             get
             {
-                return new RelayCommand(param => SaveEditedLines(), param => CanSaveEditedLines());
+                return new RelayCommand(SaveEditedLines, CanSaveEditedLines);
             }
         }
 
@@ -303,7 +318,7 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return new RelayCommand(param => DiscardEditedLines(), param => CanDiscardEditedLines());
+                return new RelayCommand(DiscardEditedLines, CanDiscardEditedLines);
             }
         }
 
@@ -325,7 +340,7 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return new RelayCommand(param => ClearFilter(), param => CanClearFilter());
+                return new RelayCommand(ClearFilter, CanClearFilter);
             }
         }
 
@@ -346,7 +361,7 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return new RelayCommand(param => OpentranslationFile());
+                return new RelayCommand(OpentranslationFile);
             }
         }
 
@@ -375,7 +390,7 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return new RelayCommand(param => SavetranslationFile(), param => CanSaveTranslationFile() );
+                return new RelayCommand(SavetranslationFile, CanSaveTranslationFile );
             }
         }
 
@@ -383,7 +398,7 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return new RelayCommand(param => SavetranslationFileAs(), param => CanSaveTranslationFile() );
+                return new RelayCommand(SavetranslationFileAs, CanSaveTranslationFile );
             }
         }
 

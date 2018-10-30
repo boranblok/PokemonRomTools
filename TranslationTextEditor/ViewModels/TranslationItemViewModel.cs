@@ -1,4 +1,5 @@
-﻿using PkmnAdvanceTranslation.Util;
+﻿using GalaSoft.MvvmLight.CommandWpf;
+using PkmnAdvanceTranslation.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -148,7 +149,7 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return new RelayCommand(param => RestoreMultiLineText(), param => CanRestoreMultiLineText());
+                return new RelayCommand(RestoreMultiLineText, CanRestoreMultiLineText);
             }
         }
 
@@ -166,7 +167,7 @@ namespace PkmnAdvanceTranslation
         {
             get
             {
-                return new RelayCommand(param => SaveMultiLineText(), param => CanSaveMultiLineText());
+                return new RelayCommand(SaveMultiLineText, CanSaveMultiLineText);
             }
         }
 
