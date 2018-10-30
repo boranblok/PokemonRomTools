@@ -34,9 +34,15 @@ namespace ReplaceTextIndexes
                 {
                     var sourceLine = sourceReader.ReadLine();
                     var targetLine = targetReader.ReadLine();
-                    if (sourceLine != null && targetLine != null && sourceLine.Length > 5 && targetLine.Length > 5)
+                    if (sourceLine != null && targetLine != null)
                     {
-                        writer.WriteLine( targetLine.Substring(0, targetLine.LastIndexOf('|')) + sourceLine.Substring(sourceLine.LastIndexOf('|')));
+                        var sourceEntries = sourceLine.Split('|');
+                        var targetEntries = targetLine.Split('|');
+                        if (sourceEntries[6] != targetEntries[6])
+                        {
+                            targetEntries[7] = sourceEntries[6];
+                        }
+                        writer.WriteLine( String.Join("|", targetEntries));
                     }
                     else
                     {
