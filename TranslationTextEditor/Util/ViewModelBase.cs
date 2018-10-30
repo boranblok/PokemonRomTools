@@ -8,6 +8,20 @@ namespace PkmnAdvanceTranslation.Util
 {
     public abstract class ViewModelBase : INotifyPropertyChanged
     {
+        private String _Title;
+        public String Title
+        {
+            get { return _Title; }
+            set
+            {
+                if (value == _Title)
+                    return;
+
+                _Title = value;
+                OnPropertyChanged("Title");
+            }
+        }
+
         #region INotifyPropertyChanged
 
         /// <summary>

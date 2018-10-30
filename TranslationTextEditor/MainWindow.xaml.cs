@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using PkmnAdvanceTranslation.Util;
+using PkmnAdvanceTranslation.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

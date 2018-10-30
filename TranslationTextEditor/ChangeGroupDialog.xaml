@@ -1,0 +1,32 @@
+﻿<Window x:Class="PkmnAdvanceTranslation.ChangeGroupDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PkmnAdvanceTranslation"
+        xmlns:dvm="clr-namespace:PkmnAdvanceTranslation.ViewModels.Design"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance dvm:ChangeGroupViewModelDesign, IsDesignTimeCreatable=True}"
+        Title="{Binding Title}" Height="100" Width="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" Grid.Column="0" Content="New Group:"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Margin="5"
+                  IsEditable="True"
+                  ItemsSource="{Binding Groups}"
+                  SelectedItem="{Binding SelectedGroup}"
+                  Text="{Binding NewGroup, UpdateSourceTrigger=LostFocus}"/>
+        <Button Grid.Row="2" Grid.Column="2" Content="Ok" Command="{Binding OkCommand}"/>
+        <Button Grid.Row="2" Grid.Column="3" Content="Cancel" Command="{Binding CancelCommand}"/>
+    </Grid>
+</Window>

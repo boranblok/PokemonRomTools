@@ -18,6 +18,8 @@ namespace PkmnAdvanceTranslation
     {
         private IOService _ioService;
         private ObservableCollection<TranslationItemViewModel> _translationLines;
+        private ObservableCollection<TranslationItemViewModel> _selectedTranslationLines;
+
         private ObservableCollection<String> _groups;
         private ICollectionView _translationLinesView;
         private FileInfo _translationFile;
@@ -35,6 +37,7 @@ namespace PkmnAdvanceTranslation
 
         public MainWindowViewModel(IOService ioService)
         {
+            Title = "Pokémon translation editor";
             _ioService = ioService;
 
             filterDelayTimer = new Timer();
@@ -90,6 +93,16 @@ namespace PkmnAdvanceTranslation
             {
                 TranslationLinesView.MoveCurrentTo(value);
                 OnPropertyChanged("CurrentTranslationItem");
+            }
+        }
+
+        public ObservableCollection<TranslationItemViewModel> SelectedTranslationLines
+        {
+            get
+            {
+                if (_selectedTranslationLines == null)
+                    _selectedTranslationLines = new ObservableCollection<TranslationItemViewModel>();
+                return _selectedTranslationLines;
             }
         }
 
@@ -218,6 +231,51 @@ namespace PkmnAdvanceTranslation
             }
         }
 
+        private DialogViewModelBase _DialogViewModel;
+        public DialogViewModelBase DialogViewModel
+        {
+            get { return _DialogViewModel; }
+            set
+            {
+                if (value == _DialogViewModel)
+                    return;
+
+                _DialogViewModel = value;
+                OnPropertyChanged("DialogViewModel");
+            }
+        }
+
+        public RelayCommand SelectionChangedCommand
+        {
+            get
+            {
+                return new RelayCommand(param => ChangeSelectedItems(param));
+            }
+        }
+
+        private void ChangeSelectedItems(Object param)
+        {
+            throw new NotImplementedException();
+        }
+
+        public RelayCommand ChangeLinesGroupCommand
+        {
+            get
+            {
+                return new RelayCommand(param => ChangeLinesGroup(), param => CanChangeLinesGroup());
+            }
+        }
+
+        private void ChangeLinesGroup()
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool CanChangeLinesGroup()
+        {
+            return false;
+        }
+
         public RelayCommand SaveEditedLinesCommand
         {
             get
@@ -337,6 +395,7 @@ namespace PkmnAdvanceTranslation
             set
             {
                 _translationFile = value;
+                Title = String.Format("Pokémon translation editor - {0}", _translationFile.Name);
                 OnPropertyChanged("TranslationFile");
             }
         }
