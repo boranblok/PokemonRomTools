@@ -20,6 +20,11 @@ namespace PkmnAdvanceTranslation
             LoadRomContents(romFile);
         }
 
+        public RomDataWrapper(Byte[] romContents)
+        {
+            RomContents = romContents;
+        }
+
         private void LoadRomContents(FileInfo romFile)
         {
             if (!romFile.Exists)

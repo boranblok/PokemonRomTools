@@ -23,8 +23,7 @@ namespace PkmnAdvanceTranslation
         private static byte fc = 0xFC;
         private static byte fd = 0xFD;
         private static int startPosition = 0x172255;
-        //TODO: will we skip this empty block?
-        private static int skipBlockStart = 0x71A232;
+        private static int skipBlockStart = 0x71A23D;
         private static int skipBlockEnd = 0xCFFFFF;
 
         private static List<Int32> existingtranslationLines;
@@ -49,9 +48,20 @@ namespace PkmnAdvanceTranslation
                 throw new ArgumentException("Pass a rom file, an existing translation file and an output file.");
             var rom = new RomDataWrapper(new FileInfo(args[0]));
 
+            var tmpRomData = new Byte[rom.RomContents.Length - (skipBlockEnd - skipBlockStart)];
+            Array.Copy(rom.RomContents, tmpRomData, skipBlockStart);
+            Array.Copy(rom.RomContents, skipBlockEnd, tmpRomData, skipBlockStart, rom.RomContents.Length - skipBlockEnd);
+
+            var romWithHole = new RomDataWrapper(tmpRomData);
+
             existingtranslationLines = LoadTranslationBaseLines(args[1]);
             if (existingtranslationLines == null)
                 existingtranslationLines = new List<Int32>();
+            for(int i = 0; i < existingtranslationLines.Count; i++)
+            {
+                if (existingtranslationLines[i] > skipBlockEnd)
+                    existingtranslationLines[i] -= (skipBlockEnd - skipBlockStart);
+            }
 
             var outputFile = new FileInfo(args[2]);
             if (outputFile.Exists)
@@ -61,21 +71,27 @@ namespace PkmnAdvanceTranslation
             sw.Start();
 
             var numThreads = Environment.ProcessorCount;
-            var numPerThread = (rom.RomContents.Length - startPosition) / numThreads;
+            var numPerThread = (romWithHole.RomContents.Length - startPosition) / numThreads;
             var tasks = new List<Task>();
             for (int i = 0; i < numThreads - 1; i++)
             {
                 var name = "FT" + (i + 1);
                 var from = startPosition + numPerThread * i;
                 var to = startPosition + numPerThread * (i + 1);
-                tasks.Add(Task.Run(() => FindStringPointers(name, rom, from, to)));
+                tasks.Add(Task.Run(() => FindStringPointers(name, romWithHole, from, to)));
             }
-            tasks.Add(Task.Run(() => FindStringPointers("FT" + numThreads, rom, startPosition + numPerThread * (numThreads - 1), rom.RomContents.Length)));
+            tasks.Add(Task.Run(() => FindStringPointers("FT" + numThreads, romWithHole, startPosition + numPerThread * (numThreads - 1), rom.RomContents.Length)));
             Task.WaitAll(tasks.ToArray());
 
             sw.Stop();
 
-            Console.WriteLine("Finding text in {0} bytes took {1}", rom.RomContents.Length, sw.Elapsed);
+            Console.WriteLine("Finding text in {0} bytes took {1}", romWithHole.RomContents.Length, sw.Elapsed);
+
+            for(int i = 0; i < newTranslationLines.Count; i++)
+            {
+                if (existingtranslationLines[i] > skipBlockStart)
+                    existingtranslationLines[i] += (skipBlockEnd - skipBlockStart);
+            }
 
             var linesToTranslate = LoadNewTranslationLines(rom);
 
