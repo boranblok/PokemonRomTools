@@ -110,5 +110,10 @@ namespace PkmnAdvanceTranslation
                 }
             }
         }
+
+        private void txtTranslated_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            txtUnTranslated.ScrollToVerticalOffset(txtUnTranslated.VerticalOffset + e.VerticalChange);
+        }
     }
 }

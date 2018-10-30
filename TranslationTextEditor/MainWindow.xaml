@@ -151,6 +151,7 @@
                 <Label Grid.Column="0" Grid.Row="0" Content="Original text"/>
                 <Rectangle Grid.Column="0" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
                 <TextBox 
+                    x:Name="txtUnTranslated"
                     Grid.Column="0" 
                     Grid.Row="1" 
                     Grid.ColumnSpan="2" 
@@ -170,7 +171,15 @@
                 </Grid>
                 <Label Grid.Column="4" Grid.Row="0" Content="Translated text"/>
                 <Rectangle Grid.Column="4" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
-                <TextBox Grid.Column="4" Grid.Row="1" Style="{StaticResource MainTextEditBox}" Grid.ColumnSpan="2" Text="{Binding CurrentTranslationItem.TranslatedMultiLine, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox 
+                    x:Name="txtTranslated"
+                    Grid.Column="4" 
+                    Grid.Row="1" 
+                    Style="{StaticResource MainTextEditBox}" 
+                    Grid.ColumnSpan="2" 
+                    Text="{Binding CurrentTranslationItem.TranslatedMultiLine, UpdateSourceTrigger=PropertyChanged}"
+                    ScrollViewer.ScrollChanged="txtTranslated_ScrollChanged"
+                    />
             </Grid>
             <util:BindableDialog DataContext="{Binding Path=DialogViewModel}"
                             Title="{Binding Path=Title}" 
