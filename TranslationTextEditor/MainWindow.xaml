@@ -17,6 +17,10 @@
                 <MenuItem Header="Save to disk _As" Command="{Binding SaveTranslationFileAsCommand}"/>
                 <MenuItem Header="E_xit" Click="CloseMenuItem_Click"/>
             </MenuItem>
+            <MenuItem Header="_Bulk operations">
+                <MenuItem Header="Save all edits to _memory" Command="{Binding SaveEditedLinesCommand}"/>
+                <MenuItem Header="_Discard current edit(s)" Command="{Binding DiscardEditedLinesCommand}"/>
+            </MenuItem>
         </Menu>
         <Grid>
             <Grid.RowDefinitions>
@@ -65,7 +69,7 @@
                 Grid.Row="2" 
                 ItemsSource="{Binding TranslationLinesView}"
                 SelectedItem="{Binding CurrentTranslationItem}" 
-                CanUserDeleteRows="True"                 
+                CanUserDeleteRows="False"                 
                 CanUserAddRows="False"
                 HorizontalScrollBarVisibility="Hidden"
                 AutoGenerateColumns="False">

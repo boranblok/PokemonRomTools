@@ -105,22 +105,6 @@ namespace PkmnAdvanceTranslation
                 ;
         }
 
-        internal void SaveEditedLines()
-        {
-            foreach (var editedLine in TranslationLines.Where(l => l.HasUnsavedChanges))
-            {
-                editedLine.SaveMultiLineTextCommand.Execute(null);
-            }
-        }
-
-        internal void DiscardEditedLines()
-        {
-            foreach(var editedLine in TranslationLines.Where(l => l.HasUnsavedChanges))
-            {
-                editedLine.RestoreMultiLineTextCommand.Execute(null);
-            }
-        }
-
         public Nullable<Boolean> TranslatedFilter
         {
             get
@@ -232,6 +216,51 @@ namespace PkmnAdvanceTranslation
                     TranslationLinesView.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
                 _groupItems = value;
             }
+        }
+
+        public RelayCommand SaveEditedLinesCommand
+        {
+            get
+            {
+                return new RelayCommand(param => SaveEditedLines(), param => CanSaveEditedLines());
+            }
+        }
+
+
+        internal void SaveEditedLines()
+        {
+            foreach (var editedLine in TranslationLines.Where(l => l.HasUnsavedChanges))
+            {
+                editedLine.SaveMultiLineTextCommand.Execute(null);
+            }
+        }
+
+        internal Boolean CanSaveEditedLines()
+        {
+            var lineWithUnsavedChange = TranslationLines.FirstOrDefault(l => l.HasUnsavedChanges);
+            return lineWithUnsavedChange != null;
+        }
+
+        public RelayCommand DiscardEditedLinesCommand
+        {
+            get
+            {
+                return new RelayCommand(param => DiscardEditedLines(), param => CanDiscardEditedLines());
+            }
+        }
+
+        internal void DiscardEditedLines()
+        {
+            foreach (var editedLine in TranslationLines.Where(l => l.HasUnsavedChanges))
+            {
+                editedLine.RestoreMultiLineTextCommand.Execute(null);
+            }
+        }
+
+        internal Boolean CanDiscardEditedLines()
+        {
+            var lineWithUnsavedChange = TranslationLines.FirstOrDefault(l => l.HasUnsavedChanges);
+            return lineWithUnsavedChange != null;
         }
 
         public RelayCommand ClearFilterCommand
