@@ -18,7 +18,6 @@ namespace PkmnAdvanceTranslation
         private static Boolean isDryrun = true;
         private static Boolean forceRepointing = false;
 
-
         private static int PrintUsage()
         {
             Console.WriteLine("Usage:");
@@ -41,8 +40,8 @@ namespace PkmnAdvanceTranslation
 
             var rom = new RomDataWrapper(new FileInfo(args[0]));
 
-            var translationBaseLines = LoadTranslationBaseLines(args[1]);
-            if (translationBaseLines == null)
+            var translationFileLines = LoadTranslationFileLines(args[1]);
+            if (translationFileLines == null)
                 return PrintUsage();
 
             var outputRom = new FileInfo(args[2]);
@@ -55,7 +54,7 @@ namespace PkmnAdvanceTranslation
 
             log.Info("Re - fetching text references and available length from rom file.");
             Console.WriteLine("Re-fetching text references and available length from rom file.");
-            List<PointerText> translatedLines = ApplyTranslationToExistingLines(rom, translationBaseLines);
+            List<PointerText> translatedLines = CreateTranslatedLinesWithRom(rom, translationFileLines);
             Console.WriteLine();
 
             log.Info("Searching lines that need repointing.");
@@ -87,25 +86,7 @@ namespace PkmnAdvanceTranslation
             return 0;
         }
 
-        private static void ApplyTranslation(RomDataWrapper rom, List<PointerText> translatedLines)
-        {
-            var repointLocation = Int32.Parse(ConfigurationManager.AppSettings["EmptySpacestart"], NumberStyles.HexNumber);
-
-            foreach(var translatedLine in translatedLines.Where(l => l.MustRepointReference))
-            {
-                rom.ClearByteRange(translatedLine.Address, translatedLine.AvailableLength);
-                rom.ModifyTextReferences(repointLocation, translatedLine.References);                
-                rom.WriteBytes(repointLocation, translatedLine.TranslatedSingleLineBytes);
-                repointLocation += translatedLine.TranslatedSingleLineBytes.Length + 1;
-            }
-            foreach(var translatedLine in translatedLines.Where(l => !l.MustRepointReference))
-            {
-                rom.WriteBytes(translatedLine.Address, translatedLine.TranslatedSingleLineBytes);
-                rom.ClearByteRange(translatedLine.Address + translatedLine.TranslatedSingleLineBytes.Length, translatedLine.AvailableLength - translatedLine.TranslatedSingleLineBytes.Length);
-            }
-        }
-
-        private static List<PointerText> LoadTranslationBaseLines(String translationFileName)
+        private static List<PointerText> LoadTranslationFileLines(String translationFileName)
         {
             var translationSourceFile = new FileInfo(translationFileName);
             if (!translationSourceFile.Exists)
@@ -114,25 +95,25 @@ namespace PkmnAdvanceTranslation
                 Console.WriteLine("Translation source file {0} does not exist", translationFileName);
                 return null;
             }
-            return PointerText.ReadPointersFromFile(translationSourceFile);            
+            return PointerText.ReadPointersFromFile(translationSourceFile);
         }
 
-        private static List<PointerText> ApplyTranslationToExistingLines(RomDataWrapper rom, List<PointerText> translationBaseLines)
+        private static List<PointerText> CreateTranslatedLinesWithRom(RomDataWrapper rom, List<PointerText> translationFileLines)
         {
             var sw = new Stopwatch();
             sw.Start();
             var translatedLines = new List<PointerText>();
             var lockObject = new Object();
             var numThreads = Environment.ProcessorCount;
-            var numPerThread = translationBaseLines.Count / numThreads;
+            var numPerThread = translationFileLines.Count / numThreads;
             var tasks = new List<Task>();
-            for(int i = 0; i < numThreads - 1; i++)
+            for (int i = 0; i < numThreads - 1; i++)
             {
-                var baseLinesToHandle = translationBaseLines.Skip(i * numPerThread).Take(numPerThread);
-                tasks.Add(Task.Run(() => ApplyTranslationToExistingLinesTask(rom, baseLinesToHandle, translatedLines, lockObject, translationBaseLines.Count)));
+                var translationFileLinesToHandle = translationFileLines.Skip(i * numPerThread).Take(numPerThread);
+                tasks.Add(Task.Run(() => ApplyTranslationToExistingLinesTask(rom, translationFileLinesToHandle, translatedLines, lockObject, translationFileLines.Count)));
             }
-            var finalBaseLinesToHandle = translationBaseLines.Skip((numThreads - 1) * numPerThread);
-            tasks.Add(Task.Run(() => ApplyTranslationToExistingLinesTask(rom, finalBaseLinesToHandle, translatedLines, lockObject, translationBaseLines.Count)));
+            var finalTranslationFileLinesToHandle = translationFileLines.Skip((numThreads - 1) * numPerThread);
+            tasks.Add(Task.Run(() => ApplyTranslationToExistingLinesTask(rom, finalTranslationFileLinesToHandle, translatedLines, lockObject, translationFileLines.Count)));
 
             Task.WaitAll(tasks.ToArray());
 
@@ -142,16 +123,25 @@ namespace PkmnAdvanceTranslation
         }
 
         private static void ApplyTranslationToExistingLinesTask(RomDataWrapper rom,
-            IEnumerable<PointerText> translatedBaseLines, List<PointerText> translatedLines, Object lockObject, Int32 totalCount)
+            IEnumerable<PointerText> translationFileLines, List<PointerText> translatedLines, Object lockObject, Int32 totalCount)
         {
-            foreach (var baseLine in translatedBaseLines)
+            foreach (var line in translationFileLines)
             {
-                var originalLine = rom.GetOriginalPointerInfo(baseLine.Address);
-                originalLine.TranslatedSingleLine = baseLine.TranslatedSingleLine;
-                originalLine.ForceRepointReference = baseLine.ForceRepointReference;                
-                lock(lockObject)
+                var mergedLine = rom.GetOriginalPointerInfo(line.Address);
+                if (line.IsTranslated)
                 {
-                    translatedLines.Add(originalLine);
+                    mergedLine.TranslatedSingleLine = line.TranslatedSingleLine;
+                    mergedLine.ForceRepointReference = line.ForceRepointReference;
+                }
+                else
+                {
+                    mergedLine.TranslatedSingleLine = line.UntranslatedSingleLine;
+                    log.Info("Using original language text for line because no translation was provided:");
+                    log.Info(line);
+                }
+                lock (lockObject)
+                {
+                    translatedLines.Add(mergedLine);
                     if (translatedLines.Count % 100 == 0)
                     {
                         Console.Write("\rProgress: {0:##0}%   ", ((Decimal)translatedLines.Count / totalCount) * 100);
@@ -244,5 +234,25 @@ namespace PkmnAdvanceTranslation
                 }
             }
         }
+
+        private static void ApplyTranslation(RomDataWrapper rom, List<PointerText> translatedLines)
+        {
+            var repointLocation = Int32.Parse(ConfigurationManager.AppSettings["EmptySpacestart"], NumberStyles.HexNumber);
+
+            foreach(var translatedLine in translatedLines.Where(l => l.MustRepointReference))
+            {
+                rom.ClearByteRange(translatedLine.Address, translatedLine.AvailableLength);
+                rom.ModifyTextReferences(repointLocation, translatedLine.References);                
+                rom.WriteBytes(repointLocation, translatedLine.TranslatedSingleLineBytes);
+                repointLocation += translatedLine.TranslatedSingleLineBytes.Length + 1;
+            }
+            foreach(var translatedLine in translatedLines.Where(l => !l.MustRepointReference))
+            {
+                rom.WriteBytes(translatedLine.Address, translatedLine.TranslatedSingleLineBytes);
+                rom.ClearByteRange(translatedLine.Address + translatedLine.TranslatedSingleLineBytes.Length, translatedLine.AvailableLength - translatedLine.TranslatedSingleLineBytes.Length);
+            }
+        }
+
+        
     }
 }
