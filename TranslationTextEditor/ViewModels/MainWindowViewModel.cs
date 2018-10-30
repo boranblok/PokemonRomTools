@@ -14,7 +14,7 @@ using System.Timers;
 using System.Windows.Data;
 using System.Windows.Threading;
 
-namespace PkmnAdvanceTranslation
+namespace PkmnAdvanceTranslation.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase
     {
@@ -283,7 +283,23 @@ namespace PkmnAdvanceTranslation
 
         private void ChangeLinesGroup()
         {
-            throw new NotImplementedException();
+            var vm = new ChangeGroupViewModel();
+            vm.Groups = Groups;
+            DialogViewModel = vm;
+            DialogViewModel.ShowDialog = true;
+            if(vm.Confirmed)
+            {
+                foreach(var line in SelectedTranslationLines)
+                {
+                    line.Group = vm.SelectedGroup;
+                }
+                if (GroupItems)
+                {
+                    TranslationLinesView.SortDescriptions.Clear();
+                    TranslationLinesView.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
+                    TranslationLinesView.Refresh();
+                }                
+            }
         }
 
         private bool CanChangeLinesGroup()

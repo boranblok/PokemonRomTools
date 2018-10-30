@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PkmnAdvanceTranslation
+namespace PkmnAdvanceTranslation.ViewModels
 {
     public class TranslationItemViewModel : ViewModelBase
     {

@@ -30,6 +30,10 @@ namespace PkmnAdvanceTranslation.ViewModels
                 }
                 return _groups;
             }
+            set
+            {
+                _groups = value;
+            }
         }
         public String SelectedGroup
         {

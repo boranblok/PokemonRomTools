@@ -18,7 +18,7 @@ namespace PkmnAdvanceTranslation
     /// <summary>
     /// Interaction logic for ChangeGroupDialog.xaml
     /// </summary>
-    public partial class ChangeGroupDialog : Window
+    public partial class ChangeGroupDialog : UserControl
     {
         public ChangeGroupDialog()
         {
