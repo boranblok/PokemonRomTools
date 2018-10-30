@@ -415,6 +415,40 @@ namespace PkmnAdvanceTranslation.ViewModels
             return SelectedTranslationLines.Count > 0;
         }
 
+        public RelayCommand DeleteSelectedLinesCommand
+        {
+            get
+            {
+                return new RelayCommand(DeleteSelectedLines, CanDeleteSelectedLines);
+            }
+        }
+
+        private void DeleteSelectedLines()
+        {
+            var message = String.Format("Are you sure you want to delete {0} entries?", SelectedTranslationLines.Count);
+            var vm = new ConfirmationDialogViewModel("Are you sure?", message);
+            DialogViewModel = vm;
+            DialogViewModel.ShowDialog = true;
+            if (vm.Confirmed)
+            {
+                var linesToRemove = new List<Int32>();
+                foreach (var line in SelectedTranslationLines)
+                {
+                    linesToRemove.Add(TranslationLines.IndexOf(line));
+                }
+                foreach(var lineIndex in linesToRemove.OrderByDescending(i => i))
+                {
+                    TranslationLines.RemoveAt(lineIndex);
+                    TranslationLinesView.Refresh();
+                }
+            }           
+        }
+
+        private bool CanDeleteSelectedLines()
+        {
+            return SelectedTranslationLines.Count > 0;
+        }
+
         public RelayCommand SaveEditedLinesCommand
         {
             get

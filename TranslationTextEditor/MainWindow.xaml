@@ -24,6 +24,7 @@
                 <MenuItem Header="_Discard current edit(s)" Command="{Binding DiscardEditedLinesCommand}"/>
                 <MenuItem Header="_Change group" Command="{Binding ChangeLinesGroupCommand}"/>
                 <MenuItem Header="Copy untranslated" Command="{Binding CopyUntranslatedToTranslatedLinesCommand}"/>
+                <MenuItem Header="Delete selected lines" Command="{Binding DeleteSelectedLinesCommand}"/>
             </MenuItem>
         </Menu>
         <Grid>
