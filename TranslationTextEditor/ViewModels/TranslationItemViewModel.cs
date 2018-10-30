@@ -17,7 +17,6 @@ namespace PkmnAdvanceTranslation.ViewModels
         public TranslationItemViewModel(PointerText pointerText)
         {
             PointerText = pointerText;
-            TextHandler.TranslateStringToBinary(PointerText);
         }
 
         public Boolean HasChangesInMemory
@@ -60,7 +59,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             get
             {
-                return PointerText.AvailableLength - PointerText.TextBytes.Count;
+                return PointerText.RemainingLength;
             }
         }
 
@@ -69,11 +68,6 @@ namespace PkmnAdvanceTranslation.ViewModels
             get
             {
                 return PointerText.IsTranslated;
-            }
-            set
-            {
-                PointerText.IsTranslated = value;
-                OnPropertyChanged("IsTranslated");
             }
         }
 
@@ -90,17 +84,16 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        public String SingleLineText
+        public String TranslatedSingleLine
         {
             get
             {
-                return PointerText.SingleLineText;
+                return PointerText.TranslatedSingleLine;
             }
             set
             {
-                PointerText.SingleLineText = value;
-                TextHandler.TranslateStringToBinary(PointerText);
-                OnPropertyChanged("SingleLineText");
+                PointerText.TranslatedSingleLine = value;
+                OnPropertyChanged("TranslatedSingleLine");
                 OnPropertyChanged("RemainingLength");
             }
         }
@@ -129,19 +122,27 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        public String MultiLineText
+        public String TranslatedMultiLine
         {
             get
             {
                 if(editedMultiLineText == null)
-                    return TextHandler.FormatEditString(SingleLineText);
+                    return TextHandler.FormatEditString(TranslatedSingleLine);
                 return editedMultiLineText;
             }
             set
             {
                 editedMultiLineText = value;
-                OnPropertyChanged("MultiLineText");
+                OnPropertyChanged("TranslatedMultiLine");
                 OnPropertyChanged("HasUnsavedChanges");
+            }
+        }
+
+        public String UnTranslatedMultiLine
+        {
+            get
+            {
+                return TextHandler.FormatEditString(PointerText.UntranslatedSingleLine);
             }
         }
 
@@ -160,7 +161,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private void RestoreMultiLineText()
         {
-            MultiLineText = null;
+            TranslatedMultiLine = null;
         }
 
         public RelayCommand SaveMultiLineTextCommand
@@ -178,8 +179,8 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private void SaveMultiLineText()
         {            
-            SingleLineText = TextHandler.EditStringToSingleLine(editedMultiLineText, IsSpecialDialog);
-            MultiLineText = null;
+            TranslatedSingleLine = TextHandler.EditStringToSingleLine(editedMultiLineText, IsSpecialDialog);
+            TranslatedMultiLine = null;
             HasChangesInMemory = true;
         }
     }

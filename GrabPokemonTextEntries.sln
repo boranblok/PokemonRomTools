@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractTextPointersFromAdva
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedLibrary", "SharedLibrary\SharedLibrary.csproj", "{629A251A-B6A4-40A4-B0AA-9F9F6993C91A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReplaceTextIndexes", "ReplaceTextIndexes\ReplaceTextIndexes.csproj", "{1931D8AE-5E74-40B0-BBD5-565DC0C2D2CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MergetranslationFiles", "ReplaceTextIndexes\MergetranslationFiles.csproj", "{1931D8AE-5E74-40B0-BBD5-565DC0C2D2CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplyTranslationsToRom", "ApplyTranslationsToRom\ApplyTranslationsToRom.csproj", "{2CE7B0ED-A1C8-448D-BFD3-79106CFEEFF8}"
 EndProject

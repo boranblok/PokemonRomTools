@@ -287,10 +287,10 @@ namespace PkmnAdvanceTranslation
             return formatted;
         }
 
-        public static void TranslateBinaryToString(PointerText text)
+        public static String TranslateBinaryToString(IEnumerable<Byte> bytes)
         {
             var builder = new StringBuilder();
-            foreach (var b in text.TextBytes)
+            foreach (var b in bytes)
             {
                 if (byteTranstbl.ContainsKey(b))
                 {
@@ -305,17 +305,17 @@ namespace PkmnAdvanceTranslation
             {
                 builder.Replace(key, stringTransTbl[key]);
             }
-            text.SetSingleLineText(builder.ToString());
+            return builder.ToString();
         }
 
-        public static void TranslateStringToBinary(PointerText text)
+        public static List<Byte> TranslateStringToBinary(String text)
         {
-            var textToWrite = text.SingleLineText;
+            var bytes = new List<Byte>();
+            var textToWrite = text;
             foreach (var key in stringTransTbl.Keys)
             {
                 textToWrite = textToWrite.Replace(stringTransTbl[key], key);
-            }
-            var bytes = new List<Byte>();
+            }            
             for (int i = 0; i < textToWrite.Length; i++)
             {
                 String searchValue;
@@ -354,7 +354,7 @@ namespace PkmnAdvanceTranslation
                         throw new Exception(String.Format("The text {0} cannot be found in the table mapping and is no hex value. Full text: {1}", searchValue, textToWrite));
                 }
             }
-            text.SetTextBytes(bytes.AsReadOnly());
+            return bytes;
         }
     }
 }

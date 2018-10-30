@@ -120,7 +120,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 && (!UnsavedFilter.HasValue || translationLine.HasUnsavedChanges == UnsavedFilter.Value)
                 && (GroupFilter == null || String.IsNullOrWhiteSpace(GroupFilter.Value) || translationLine.Group == GroupFilter.Value)
                 && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
-                && (String.IsNullOrWhiteSpace(ContentFilter) || translationLine.SingleLineText.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                && (String.IsNullOrWhiteSpace(ContentFilter) || translationLine.TranslatedSingleLine.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) >= 0)
                 ;
         }
 
@@ -460,13 +460,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private void WriteTranslationFile(FileInfo outputFile)
         {
-            using (var writer = new StreamWriter(outputFile.Open(FileMode.Create), Encoding.GetEncoding(1252)))
-            {
-                foreach (var line in TranslationLines.OrderBy(l => l.Address))
-                {
-                    writer.WriteLine(line.PointerText);
-                }
-            }
+            PointerText.WritePointersToFile(outputFile, TranslationLines.Select(l => l.PointerText).OrderBy(l => l.Address));
         }
     }
 }

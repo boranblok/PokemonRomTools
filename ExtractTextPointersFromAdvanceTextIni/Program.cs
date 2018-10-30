@@ -12,7 +12,6 @@ namespace PkmnAdvanceTranslation
 {
     class Program
     {
-        private static readonly Boolean test = true;
         static void Main(string[] args)
         {
             if (args.Length < 3)
@@ -47,24 +46,8 @@ namespace PkmnAdvanceTranslation
                     }
                     else
                     {
-                        var text = rom.GetTextAtPointer(intValue);
-                        TextHandler.TranslateBinaryToString(text);
-                        text.Group = FindGroup(bpreContents, match.Index);
-                        if (test)
-                        {
-                            var bytes = new List<Byte>(text.TextBytes);
-                            var textValue = text.SingleLineText;
-                            text.SingleLineText = null;
-                            text.SingleLineText = textValue;
-                            TextHandler.TranslateStringToBinary(text);
-                            var bytes2 = new List<Byte>(text.TextBytes);
-                            Debug.Assert(bytes.Count == bytes2.Count, "Roundtrip byte translation failed, arrays are different length.");
-                            for (int i = 0; i < bytes.Count; i++)
-                            {
-                                Debug.Assert(bytes[i] == bytes2[i], "Roundtrip byte translation failed, arrays have different content.",
-                                    "byte[{0}] has value {1:X2} and byte2[{0}] has value {2:X2}.", i, bytes[i], bytes2[i]);
-                            }
-                        }
+                        var text = rom.GetOriginalPointerInfo(intValue);                        
+                        text.Group = FindGroup(bpreContents, match.Index);                        
                         foundText.Add(intValue, text);
                     }
                 }

@@ -110,10 +110,17 @@
                             <TextBlock Text="Ch." ToolTip="Has unsaved changes"/>
                         </DataGridCheckBoxColumn.Header>
                     </DataGridCheckBoxColumn>
-                    <DataGridTemplateColumn Width="*" Header="Single line text representation" SortMemberPath="SingleLineText">
+                    <DataGridTemplateColumn Width="*" Header="Original text" SortMemberPath="TranslatedMultiLine">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding SingleLineText}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
+                                <TextBlock Text="{Binding TranslatedMultiLine}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="*" Header="Translated text" SortMemberPath="UnTranslatedMultiLine">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding UnTranslatedMultiLine}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

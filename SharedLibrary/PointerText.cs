@@ -33,7 +33,7 @@ namespace PkmnAdvanceTranslation
         {
             using (var writer = new StreamWriter(file.Open(FileMode.Create), Encoding.GetEncoding(1252)))
             {
-                foreach (var line in lines.OrderBy(l => l.Address))
+                foreach (var line in lines)
                 {
                     writer.WriteLine(line);
                 }
@@ -41,41 +41,58 @@ namespace PkmnAdvanceTranslation
         }
 
         public static readonly Char[] HexChars = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f' };
-        private string _singleLineText;
-        private ReadOnlyCollection<byte> _textBytes;
-        private List<int> _references;
 
+        private String _translatedSingleLine;
+        private Byte[] _translatedSingleLineBytes;
+        private List<int> _references;
+        
         public Int32 Address { get; set; }
 
         public List<Int32> References { get => _references; set { _references = value; ReferenceCount = value.Count;  } }
         public Int32 ReferenceCount { get; set; }
-        public String SingleLineText
+        public String TranslatedSingleLine
         {
-            get => _singleLineText;
-            set { _singleLineText = value; _textBytes = null; }
+            get
+            {
+                return _translatedSingleLine;
+            }
+            set
+            {
+                _translatedSingleLine = value;
+                _translatedSingleLineBytes = TextHandler.TranslateStringToBinary(value).ToArray();
+            }
         }
-        public ReadOnlyCollection<Byte> TextBytes
+
+        public Byte[] TranslatedSingleLineBytes
         {
-            get => _textBytes;
-            set { _textBytes = value; _singleLineText = null; }
+            get
+            {
+                return _translatedSingleLineBytes;
+            }
         }
+
+        public String UntranslatedSingleLine { get; set; }
+
         public Boolean ForceRepointReference { get; set; }
         public Int32 AvailableLength { get; set; }
 
+        public Int32 RemainingLength
+        {
+            get
+            {
+                return AvailableLength - TranslatedSingleLineBytes.Length;
+            }
+        }
+
         public Boolean MustRepointReference { get; set; }
-        public Boolean IsTranslated { get; set; }
+        public Boolean IsTranslated {
+            get
+            {
+                return !String.IsNullOrWhiteSpace(TranslatedSingleLine);
+            }
+        }
         public TextMode TextMode { get; set; }
         public String Group { get; set; }
-
-        internal void SetSingleLineText(String translatedText)
-        {
-            _singleLineText = translatedText;
-        }
-
-        internal void SetTextBytes(ReadOnlyCollection<Byte> translatedBytes)
-        {
-            _textBytes = translatedBytes;
-        }
 
         public Boolean CanRepointReference
         {
@@ -87,8 +104,8 @@ namespace PkmnAdvanceTranslation
 
         public override String ToString()
         {
-            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}|{5}|{6,-40}|{7}", 
-                Address, ReferenceCount, AvailableLength, ForceRepointReference ? 1 : 0, IsTranslated ? "Y" : "N", TextMode.ToString()[0], Group, SingleLineText);
+            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}|{5,-40}|{6}|{7}", 
+                Address, ReferenceCount, AvailableLength, ForceRepointReference ? 1 : 0,TextMode.ToString()[0], Group, UntranslatedSingleLine, TranslatedSingleLine);
         }
 
         public static PointerText FromString(String pointerTextString)
@@ -128,18 +145,6 @@ namespace PkmnAdvanceTranslation
 
             switch (parts[4])
             {
-                case "N":
-                    result.IsTranslated = false;
-                    break;
-                case "T":
-                    result.IsTranslated = true;
-                    break;
-                default:
-                    throw new Exception(String.Format("{0} is not a valid translated Value, expected Y or N. {1} is not valid", parts[4], pointerTextString));
-            }
-
-            switch (parts[5])
-            {
                 case "I":
                     result.TextMode = TextMode.Into;
                     break;
@@ -150,9 +155,11 @@ namespace PkmnAdvanceTranslation
                     throw new Exception(String.Format("{0} is not a valid textmode Value, expected I or N. {1} is not valid", parts[5], pointerTextString));
             }
 
-            result.Group = parts[6].Trim();
+            result.Group = parts[5].Trim();
 
-            result.SingleLineText = parts[7];
+            result.UntranslatedSingleLine = parts[6];
+
+            result.TranslatedSingleLine = parts[7];
 
             return result;
         }

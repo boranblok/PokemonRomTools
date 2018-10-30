@@ -12,7 +12,7 @@ namespace ReplaceTextIndexes
         static void Main(string[] args)
         {
             if (args.Length < 3)
-                throw new Exception("Give source index file, target index file and output index file names.");
+                throw new Exception("Give source translation file, target index file and output translation file names.");
 
             var indexSourceFile = new FileInfo(args[0]);
             var indexTargetFile = new FileInfo(args[1]);
@@ -36,7 +36,7 @@ namespace ReplaceTextIndexes
                     var targetLine = targetReader.ReadLine();
                     if (sourceLine != null && targetLine != null && sourceLine.Length > 5 && targetLine.Length > 5)
                     {
-                        writer.WriteLine(sourceLine.Substring(0, 14) + targetLine.Substring(14));
+                        writer.WriteLine( targetLine.Substring(0, targetLine.LastIndexOf('|')) + sourceLine.Substring(sourceLine.LastIndexOf('|')));
                     }
                     else
                     {

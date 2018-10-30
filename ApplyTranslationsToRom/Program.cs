@@ -94,14 +94,14 @@ namespace PkmnAdvanceTranslation
             foreach(var translatedLine in translatedLines.Where(l => l.MustRepointReference))
             {
                 rom.ClearByteRange(translatedLine.Address, translatedLine.AvailableLength);
-                rom.WriteBytes(repointLocation, translatedLine.TextBytes.ToArray());
-                rom.ModifyTextReferences(repointLocation, translatedLine.References);
-                repointLocation += translatedLine.TextBytes.Count + 1;
+                rom.ModifyTextReferences(repointLocation, translatedLine.References);                
+                rom.WriteBytes(repointLocation, translatedLine.TranslatedSingleLineBytes);
+                repointLocation += translatedLine.TranslatedSingleLineBytes.Length + 1;
             }
             foreach(var translatedLine in translatedLines.Where(l => !l.MustRepointReference))
             {
-                rom.WriteBytes(translatedLine.Address, translatedLine.TextBytes.ToArray());
-                rom.ClearByteRange(translatedLine.Address + translatedLine.TextBytes.Count, translatedLine.AvailableLength - translatedLine.TextBytes.Count);
+                rom.WriteBytes(translatedLine.Address, translatedLine.TranslatedSingleLineBytes);
+                rom.ClearByteRange(translatedLine.Address + translatedLine.TranslatedSingleLineBytes.Length, translatedLine.AvailableLength - translatedLine.TranslatedSingleLineBytes.Length);
             }
         }
 
@@ -145,10 +145,9 @@ namespace PkmnAdvanceTranslation
         {
             foreach (var baseLine in translatedBaseLines)
             {
-                var originalLine = rom.GetTextAtPointer(baseLine.Address);
-                originalLine.SingleLineText = baseLine.SingleLineText;
-                originalLine.ForceRepointReference = baseLine.ForceRepointReference;
-                TextHandler.TranslateStringToBinary(originalLine);
+                var originalLine = rom.GetOriginalPointerInfo(baseLine.Address);
+                originalLine.TranslatedSingleLine = baseLine.TranslatedSingleLine;
+                originalLine.ForceRepointReference = baseLine.ForceRepointReference;                
                 lock(lockObject)
                 {
                     translatedLines.Add(originalLine);
@@ -162,12 +161,12 @@ namespace PkmnAdvanceTranslation
 
         private static void RepointLinesIfRequired(List<PointerText> translatedLines)
         {
-            foreach (var translatedLine in translatedLines.Where(l => l.TextBytes.Count > l.AvailableLength))
+            foreach (var translatedLine in translatedLines.Where(l => l.TranslatedSingleLineBytes.Length > l.AvailableLength))
             {
                 if (translatedLine.CanRepointReference)
                 {
                     //If we can repoint we only check if we really need to.
-                    var requiredSpace = translatedLine.TextBytes.Count - translatedLine.AvailableLength;
+                    var requiredSpace = translatedLine.TranslatedSingleLineBytes.Length - translatedLine.AvailableLength;
                     var nextTextAddress = translatedLine.Address + translatedLine.AvailableLength + 1;
                     while (requiredSpace > 0)
                     {
@@ -211,7 +210,7 @@ namespace PkmnAdvanceTranslation
                         //Mainly by repointing lines that did not need repointing.
                         //If this is not possible an error is thrown, the line will have to fit in the original allotted space.
 
-                        var requiredSpace = translatedLine.TextBytes.Count - translatedLine.AvailableLength;
+                        var requiredSpace = translatedLine.TranslatedSingleLineBytes.Length - translatedLine.AvailableLength;
                         var nextTextAddress = translatedLine.Address + translatedLine.AvailableLength + 1;
                         while (requiredSpace > 0)
                         {

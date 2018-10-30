@@ -44,7 +44,7 @@ namespace PkmnAdvanceTranslation
             }
         }
 
-        public PointerText GetTextAtPointer(Int32 textPointer)
+        public PointerText GetOriginalPointerInfo(Int32 textPointer)
         {
             var result = new PointerText();
             result.Address = textPointer;            
@@ -68,7 +68,8 @@ namespace PkmnAdvanceTranslation
                 }
                 index++;
             }
-            result.TextBytes = textBytes.AsReadOnly();
+            result.AvailableLength = textBytes.Count;
+            result.UntranslatedSingleLine = TextHandler.TranslateBinaryToString(textBytes);
             return result;
         }
 

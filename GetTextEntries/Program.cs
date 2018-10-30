@@ -84,7 +84,7 @@ namespace PkmnAdvanceTranslation
 
             Console.WriteLine("Writing missed text entries to file.");
 
-            PointerText.WritePointersToFile(outputFile, linesToTranslate);
+            PointerText.WritePointersToFile(outputFile, linesToTranslate.OrderBy(l => l.Address));
 
             Console.WriteLine("Done, press any key to continue...");
             Console.ReadLine();
@@ -118,8 +118,7 @@ namespace PkmnAdvanceTranslation
         {
             foreach (var line in linesToGet)
             {
-                var lineTotranslate = rom.GetTextAtPointer(line);
-                TextHandler.TranslateBinaryToString(lineTotranslate);
+                var lineTotranslate = rom.GetOriginalPointerInfo(line);
                 lock (lockObject)
                 {
                     linestotranslate.Add(lineTotranslate);

@@ -51,10 +51,5 @@
     <Compile Include="TextHandler.cs" />
     <Compile Include="WordBinarySearcher.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="table file.tbl">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

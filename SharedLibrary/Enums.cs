@@ -8,7 +8,7 @@ namespace PkmnAdvanceTranslation
 {
     public enum TextMode
     {
-        Into,
-        Dialog
+        Dialog,
+        Into        
     }
 }
