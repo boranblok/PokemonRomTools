@@ -15,13 +15,8 @@ namespace PkmnAdvanceTranslation
     {
         private static readonly byte end = 0xFF;
         private static readonly int backSearch = 300;
-        private static readonly int minStringLength = 1;        
-        private static byte printableCharStart = 0xA1;
-        private static byte printableCharEnd = 0xEE;
-        private static int successiveNPCCutoff = 3;
-        private static int totalNPCCutoff = 10;
-        private static byte fc = 0xFC;
-        private static byte fd = 0xFD;
+        private static readonly int minStringLength = 1;
+
         private static int startPosition = 0x172255;
         private static int skipBlockStart = 0x71A23D;
         private static int skipBlockEnd = 0xCFFFFF;
@@ -89,8 +84,8 @@ namespace PkmnAdvanceTranslation
 
             for(int i = 0; i < newTranslationLines.Count; i++)
             {
-                if (existingtranslationLines[i] > skipBlockStart)
-                    existingtranslationLines[i] += (skipBlockEnd - skipBlockStart);
+                if (newTranslationLines[i] > skipBlockStart)
+                    newTranslationLines[i] += (skipBlockEnd - skipBlockStart);
             }
 
             var linesToTranslate = LoadNewTranslationLines(rom);
@@ -171,11 +166,11 @@ namespace PkmnAdvanceTranslation
                 var readByte = rom.RomContents[i];
                 if (readByte == end)
                 {
-                    if (prevEnd != from && i - prevEnd > minStringLength)
+                    if (i - prevEnd > minStringLength)
                     {
                         var possibleTxt = prevEnd + 1;
                         if (existingtranslationLines.Contains(possibleTxt))
-                            continue;                            
+                            continue;
 
                         if(rom.IsTextReference(possibleTxt))
                         { 
@@ -187,32 +182,8 @@ namespace PkmnAdvanceTranslation
                         else
                         {
                             var backSearchLimit = (i - prevEnd < backSearch) ? i - prevEnd : backSearch;
-                            var successiveNPC = 0;
-                            var totalNPC = 0;
                             for (int j = i - 1; j > (i - backSearchLimit + 1); j--)
-                            {
-                                byte value = rom.RomContents[j];
-                                if (value != fc && value != fd && (value < printableCharStart || value > printableCharEnd))
-                                {
-                                    successiveNPC++;
-                                    totalNPC++;
-                                    if (successiveNPC > 2 || totalNPC > totalNPCCutoff) break;
-                                }
-                                else
-                                {
-                                    if (successiveNPC > 0)
-                                    {
-                                        if (value == fc || value == fd)
-                                            successiveNPC = 0;
-                                        else
-                                            break;
-                                    }
-                                    else
-                                    {
-                                        if (value == fc || value == fd)
-                                            break;
-                                    }
-                                }
+                            {                                
                                 if (rom.IsTextReference(j))
                                 {
                                     lock (newTranslationLinesLockObject)

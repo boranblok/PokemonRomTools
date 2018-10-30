@@ -30,6 +30,8 @@ namespace EndianSwapperWpf
 
         private void SetRef(String ptr)
         {
+            if (ptr.Length == 8)
+                ptr = ptr.Substring(2);
             txtREF.Text = ptr.Substring(4, 2) + ptr.Substring(2, 2) + ptr.Substring(0, 2) + "08";
             Clipboard.SetText(txtREF.Text);
         }
