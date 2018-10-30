@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,6 +26,10 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private ObservableCollection<GroupViewModel> _groups;
         private ICollectionView _translationLinesView;
+
+        private List<ContainsViewModel> _containsModes;
+        private ContainsViewModel _currentContainsMode;
+
         private FileInfo _translationFile;
 
         private Boolean _groupItems;
@@ -43,12 +48,25 @@ namespace PkmnAdvanceTranslation.ViewModels
             Title = "Pokémon translation editor";
             _ioService = ioService;
 
+            LoadContainsModes();
+
             filterDelayTimer = new Timer();
             filterDelayTimer.Interval = 50;
             filterDelayTimer.AutoReset = true;
             filterDelayTimer.Elapsed += new ElapsedEventHandler(filterDelayTimer_Elapsed);
 
             dispatcher = Dispatcher.CurrentDispatcher;
+        }
+
+        private void LoadContainsModes()
+        {
+            _containsModes = new List<ContainsViewModel>();
+            foreach(var value in Enum.GetValues(typeof(ContainFilterMode)))
+            {
+                var enumValue = (ContainFilterMode)value;
+                _containsModes.Add(new ContainsViewModel(enumValue.ToString(), enumValue));
+            }
+            _currentContainsMode = _containsModes[0];
         }
 
         public ObservableCollection<GroupViewModel> Groups
@@ -60,6 +78,14 @@ namespace PkmnAdvanceTranslation.ViewModels
                     _groups = new ObservableCollection<GroupViewModel>();
                 }
                 return _groups;
+            }
+        }
+
+        public List<ContainsViewModel> ContainsModes
+        {
+            get
+            {
+                return _containsModes;
             }
         }
 
@@ -99,6 +125,24 @@ namespace PkmnAdvanceTranslation.ViewModels
             {
                 _currentTranslationLineItem = value;
                 OnPropertyChanged("CurrentTranslationItem");
+                OnPropertyChanged("HasCurrentTranslationItem");
+                OnPropertyChanged("HasNoCurrentTranslationItem");
+            }
+        }
+
+        public Boolean HasCurrentTranslationItem
+        {
+            get
+            {
+                return CurrentTranslationItem != null;
+            }
+        }
+
+        public Boolean HasNoCurrentTranslationItem
+        {
+            get
+            {
+                return !HasCurrentTranslationItem;
             }
         }
 
@@ -120,8 +164,26 @@ namespace PkmnAdvanceTranslation.ViewModels
                 && (!UnsavedFilter.HasValue || translationLine.HasUnsavedChanges == UnsavedFilter.Value)
                 && (GroupFilter == null || String.IsNullOrWhiteSpace(GroupFilter.Value) || translationLine.Group == GroupFilter.Value)
                 && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
-                && (String.IsNullOrWhiteSpace(ContentFilter) || translationLine.TranslatedSingleLine.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) >= 0)
+                && MatchesContentFilter(translationLine)
                 ;
+        }
+
+        private Boolean MatchesContentFilter(TranslationItemViewModel translationLine)
+        {
+            if (String.IsNullOrWhiteSpace(ContentFilter))
+                return true;
+            switch(CurrentContainsMode.FilterMode)
+            {
+                case ContainFilterMode.Both:
+                    return translationLine.TranslatedSingleLine.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) > 0 
+                        && translationLine.UnTranslatedSingleLine.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) > 0;
+                case ContainFilterMode.Translated:
+                    return translationLine.TranslatedSingleLine.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) > 0;
+                case ContainFilterMode.Untranslated:
+                    return translationLine.UnTranslatedSingleLine.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) > 0;
+                default:
+                    return true;
+            }
         }
 
         public Nullable<Boolean> TranslatedFilter
@@ -135,6 +197,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 if (value == _translatedFilter)
                     return;
                 _translatedFilter = value;
+                OnPropertyChanged("TranslatedFilter");
                 TranslationLinesView.Refresh();
             }
         }
@@ -150,6 +213,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 if (value == _unsavedFilter)
                     return;
                 _unsavedFilter = value;
+                OnPropertyChanged("UnsavedFilter");
                 TranslationLinesView.Refresh();
             }
         }
@@ -166,6 +230,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                     return;
 
                 _groupFilter = value;
+                OnPropertyChanged("GroupFilter");
                 TranslationLinesView.Refresh();
             }
         }
@@ -181,6 +246,20 @@ namespace PkmnAdvanceTranslation.ViewModels
                 _addressFilter = value;
                 OnPropertyChanged("AddressFilter");
                 FilterChangedAsync();
+            }
+        }
+
+        public ContainsViewModel CurrentContainsMode
+        {
+            get { return _currentContainsMode;  }
+            set
+            {
+                if (value == _currentContainsMode)
+                    return;
+
+                _currentContainsMode = value;
+                OnPropertyChanged("CurrentContainsMode");
+                TranslationLinesView.Refresh();
             }
         }
 
@@ -363,10 +442,17 @@ namespace PkmnAdvanceTranslation.ViewModels
         private void ClearFilter()
         {
             _translatedFilter = null;
+            OnPropertyChanged("TranslatedFilter");
             _unsavedFilter = null;
-            _groupFilter = null;
+            OnPropertyChanged("UnsavedFilter");
+            _groupFilter = Groups.FirstOrDefault();
+            OnPropertyChanged("GroupFilter");
             _addressFilter = null;
+            OnPropertyChanged("AddressFilter");
             _contentFilter = null;
+            OnPropertyChanged("ContentFilter");
+            _currentContainsMode = _containsModes[0];
+            OnPropertyChanged("CurrentContainsMode");
             TranslationLinesView.Refresh();
         }
 
@@ -398,6 +484,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             TranslationLines.Clear();
             Groups.Clear();
             Groups.Add(new GroupViewModel("<ALL>", ""));
+            GroupFilter = Groups[0];
             foreach (var line in PointerText.ReadPointersFromFile(translationSourceFile))
             {
                 if (!Groups.Any(g => g.Value == line.Group))
