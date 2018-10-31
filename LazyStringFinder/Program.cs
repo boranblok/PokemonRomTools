@@ -23,7 +23,7 @@ namespace PkmnAdvanceTranslation
 
         private static List<Int32> existingtranslationLines;
         private static readonly Object newTranslationLinesLockObject = new object();
-        private static List<Int32> newTranslationLines = new List<Int32>();        
+        private static List<Int32> newTranslationLines = new List<Int32>();
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         static extern EXECUTION_STATE SetThreadExecutionState(EXECUTION_STATE esFlags);
@@ -52,7 +52,7 @@ namespace PkmnAdvanceTranslation
             existingtranslationLines = LoadTranslationBaseLines(args[1]);
             if (existingtranslationLines == null)
                 existingtranslationLines = new List<Int32>();
-            for(int i = 0; i < existingtranslationLines.Count; i++)
+            for (int i = 0; i < existingtranslationLines.Count; i++)
             {
                 if (existingtranslationLines[i] > skipBlockEnd)
                     existingtranslationLines[i] -= (skipBlockEnd - skipBlockStart);
@@ -82,7 +82,7 @@ namespace PkmnAdvanceTranslation
 
             Console.WriteLine("Finding text in {0} bytes took {1}", romWithHole.RomContents.Length, sw.Elapsed);
 
-            for(int i = 0; i < newTranslationLines.Count; i++)
+            for (int i = 0; i < newTranslationLines.Count; i++)
             {
                 if (newTranslationLines[i] > skipBlockStart)
                     newTranslationLines[i] += (skipBlockEnd - skipBlockStart);
@@ -154,8 +154,8 @@ namespace PkmnAdvanceTranslation
 
         private static void FindStringPointers(String threadName, RomDataWrapper rom, int from, int to)
         {
-            int prevEnd = from;
-            for (int i = from; i < to ; i++)
+
+            for (int i = from; i < to - 1; i++)
             {
                 if (i % 10000 == 0)
                 {
@@ -164,38 +164,20 @@ namespace PkmnAdvanceTranslation
                 }
 
                 var readByte = rom.RomContents[i];
-                if (readByte == end)
+                var nextByte = rom.RomContents[i + 1];
+                if (readByte == end && nextByte != end)
                 {
-                    if (i - prevEnd > minStringLength)
-                    {
-                        var possibleTxt = prevEnd + 1;
-                        if (existingtranslationLines.Contains(possibleTxt))
-                            continue;
+                    var possibleTxt = i + 1;
+                    if (existingtranslationLines.Contains(possibleTxt))
+                        continue;
 
-                        if(rom.IsTextReference(possibleTxt))
-                        { 
-                            lock (newTranslationLinesLockObject)
-                            {
-                                newTranslationLines.Add(possibleTxt);
-                            }
-                        }
-                        else
+                    if (rom.IsTextReference(possibleTxt))
+                    {
+                        lock (newTranslationLinesLockObject)
                         {
-                            var backSearchLimit = (i - prevEnd < backSearch) ? i - prevEnd : backSearch;
-                            for (int j = i - 1; j > (i - backSearchLimit + 1); j--)
-                            {                                
-                                if (rom.IsTextReference(j))
-                                {
-                                    lock (newTranslationLinesLockObject)
-                                    {
-                                        newTranslationLines.Add(j);
-                                    }
-                                    break; //we stop after first found pointer.
-                                }
-                            }
+                            newTranslationLines.Add(possibleTxt);
                         }
                     }
-                    prevEnd = i;
                 }
             }
         }

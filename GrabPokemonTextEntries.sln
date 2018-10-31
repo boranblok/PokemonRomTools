@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndianSwapperWpf", "EndianS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TranslationTextEditor", "TranslationTextEditor\TranslationTextEditor.csproj", "{CA6103FF-D431-4295-9768-C6E034FF9853}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazyStringFinder", "LazyStringFinder\LazyStringFinder.csproj", "{145CF52A-7530-4B96-8EDF-547DE5AF7C07}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{CA6103FF-D431-4295-9768-C6E034FF9853}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA6103FF-D431-4295-9768-C6E034FF9853}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA6103FF-D431-4295-9768-C6E034FF9853}.Release|Any CPU.Build.0 = Release|Any CPU
+		{145CF52A-7530-4B96-8EDF-547DE5AF7C07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{145CF52A-7530-4B96-8EDF-547DE5AF7C07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{145CF52A-7530-4B96-8EDF-547DE5AF7C07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{145CF52A-7530-4B96-8EDF-547DE5AF7C07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
