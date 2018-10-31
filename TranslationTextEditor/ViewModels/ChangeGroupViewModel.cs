@@ -3,39 +3,31 @@ using PkmnAdvanceTranslation.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 
 namespace PkmnAdvanceTranslation.ViewModels
 {
     public class ChangeGroupViewModel : DialogViewModelBase
     {
-        private ObservableCollection<GroupViewModel> _groups;
         private String _selectedGroup;
         public String _newGroup;
 
-        public ChangeGroupViewModel()
+        public ChangeGroupViewModel(ObservableCollection<String> groups)
         {
             Title = "Select new group for selected lines";
+            Groups = groups;
+            GroupsView = CollectionViewSource.GetDefaultView(Groups);
+            GroupsView.SortDescriptions.Add(new SortDescription("", ListSortDirection.Ascending));
         }
 
-        public ObservableCollection<GroupViewModel> Groups
-        {
-            get
-            {
-                if (_groups == null)
-                {
-                    _groups = new ObservableCollection<GroupViewModel>();
-                }
-                return _groups;
-            }
-            set
-            {
-                _groups = value;
-            }
-        }
+        public ObservableCollection<String> Groups { get; private set; }
+        public ICollectionView GroupsView { get; private set; }
+
         public String SelectedGroup
         {
             get { return _selectedGroup; }
@@ -68,7 +60,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             if (!String.IsNullOrEmpty(_newGroup))
             {
-                Groups.Add(new GroupViewModel(_newGroup, _newGroup));
+                Groups.Add(_newGroup);
                 SelectedGroup = _newGroup;
             }
             Confirmed = true;

@@ -67,13 +67,12 @@
                 <CheckBox Grid.Column="1" IsChecked="{Binding UnsavedFilter}" IsThreeState="True"/>
                 <Label Grid.Column="2" Content="Filter Translated:" />
                 <CheckBox Grid.Column="3" IsChecked="{Binding TranslatedFilter}" IsThreeState="True"/>                
-                <Label Grid.Column="4" Content="Show groups:" />
+                <Label Grid.Column="4" Content="Filter groups:" />
                 <mcb:MultiComboBox Grid.Column="5" SelectionMode="Multiple" 
                                  VerticalAlignment="Center"
                                  IsCreateNewEnabled="False"
-                                 ItemsSource="{Binding Groups}"
-                                 SelectedItems="{Binding SelectedGroups}"
-                                 DisplayMemberPath="Title">
+                                 ItemsSource="{Binding GroupsView}"
+                                 SelectedItems="{Binding SelectedGroups}">
                     <mcb:MultiComboBox.DisplaySeparator>
                         <Ellipse Margin="3,0" Height="4" Width="4" Fill="Black"/>
                     </mcb:MultiComboBox.DisplaySeparator>

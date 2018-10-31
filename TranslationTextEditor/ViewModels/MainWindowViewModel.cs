@@ -28,6 +28,8 @@ namespace PkmnAdvanceTranslation.ViewModels
         private FileInfo _translationFile;
 
         private Boolean _groupItems;
+
+
         private String _addressFilter;
         private String _contentFilter;
         private Nullable<Boolean> _translatedFilter;
@@ -43,8 +45,10 @@ namespace PkmnAdvanceTranslation.ViewModels
             _ioService = ioService;
 
             LoadContainsModes();
-            Groups = new ObservableCollection<GroupViewModel>();
-            SelectedGroups = new ObservableCollection<GroupViewModel>();
+            Groups = new ObservableCollection<String>();
+            GroupsView = CollectionViewSource.GetDefaultView(Groups);
+            GroupsView.SortDescriptions.Add(new SortDescription("", ListSortDirection.Ascending));
+            SelectedGroups = new ObservableCollection<String>();
             SelectedGroups.CollectionChanged += SelectedGroups_CollectionChanged;
             TranslationLines = new ObservableCollection<TranslationItemViewModel>();
             TranslationLinesView = CollectionViewSource.GetDefaultView(TranslationLines);
@@ -71,18 +75,12 @@ namespace PkmnAdvanceTranslation.ViewModels
             _currentContainsMode = ContainsModes[0];
         }
 
-        public ObservableCollection<GroupViewModel> Groups { get; private set; }
-
-        public ObservableCollection<GroupViewModel> SelectedGroups { get; private set; }
-
-        private void SelectedGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => TranslationLinesView.Refresh();
-
+        public ObservableCollection<String> Groups { get; private set; }
+        public ICollectionView GroupsView { get; private set; }
+        public ObservableCollection<String> SelectedGroups { get; private set; }
         public List<ContainsViewModel> ContainsModes { get; private set; }
-
         public ObservableCollection<TranslationItemViewModel> TranslationLines { get; private set; }
-
-        public virtual ICollectionView TranslationLinesView { get; private set; }
-
+        public ICollectionView TranslationLinesView { get; private set; }
         public ObservableCollection<TranslationItemViewModel> SelectedTranslationLines { get; private set; }
 
         public TranslationItemViewModel CurrentTranslationItem
@@ -123,16 +121,14 @@ namespace PkmnAdvanceTranslation.ViewModels
             return (!TranslatedFilter.HasValue || translationLine.IsTranslated == TranslatedFilter.Value)
                 && (!UnsavedFilter.HasValue || translationLine.HasUnsavedChanges == UnsavedFilter.Value)                
                 && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
-                && MatchesGroupFilter(translationLine)
+                && (SelectedGroups.Count == 0 || SelectedGroups.Contains(translationLine.Group))
                 && MatchesContentFilter(translationLine)
                 ;
         }
 
-        private bool MatchesGroupFilter(TranslationItemViewModel translationLine)
+        private void SelectedGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (SelectedGroups.Count == 0)
-                return true;
-            return SelectedGroups.Any(g => g.Value == translationLine.Group);
+            TranslationLinesView.Refresh();
         }
 
         private Boolean MatchesContentFilter(TranslationItemViewModel translationLine)
@@ -312,8 +308,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private void ChangeLinesGroup()
         {
-            var vm = new ChangeGroupViewModel();
-            vm.Groups = Groups;
+            var vm = new ChangeGroupViewModel(Groups);
             DialogViewModel = vm;
             DialogViewModel.ShowDialog = true;
             if(vm.Confirmed)
@@ -325,9 +320,9 @@ namespace PkmnAdvanceTranslation.ViewModels
                 if (GroupItems)
                 {
                     TranslationLinesView.SortDescriptions.Clear();
-                    TranslationLinesView.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));
-                    TranslationLinesView.Refresh();
-                }                
+                    TranslationLinesView.SortDescriptions.Add(new SortDescription("Group", ListSortDirection.Ascending));                    
+                }
+                TranslationLinesView.Refresh();
             }
         }
 
@@ -501,11 +496,10 @@ namespace PkmnAdvanceTranslation.ViewModels
             TranslationLines.Clear();
             Groups.Clear();
             SelectedGroups.Clear();
-            Groups.Add(new GroupViewModel("<ALL>", ""));
             foreach (var line in PointerText.ReadPointersFromFile(translationSourceFile))
             {
-                if (!Groups.Any(g => g.Value == line.Group))
-                    Groups.Add(new GroupViewModel(line.Group, line.Group));
+                if (!Groups.Contains(line.Group))
+                    Groups.Add(line.Group);
                 TranslationLines.Add(new TranslationItemViewModel(line));
             }
         }

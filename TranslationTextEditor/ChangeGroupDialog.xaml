@@ -23,8 +23,7 @@
         <Label Grid.Row="0" Grid.Column="0" Content="New Group:"/>
         <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" Margin="5"
                   IsEditable="True"
-                  ItemsSource="{Binding Groups}"
-                  DisplayMemberPath="Title"
+                  ItemsSource="{Binding GroupsView}"
                   SelectedItem="{Binding SelectedGroup}"                  
                   Text="{Binding NewGroup, UpdateSourceTrigger=LostFocus}"/>
         <Button Grid.Row="2" Grid.Column="2" Content="Ok" Command="{Binding OkCommand}"/>

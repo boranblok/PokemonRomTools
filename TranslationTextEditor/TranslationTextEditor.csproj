@@ -88,7 +88,6 @@
     <Compile Include="ViewModels\Design\ChangeGroupViewModelDesign.cs" />
     <Compile Include="ViewModels\Design\ConfirmationDialogViewModelDesign.cs" />
     <Compile Include="ViewModels\Design\MainWindowViewModelDesign.cs" />
-    <Compile Include="ViewModels\GroupViewModel.cs" />
     <Compile Include="ViewModels\TranslationItemViewModel.cs" />
     <Compile Include="Util\ViewModelBase.cs" />
     <Page Include="ChangeGroupDialog.xaml">
