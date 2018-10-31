@@ -313,6 +313,8 @@ namespace PkmnAdvanceTranslation.ViewModels
             DialogViewModel.ShowDialog = true;
             if(vm.Confirmed)
             {
+                if (!SelectedGroups.Contains(vm.SelectedGroup))
+                    SelectedGroups.Add(vm.SelectedGroup);
                 foreach(var line in SelectedTranslationLines)
                 {
                     line.Group = vm.SelectedGroup;
