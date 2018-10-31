@@ -76,7 +76,7 @@ namespace PkmnAdvanceTranslation
         protected override void OnClosing(CancelEventArgs e)
         {            
             
-            var unsavedLineCount = vm.TranslationLines.Count(l => l.HasUnsavedChanges);
+            var unsavedLineCount = vm.TranslationLines.Count(l => l.HasChangesInEditor);
             if(unsavedLineCount > 0)
             {
                 var message = String.Format("There are {0} lines still being edited on, do you want to save these?", unsavedLineCount);

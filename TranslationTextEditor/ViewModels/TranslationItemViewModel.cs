@@ -80,6 +80,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             set
             {
                 PointerText.Group = value;
+                HasChangesInMemory = true;
                 OnPropertyChanged("Group");
             }
         }
@@ -110,7 +111,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             {
                 editedMultiLineText = value;
                 OnPropertyChanged("TranslatedMultiLine");
-                OnPropertyChanged("HasUnsavedChanges");
+                OnPropertyChanged("HasChangesInEditor");
             }
         }
 
@@ -146,7 +147,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        public Boolean HasUnsavedChanges
+        public Boolean HasChangesInEditor
         {
             get
             {
@@ -177,7 +178,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private Boolean CanRestoreMultiLineText()
         {
-            return HasUnsavedChanges;
+            return HasChangesInEditor;
         }
 
         private void RestoreMultiLineText()
@@ -195,7 +196,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private Boolean CanSaveMultiLineText()
         {
-            return HasUnsavedChanges;
+            return HasChangesInEditor;
         }
 
         private void SaveMultiLineText()

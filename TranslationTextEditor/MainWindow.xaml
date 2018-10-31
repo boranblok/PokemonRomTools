@@ -63,8 +63,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Filter Unsaved:" />
-                <CheckBox Grid.Column="1" IsChecked="{Binding UnsavedFilter}" IsThreeState="True"/>
+                <Label Grid.Column="0" Content="Filter Editing:" />
+                <CheckBox Grid.Column="1" IsChecked="{Binding EditingFilter}" IsThreeState="True"/>
                 <Label Grid.Column="2" Content="Filter Translated:" />
                 <CheckBox Grid.Column="3" IsChecked="{Binding TranslatedFilter}" IsThreeState="True"/>                
                 <Label Grid.Column="4" Content="Filter groups:" />
@@ -120,9 +120,9 @@
                             <TextBlock Text="Tr." ToolTip="Translated"/>
                         </DataGridCheckBoxColumn.Header>
                     </DataGridCheckBoxColumn>
-                    <DataGridCheckBoxColumn Width="Auto" Binding="{Binding HasUnsavedChanges, Mode=OneWay}">
+                    <DataGridCheckBoxColumn Width="Auto" Binding="{Binding HasChangesInEditor, Mode=OneWay}">
                         <DataGridCheckBoxColumn.Header>
-                            <TextBlock Text="Ch." ToolTip="Has unsaved changes"/>
+                            <TextBlock Text="Ed." ToolTip="Has been edited and not saved to memory"/>
                         </DataGridCheckBoxColumn.Header>
                     </DataGridCheckBoxColumn>
                     <DataGridTextColumn Width="Auto" Binding="{Binding Group, Mode=OneWay}" Header="Group" Visibility="{Binding Data.NotGroupItems, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}}" />

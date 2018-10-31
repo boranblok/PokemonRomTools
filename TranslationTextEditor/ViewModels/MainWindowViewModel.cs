@@ -119,7 +119,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             if (translationLine == null)
                 return false;
             return (!TranslatedFilter.HasValue || translationLine.IsTranslated == TranslatedFilter.Value)
-                && (!UnsavedFilter.HasValue || translationLine.HasUnsavedChanges == UnsavedFilter.Value)                
+                && (!EditingFilter.HasValue || translationLine.HasChangesInEditor == EditingFilter.Value)                
                 && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
                 && (SelectedGroups.Count == 0 || SelectedGroups.Contains(translationLine.Group))
                 && MatchesContentFilter(translationLine)
@@ -165,7 +165,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        public Nullable<Boolean> UnsavedFilter
+        public Nullable<Boolean> EditingFilter
         {
             get
             {
@@ -176,7 +176,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 if (value == _unsavedFilter)
                     return;
                 _unsavedFilter = value;
-                OnPropertyChanged("UnsavedFilter");
+                OnPropertyChanged("EditingFilter");
                 TranslationLinesView.Refresh();
             }
         }
@@ -324,7 +324,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             DialogViewModel.ShowDialog = true;
             if(vm.Confirmed)
             {
-                if (!SelectedGroups.Contains(vm.SelectedGroup))
+                if (SelectedGroups.Count > 0 && !SelectedGroups.Contains(vm.SelectedGroup))
                     SelectedGroups.Add(vm.SelectedGroup);
                 foreach(var line in SelectedTranslationLines)
                 {
@@ -418,7 +418,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         internal void SaveEditedLines()
         {
-            foreach (var editedLine in TranslationLines.Where(l => l.HasUnsavedChanges))
+            foreach (var editedLine in TranslationLines.Where(l => l.HasChangesInEditor))
             {
                 editedLine.SaveMultiLineTextCommand.Execute(null);
             }
@@ -426,7 +426,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         internal Boolean CanSaveEditedLines()
         {
-            var lineWithUnsavedChange = TranslationLines.FirstOrDefault(l => l.HasUnsavedChanges);
+            var lineWithUnsavedChange = TranslationLines.FirstOrDefault(l => l.HasChangesInEditor);
             return lineWithUnsavedChange != null;
         }
 
@@ -440,7 +440,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         internal void DiscardEditedLines()
         {
-            foreach (var editedLine in TranslationLines.Where(l => l.HasUnsavedChanges))
+            foreach (var editedLine in TranslationLines.Where(l => l.HasChangesInEditor))
             {
                 editedLine.RestoreMultiLineTextCommand.Execute(null);
             }
@@ -448,7 +448,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         internal Boolean CanDiscardEditedLines()
         {
-            var lineWithUnsavedChange = TranslationLines.FirstOrDefault(l => l.HasUnsavedChanges);
+            var lineWithUnsavedChange = TranslationLines.FirstOrDefault(l => l.HasChangesInEditor);
             return lineWithUnsavedChange != null;
         }
 
@@ -465,7 +465,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             _translatedFilter = null;
             OnPropertyChanged("TranslatedFilter");
             _unsavedFilter = null;
-            OnPropertyChanged("UnsavedFilter");
+            OnPropertyChanged("EditingFilter");
             SelectedGroups.Clear();
             _addressFilter = null;
             OnPropertyChanged("AddressFilter");
@@ -479,7 +479,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         private bool CanClearFilter()
         {
             return TranslatedFilter.HasValue 
-                || UnsavedFilter.HasValue 
+                || EditingFilter.HasValue 
                 || SelectedGroups.Count > 0 
                 || !String.IsNullOrWhiteSpace(AddressFilter) 
                 || !String.IsNullOrWhiteSpace(ContentFilter)
