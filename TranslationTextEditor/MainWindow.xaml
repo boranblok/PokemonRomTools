@@ -136,7 +136,7 @@
                     <DataGridTemplateColumn Width="*" Header="Translated text" SortMemberPath="TranslatedSingleLine">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding TranslatedSingleLine, Mode=TwoWay}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
+                                <TextBlock Text="{Binding TranslatedSingleLine}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
