@@ -4,10 +4,11 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:command="http://www.galasoft.ch/mvvmlight"
+        xmlns:command="http://www.galasoft.ch/mvvmlight"        
         xmlns:local="clr-namespace:PkmnAdvanceTranslation"
         xmlns:util="clr-namespace:PkmnAdvanceTranslation.Util"
         xmlns:dvm="clr-namespace:PkmnAdvanceTranslation.ViewModels.Design"
+        xmlns:mcb="clr-namespace:DonaldWindgate.CodeProject;assembly=MultiComboBox"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance dvm:MainWindowViewModelDesign, IsDesignTimeCreatable=True}"
         Title="{Binding Title}" Height="500" Width="1150" MinWidth="1150" MinHeight="500">
@@ -44,8 +45,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Group:"/>                
-                <ComboBox Grid.Column="1" Width="150"  ItemsSource="{Binding Groups}" SelectedItem="{Binding GroupFilter}" DisplayMemberPath="Title" />
+                <Label Grid.Column="0" Content="Group grid:"/>
+                <CheckBox Grid.Column="1" IsChecked="{Binding GroupItems}" />                
                 <Label Grid.Column="2" Content="Address:"/>
                 <TextBox Grid.Column="3" Style="{StaticResource AddressBox}" MaxLength="6" Text="{Binding AddressFilter, UpdateSourceTrigger=PropertyChanged}" />
                 <Label Grid.Column="4" Content="Contains:"/>
@@ -56,20 +57,28 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Content="Group grid:" />
-                <CheckBox Grid.Column="1" IsChecked="{Binding GroupItems}" />
-                <Label Grid.Column="3" Content="Filter Translated:" />
-                <CheckBox Grid.Column="4" IsChecked="{Binding TranslatedFilter}" IsThreeState="True"/>
-                <Label Grid.Column="5" Content="Filter Unsaved:" />
-                <CheckBox Grid.Column="6" IsChecked="{Binding UnsavedFilter}" IsThreeState="True"/>
-                <Button Grid.Column="7" Content="Clear all filters" Command="{Binding ClearFilterCommand}" />
+                <Label Grid.Column="0" Content="Filter Unsaved:" />
+                <CheckBox Grid.Column="1" IsChecked="{Binding UnsavedFilter}" IsThreeState="True"/>
+                <Label Grid.Column="2" Content="Filter Translated:" />
+                <CheckBox Grid.Column="3" IsChecked="{Binding TranslatedFilter}" IsThreeState="True"/>                
+                <Label Grid.Column="4" Content="Show groups:" />
+                <mcb:MultiComboBox Grid.Column="5" SelectionMode="Multiple" 
+                                 VerticalAlignment="Center"
+                                 IsCreateNewEnabled="False"
+                                 ItemsSource="{Binding Groups}"
+                                 SelectedItems="{Binding SelectedGroups}"
+                                 DisplayMemberPath="Title">
+                    <mcb:MultiComboBox.DisplaySeparator>
+                        <Ellipse Margin="3,0" Height="4" Width="4" Fill="Black"/>
+                    </mcb:MultiComboBox.DisplaySeparator>
+                </mcb:MultiComboBox>
+                <Button Grid.Column="6" Content="Clear all filters" Command="{Binding ClearFilterCommand}" />
             </Grid>
             <DataGrid
                 Name="TranslationLinesGrid"

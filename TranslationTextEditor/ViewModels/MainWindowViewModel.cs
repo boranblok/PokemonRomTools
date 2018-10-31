@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -25,6 +26,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         private TranslationItemViewModel _currentTranslationLineItem;
 
         private ObservableCollection<GroupViewModel> _groups;
+        private ObservableCollection<GroupViewModel> _selectedGroups;
         private ICollectionView _translationLinesView;
 
         private List<ContainsViewModel> _containsModes;
@@ -33,7 +35,6 @@ namespace PkmnAdvanceTranslation.ViewModels
         private FileInfo _translationFile;
 
         private Boolean _groupItems;
-        private GroupViewModel _groupFilter;
         private String _addressFilter;
         private String _contentFilter;
         private Nullable<Boolean> _translatedFilter;
@@ -79,6 +80,24 @@ namespace PkmnAdvanceTranslation.ViewModels
                 }
                 return _groups;
             }
+        }
+
+        public ObservableCollection<GroupViewModel> SelectedGroups
+        {
+            get
+            {
+                if (_selectedGroups == null)
+                {
+                    _selectedGroups = new ObservableCollection<GroupViewModel>();
+                    _selectedGroups.CollectionChanged += _selectedGroups_CollectionChanged;
+                }
+                return _selectedGroups;
+            }
+        }
+
+        private void _selectedGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            TranslationLinesView.Refresh();
         }
 
         public List<ContainsViewModel> ContainsModes
@@ -161,11 +180,18 @@ namespace PkmnAdvanceTranslation.ViewModels
             if (translationLine == null)
                 return false;
             return (!TranslatedFilter.HasValue || translationLine.IsTranslated == TranslatedFilter.Value)
-                && (!UnsavedFilter.HasValue || translationLine.HasUnsavedChanges == UnsavedFilter.Value)
-                && (GroupFilter == null || String.IsNullOrWhiteSpace(GroupFilter.Value) || translationLine.Group == GroupFilter.Value)
+                && (!UnsavedFilter.HasValue || translationLine.HasUnsavedChanges == UnsavedFilter.Value)                
                 && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
+                && MatchesGroupFilter(translationLine)
                 && MatchesContentFilter(translationLine)
                 ;
+        }
+
+        private bool MatchesGroupFilter(TranslationItemViewModel translationLine)
+        {
+            if (SelectedGroups.Count == 0)
+                return true;
+            return SelectedGroups.Any(g => g.Value == translationLine.Group);
         }
 
         private Boolean MatchesContentFilter(TranslationItemViewModel translationLine)
@@ -214,23 +240,6 @@ namespace PkmnAdvanceTranslation.ViewModels
                     return;
                 _unsavedFilter = value;
                 OnPropertyChanged("UnsavedFilter");
-                TranslationLinesView.Refresh();
-            }
-        }
-
-        public GroupViewModel GroupFilter
-        {
-            get
-            {
-                return _groupFilter;
-            }
-            set
-            {
-                if (value == _groupFilter)
-                    return;
-
-                _groupFilter = value;
-                OnPropertyChanged("GroupFilter");
                 TranslationLinesView.Refresh();
             }
         }
@@ -508,8 +517,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             OnPropertyChanged("TranslatedFilter");
             _unsavedFilter = null;
             OnPropertyChanged("UnsavedFilter");
-            _groupFilter = Groups.FirstOrDefault();
-            OnPropertyChanged("GroupFilter");
+            _selectedGroups.Clear();
             _addressFilter = null;
             OnPropertyChanged("AddressFilter");
             _contentFilter = null;
@@ -521,7 +529,12 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private bool CanClearFilter()
         {
-            return GroupFilter != null || !String.IsNullOrWhiteSpace(AddressFilter) || !String.IsNullOrWhiteSpace(ContentFilter);
+            return TranslatedFilter.HasValue 
+                || UnsavedFilter.HasValue 
+                || SelectedGroups.Count > 0 
+                || !String.IsNullOrWhiteSpace(AddressFilter) 
+                || !String.IsNullOrWhiteSpace(ContentFilter)
+                || _currentContainsMode != _containsModes[0];
         }
 
         public RelayCommand OpenTranslationFileCommand
@@ -546,8 +559,8 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             TranslationLines.Clear();
             Groups.Clear();
+            SelectedGroups.Clear();
             Groups.Add(new GroupViewModel("<ALL>", ""));
-            GroupFilter = Groups[0];
             foreach (var line in PointerText.ReadPointersFromFile(translationSourceFile))
             {
                 if (!Groups.Any(g => g.Value == line.Group))

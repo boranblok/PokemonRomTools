@@ -160,6 +160,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MultiSelectComboBox\MultiComboBox.csproj">
+      <Project>{6e683ffd-0f53-4225-b34c-88ef47f7d062}</Project>
+      <Name>MultiComboBox</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj">
       <Project>{629a251a-b6a4-40a4-b0aa-9f9f6993c91a}</Project>
       <Name>SharedLibrary</Name>
