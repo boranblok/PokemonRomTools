@@ -78,7 +78,7 @@
                     </mcb:MultiComboBox.DisplaySeparator>
                 </mcb:MultiComboBox>
                 <Button Grid.Column="6" Content="Clear all filters" Command="{Binding ClearFilterCommand}" />
-            </Grid>
+            </Grid>            
             <DataGrid
                 Name="TranslationLinesGrid"
                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
@@ -95,6 +95,9 @@
                             CommandParameter="{Binding SelectedItems, ElementName=TranslationLinesGrid}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
+                <DataGrid.Resources>
+                    <util:BindingProxy x:Key="proxy" Data="{Binding}"/>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="Auto" Header="Address" Binding="{Binding Address, Mode=OneWay}" ElementStyle="{StaticResource AddressCell}"/>
                     <DataGridTextColumn Width="Auto" Binding="{Binding ReferenceCount, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
@@ -122,6 +125,7 @@
                             <TextBlock Text="Ch." ToolTip="Has unsaved changes"/>
                         </DataGridCheckBoxColumn.Header>
                     </DataGridCheckBoxColumn>
+                    <DataGridTextColumn Width="Auto" Binding="{Binding Group, Mode=OneWay}" Header="Group" Visibility="{Binding Data.NotGroupItems, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}}" />
                     <DataGridTemplateColumn Width="*" Header="Original text" SortMemberPath="UnTranslatedSingleLine">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -132,7 +136,7 @@
                     <DataGridTemplateColumn Width="*" Header="Translated text" SortMemberPath="TranslatedSingleLine">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding TranslatedSingleLine}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
+                                <TextBlock Text="{Binding TranslatedSingleLine, Mode=TwoWay}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

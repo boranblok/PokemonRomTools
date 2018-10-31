@@ -6,6 +6,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/StaticResources.xaml"/>
                 <ResourceDictionary Source="Resources/ViewToViewModelMapping.xaml"/>
                 <ResourceDictionary Source="Fonts/Fonts.xaml"/>
                 <ResourceDictionary Source="Resources/Styles.xaml" />

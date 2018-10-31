@@ -259,6 +259,17 @@ namespace PkmnAdvanceTranslation.ViewModels
                 else if(!_groupItems && value)
                     TranslationLinesView.GroupDescriptions.Add(new PropertyGroupDescription("Group"));
                 _groupItems = value;
+
+                OnPropertyChanged("GroupItems");
+                OnPropertyChanged("NotGroupItems");
+            }
+        }
+
+        public Boolean NotGroupItems
+        {
+            get
+            {
+                return !GroupItems;
             }
         }
 
