@@ -186,13 +186,11 @@ namespace PkmnAdvanceTranslation
                         log.Warn("Forcing repoint of:");
                         log.Warn(translatedLine);
                         log.Warn("This can cause rom corruption, test thoroughly!");
-                        log.WarnFormat("Following locations will have their indices changed from {0}", currentPointerValue);
-                        log.Warn(String.Join(", ", translatedLine.References.Select(r => r.ToString("X6"))));
+                        log.WarnFormat("Following locations will have their indices changed from {0}: {1}", currentPointerValue, String.Join(", ", translatedLine.References.Select(r => r.ToString("X6"))));
                         Console.WriteLine("WARNING, Forcing repoint of:");
                         Console.WriteLine(translatedLine);
                         Console.WriteLine("This can cause rom corruption, test thoroughly!");
-                        Console.WriteLine("Following locations will have their indices changed from {0}", currentPointerValue);
-                        Console.WriteLine(String.Join(", ", translatedLine.References.Select(r => r.ToString("X6"))));
+                        Console.WriteLine("Following locations will have their indices changed from {0}: {1}", currentPointerValue, String.Join(", ", translatedLine.References.Select(r => r.ToString("X6"))));
                     }
                     else
                     {
