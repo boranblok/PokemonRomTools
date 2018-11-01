@@ -21,10 +21,11 @@
                 <MenuItem Header="E_xit" Click="CloseMenuItem_Click"/>
             </MenuItem>
             <MenuItem Header="_Bulk operations">
-                <MenuItem Header="Save all edits to _memory" Command="{Binding SaveEditedLinesCommand}"/>
-                <MenuItem Header="_Discard current edit(s)" Command="{Binding DiscardEditedLinesCommand}"/>
                 <MenuItem Header="_Change group" Command="{Binding ChangeLinesGroupCommand}"/>
+                <MenuItem Header="Change is special dialog" Command="{Binding SetTextModeOnLinesCommand}"/>
                 <MenuItem Header="Copy untranslated" Command="{Binding CopyUntranslatedToTranslatedLinesCommand}"/>
+                <MenuItem Header="_Discard current edit(s)" Command="{Binding DiscardEditedLinesCommand}"/>
+                <MenuItem Header="Save all edits to _memory" Command="{Binding SaveEditedLinesCommand}"/>
                 <MenuItem Header="Delete selected lines" Command="{Binding DeleteSelectedLinesCommand}"/>
             </MenuItem>
         </Menu>

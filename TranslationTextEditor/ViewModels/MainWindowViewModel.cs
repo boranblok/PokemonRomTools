@@ -330,7 +330,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             get
             {
-                return new RelayCommand(ChangeLinesGroup, CanChangeLinesGroup);
+                return new RelayCommand(ChangeLinesGroup, IsAtLeastOneLineSelected);
             }
         }
 
@@ -356,7 +356,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        private bool CanChangeLinesGroup()
+        private bool IsAtLeastOneLineSelected()
         {
             return SelectedTranslationLines.Count > 0;
         }
@@ -365,7 +365,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             get
             {
-                return new RelayCommand(CopyUntranslatedToTranslatedLines, CanCopyUntranslatedToTranslatedLines);
+                return new RelayCommand(CopyUntranslatedToTranslatedLines, IsAtLeastOneLineSelected);
             }
         }
 
@@ -385,16 +385,34 @@ namespace PkmnAdvanceTranslation.ViewModels
             }           
         }
 
-        private bool CanCopyUntranslatedToTranslatedLines()
+        public RelayCommand SetTextModeOnLinesCommand
         {
-            return SelectedTranslationLines.Count > 0;
+            get
+            {
+                return new RelayCommand(SetTextModeOnLines, IsAtLeastOneLineSelected);
+            }
+        }
+
+        private void SetTextModeOnLines()
+        {            
+            var vm = new ChangeTextModeViewModel();
+            DialogViewModel = vm;
+            DialogViewModel.ShowDialog = true;
+            if (vm.Confirmed)
+            {
+                foreach (var line in SelectedTranslationLines)
+                {
+                    line.IsSpecialDialog = vm.IsSpecialDialog;
+                    line.SaveMultiLineTextCommand.Execute(null);
+                }
+            }
         }
 
         public RelayCommand DeleteSelectedLinesCommand
         {
             get
             {
-                return new RelayCommand(DeleteSelectedLines, CanDeleteSelectedLines);
+                return new RelayCommand(DeleteSelectedLines, IsAtLeastOneLineSelected);
             }
         }
 
@@ -419,11 +437,6 @@ namespace PkmnAdvanceTranslation.ViewModels
             }           
         }
 
-        private bool CanDeleteSelectedLines()
-        {
-            return SelectedTranslationLines.Count > 0;
-        }
-
         public RelayCommand SaveEditedLinesCommand
         {
             get
@@ -443,8 +456,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         internal Boolean CanSaveEditedLines()
         {
-            var lineWithUnsavedChange = TranslationLines.FirstOrDefault(l => l.HasChangesInEditor);
-            return lineWithUnsavedChange != null;
+            return TranslationLines.Any(l => l.HasChangesInEditor);
         }
 
         public RelayCommand DiscardEditedLinesCommand
@@ -465,8 +477,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         internal Boolean CanDiscardEditedLines()
         {
-            var lineWithUnsavedChange = TranslationLines.FirstOrDefault(l => l.HasChangesInEditor);
-            return lineWithUnsavedChange != null;
+            return TranslationLines.Any(l => l.HasChangesInEditor);
         }
 
         public RelayCommand ClearFilterCommand
