@@ -69,6 +69,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Filter Editing:" />
                 <CheckBox Grid.Column="1" IsChecked="{Binding EditingFilter}" IsThreeState="True"/>
@@ -84,7 +85,8 @@
                         <Ellipse Margin="3,0" Height="4" Width="4" Fill="Black"/>
                     </mcb:MultiComboBox.DisplaySeparator>
                 </mcb:MultiComboBox>
-                <Button Grid.Column="6" Content="Clear all filters" Command="{Binding ClearFilterCommand}" />
+                <CheckBox Grid.Column="6" Content="Hide these groups" IsChecked="{Binding InverseGroupFilter}" />
+                <Button Grid.Column="7" Content="Clear all filters" Command="{Binding ClearFilterCommand}" />
             </Grid>            
             <DataGrid
                 Name="TranslationLinesGrid"

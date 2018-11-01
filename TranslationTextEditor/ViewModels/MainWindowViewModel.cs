@@ -29,7 +29,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private Boolean _groupItems;
 
-
+        private Boolean _inverseGroupFilter;
         private String _addressFilter;
         private String _contentFilter;
         private String[] _contentFilters;
@@ -119,7 +119,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             {
                 return !HasCurrentTranslationItem;
             }
-        }        
+        }
 
         private Boolean MatchesFilter(TranslationItemViewModel translationLine)
         {
@@ -128,14 +128,9 @@ namespace PkmnAdvanceTranslation.ViewModels
             return (!TranslatedFilter.HasValue || translationLine.IsTranslated == TranslatedFilter.Value)
                 && (!EditingFilter.HasValue || translationLine.HasChangesInEditor == EditingFilter.Value)                
                 && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
-                && (SelectedGroups.Count == 0 || SelectedGroups.Contains(translationLine.Group))
+                && (SelectedGroups.Count == 0 || (InverseGroupFilter && !SelectedGroups.Contains(translationLine.Group)) || (!InverseGroupFilter && SelectedGroups.Contains(translationLine.Group)))
                 && MatchesContentFilter(translationLine)
                 ;
-        }
-
-        private void SelectedGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            TranslationLinesView.Refresh();
         }
 
         private Boolean MatchesContentFilter(TranslationItemViewModel translationLine)
@@ -199,6 +194,27 @@ namespace PkmnAdvanceTranslation.ViewModels
                     return;
                 _unsavedFilter = value;
                 OnPropertyChanged("EditingFilter");
+                TranslationLinesView.Refresh();
+            }
+        }
+
+        private void SelectedGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            TranslationLinesView.Refresh();
+        }
+
+        public Boolean InverseGroupFilter
+        {
+            get
+            {
+                return _inverseGroupFilter;
+            }
+            set
+            {
+                if (value == _inverseGroupFilter)
+                    return;
+                _inverseGroupFilter = value;
+                OnPropertyChanged("InverseGroupFilter");
                 TranslationLinesView.Refresh();
             }
         }
