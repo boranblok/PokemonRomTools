@@ -270,7 +270,8 @@ namespace PkmnAdvanceTranslation.ViewModels
                 || SelectedGroups.Count > 0
                 || !String.IsNullOrWhiteSpace(AddressFilter)
                 || !String.IsNullOrWhiteSpace(ContentFilter)
-                || _currentContainsMode != ContainsModes[0];
+                || _currentContainsMode != ContainsModes[0]
+                || _inverseGroupFilter != false;
         }
     }
 
