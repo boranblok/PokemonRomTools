@@ -153,13 +153,15 @@
             </DataGrid>
             <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="347"/>
                     <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="347"/>
                     <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -171,11 +173,11 @@
                     x:Name="txtUnTranslated"
                     Grid.Column="1" 
                     Grid.Row="1" 
-                    Grid.ColumnSpan="2" 
+                    Grid.ColumnSpan="3" 
                     Style="{StaticResource MainTextEditBox}" 
                     Text="{Binding CurrentTranslationItem.UnTranslatedMultiLine, Mode=OneWay}" 
                     IsReadOnly="True" IsReadOnlyCaretVisible="True"/>
-                <Grid Grid.Column="4" Grid.Row="1">
+                <Grid Grid.Column="5" Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -188,14 +190,14 @@
                     <Button Grid.Row="3" Content="Restore" Command="{Binding CurrentTranslationItem.RestoreMultiLineTextCommand}" IsEnabled="{Binding HasCurrentTranslationItem}"/>
                     <Button Grid.Row="4" Content="Save to memory" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}" IsEnabled="{Binding HasCurrentTranslationItem}"/>
                 </Grid>
-                <Label Grid.Column="5" Grid.Row="0" Content="Translated text"/>
-                <Rectangle Grid.Column="5" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
+                <Label Grid.Column="6" Grid.Row="0" Content="Translated text"/>
+                <Rectangle Grid.Column="6" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
                 <TextBox 
                     x:Name="txtTranslated"
-                    Grid.Column="5" 
+                    Grid.Column="6" 
                     Grid.Row="1" 
                     Style="{StaticResource MainTextEditBox}" 
-                    Grid.ColumnSpan="2" 
+                    Grid.ColumnSpan="3" 
                     Text="{Binding CurrentTranslationItem.TranslatedMultiLine, UpdateSourceTrigger=PropertyChanged}"
                     ScrollViewer.ScrollChanged="txtTranslated_ScrollChanged"
                     IsReadOnly="{Binding HasNoCurrentTranslationItem}"
