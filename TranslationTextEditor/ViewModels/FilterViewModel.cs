@@ -50,6 +50,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private void OnFilterChanged()
         {
+            OnPropertyChanged("ClearFilterCommand");
             FilterChanged?.Invoke(this, new EventArgs());
         }
 
