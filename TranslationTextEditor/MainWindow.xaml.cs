@@ -29,9 +29,16 @@ namespace PkmnAdvanceTranslation
         public MainWindow()
         {
             vm = new MainWindowViewModel(this);
+            vm.TranslationLinesView.CurrentChanged += TranslationLinesView_CurrentChanged;
             DataContext = vm;
 
             InitializeComponent();
+        }
+
+        private void TranslationLinesView_CurrentChanged(object sender, EventArgs e)
+        {
+            if(vm.TranslationLinesView.CurrentItem != null)
+                TranslationLinesGrid.ScrollIntoView(vm.TranslationLinesView.CurrentItem);
         }
 
         public String OpenFileDialog(String defaultPath, String title)
