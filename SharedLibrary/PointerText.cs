@@ -146,7 +146,7 @@ namespace PkmnAdvanceTranslation
             switch (parts[4])
             {
                 case "I":
-                    result.TextMode = TextMode.Into;
+                    result.TextMode = TextMode.Intro;
                     break;
                 case "D":
                     result.TextMode = TextMode.Dialog;

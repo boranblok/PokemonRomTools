@@ -137,12 +137,12 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             get
             {
-                return PointerText.TextMode == TextMode.Into;
+                return PointerText.TextMode == TextMode.Intro;
             }
             set
             {
                 if (value)
-                    PointerText.TextMode = TextMode.Into;
+                    PointerText.TextMode = TextMode.Intro;
                 else
                     PointerText.TextMode = TextMode.Dialog;
                 OnPropertyChanged("IsSpecialDialog");                
