@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MergetranslationFiles", "Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplyTranslationsToRom", "ApplyTranslationsToRom\ApplyTranslationsToRom.csproj", "{2CE7B0ED-A1C8-448D-BFD3-79106CFEEFF8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndianSwapper", "EndianSwapper\EndianSwapper.csproj", "{54B0168A-4A12-4926-97A3-65236CFD650E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndianSwapperWpf", "EndianSwapperWpf\EndianSwapperWpf.csproj", "{1E5872CA-1C3E-4BB3-B2E1-D82B77CC61C0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TranslationTextEditor", "TranslationTextEditor\TranslationTextEditor.csproj", "{CA6103FF-D431-4295-9768-C6E034FF9853}"
@@ -75,14 +73,6 @@ Global
 		{2CE7B0ED-A1C8-448D-BFD3-79106CFEEFF8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2CE7B0ED-A1C8-448D-BFD3-79106CFEEFF8}.Release|x86.ActiveCfg = Release|Any CPU
 		{2CE7B0ED-A1C8-448D-BFD3-79106CFEEFF8}.Release|x86.Build.0 = Release|Any CPU
-		{54B0168A-4A12-4926-97A3-65236CFD650E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54B0168A-4A12-4926-97A3-65236CFD650E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54B0168A-4A12-4926-97A3-65236CFD650E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{54B0168A-4A12-4926-97A3-65236CFD650E}.Debug|x86.Build.0 = Debug|Any CPU
-		{54B0168A-4A12-4926-97A3-65236CFD650E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54B0168A-4A12-4926-97A3-65236CFD650E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54B0168A-4A12-4926-97A3-65236CFD650E}.Release|x86.ActiveCfg = Release|Any CPU
-		{54B0168A-4A12-4926-97A3-65236CFD650E}.Release|x86.Build.0 = Release|Any CPU
 		{1E5872CA-1C3E-4BB3-B2E1-D82B77CC61C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1E5872CA-1C3E-4BB3-B2E1-D82B77CC61C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E5872CA-1C3E-4BB3-B2E1-D82B77CC61C0}.Debug|x86.ActiveCfg = Debug|Any CPU
