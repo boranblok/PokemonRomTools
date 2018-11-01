@@ -165,7 +165,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private void CopyUntranslatedToTranslated()
         {
-            TranslatedMultiLine = UnTranslatedSingleLine;
+            TranslatedMultiLine = UnTranslatedMultiLine;
         }
 
         public RelayCommand RestoreMultiLineTextCommand
