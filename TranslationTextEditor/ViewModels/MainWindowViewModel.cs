@@ -486,6 +486,42 @@ namespace PkmnAdvanceTranslation.ViewModels
             return TranslationLines.Any(l => l.HasChangesInEditor);
         }
 
+        public RelayCommand SelectPreviousLineCommand
+        {
+            get
+            {
+                return new RelayCommand(SelectPreviousLine, CanSelectPreviousLine);
+            }
+        }
+
+        private bool CanSelectPreviousLine()
+        {
+            return SelectedTranslationLines.Count == 1;
+        }
+
+        private void SelectPreviousLine()
+        {
+            TranslationLinesView.MoveCurrentToPrevious();
+        }
+
+        public RelayCommand SelectNextLineCommand
+        {
+            get
+            {
+                return new RelayCommand(SelectNextLine, CanSelectNextLine);
+            }
+        }
+
+        private bool CanSelectNextLine()
+        {
+            return SelectedTranslationLines.Count == 1;
+        }
+
+        private void SelectNextLine()
+        {
+            TranslationLinesView.MoveCurrentToNext();
+        }
+
         public RelayCommand ClearFilterCommand
         {
             get
