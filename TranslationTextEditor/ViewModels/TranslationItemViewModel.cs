@@ -13,6 +13,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         public PointerText PointerText { get; private set; }
         private String editedMultiLineText;
         private Boolean _hasChangesInMemory;
+        private Boolean _hasChangesInEditor;
 
         public TranslationItemViewModel(PointerText pointerText)
         {
@@ -96,6 +97,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 PointerText.TranslatedSingleLine = value;
                 OnPropertyChanged("TranslatedSingleLine");
                 OnPropertyChanged("RemainingLength");
+                OnPropertyChanged("IsTranslated");
             }
         }
 
@@ -111,7 +113,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             {
                 editedMultiLineText = value;
                 OnPropertyChanged("TranslatedMultiLine");
-                OnPropertyChanged("HasChangesInEditor");
+                HasChangesInEditor = value != null;
             }
         }
 
@@ -143,7 +145,8 @@ namespace PkmnAdvanceTranslation.ViewModels
                     PointerText.TextMode = TextMode.Into;
                 else
                     PointerText.TextMode = TextMode.Dialog;
-                OnPropertyChanged("IsSpecialDialog");
+                OnPropertyChanged("IsSpecialDialog");                
+                HasChangesInEditor = true;
             }
         }
 
@@ -151,7 +154,12 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             get
             {
-                return editedMultiLineText != null;
+                return _hasChangesInEditor;
+            }
+            set
+            {
+                _hasChangesInEditor = value;
+                OnPropertyChanged("HasChangesInEditor");
             }
         }
 
@@ -178,7 +186,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private Boolean CanRestoreMultiLineText()
         {
-            return HasChangesInEditor;
+            return editedMultiLineText != null;
         }
 
         private void RestoreMultiLineText()
@@ -200,7 +208,9 @@ namespace PkmnAdvanceTranslation.ViewModels
         }
 
         private void SaveMultiLineText()
-        {            
+        {
+            if (editedMultiLineText == null) //BLB we're re-saving (textmode change)
+                editedMultiLineText = TranslatedMultiLine;
             TranslatedSingleLine = TextHandler.EditStringToSingleLine(editedMultiLineText, IsSpecialDialog);
             TranslatedMultiLine = null;
             HasChangesInMemory = true;
