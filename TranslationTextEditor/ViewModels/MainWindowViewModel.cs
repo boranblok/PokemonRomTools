@@ -39,6 +39,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         private Dispatcher dispatcher;
         private DateTime filterStart;
         private Timer filterDelayTimer;
+        private Timer autoSaveTimer;
 
         public MainWindowViewModel(IOService ioService)
         {
@@ -60,7 +61,12 @@ namespace PkmnAdvanceTranslation.ViewModels
             filterDelayTimer = new Timer();
             filterDelayTimer.Interval = 50;
             filterDelayTimer.AutoReset = true;
-            filterDelayTimer.Elapsed += new ElapsedEventHandler(filterDelayTimer_Elapsed);
+            filterDelayTimer.Elapsed += FilterDelayTimer_Elapsed;
+
+            autoSaveTimer = new Timer();
+            autoSaveTimer.Interval = 1 * 60 * 1000;
+            autoSaveTimer.AutoReset = true;
+            autoSaveTimer.Elapsed += AutoSaveTimer_Elapsed;
 
             dispatcher = Dispatcher.CurrentDispatcher;
         }
@@ -250,7 +256,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        private void filterDelayTimer_Elapsed(object sender, ElapsedEventArgs e)
+        private void FilterDelayTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             if ((DateTime.Now - filterStart).TotalSeconds > .3) //We only apply the typed filter 0.3 seconds after the user stopped typing.
             {
@@ -543,6 +549,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                     Groups.Add(line.Group);
                 TranslationLines.Add(new TranslationItemViewModel(line));
             }
+            autoSaveTimer.Start();
         }
 
         public RelayCommand SaveTranslationFileCommand
@@ -585,6 +592,33 @@ namespace PkmnAdvanceTranslation.ViewModels
                 if (newFile.Exists)
                     TranslationFile = newFile;
             }
+        }
+
+        private void AutoSaveTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            AutoSavetranslationFile();
+        }
+
+        private void AutoSavetranslationFile()
+        {
+            if (TranslationFile == null)
+                return;
+
+            DirectoryInfo autosaveFolder = new DirectoryInfo("autosave");
+            if (!autosaveFolder.Exists)
+            {
+                autosaveFolder.Create();
+                autosaveFolder.Refresh();
+            }
+            var existingFiles = autosaveFolder.GetFiles("*_autosave.txt");
+            foreach(var file in existingFiles.OrderByDescending(f => f.LastWriteTime).Skip(10)) //TODO: parameter?
+            {
+                file.Delete();
+            }
+            var baseName = TranslationFile.Name.Substring(0, TranslationFile.Name.Length - TranslationFile.Extension.Length);
+            var backupFileName = String.Format("{0}_{1:yyMMddHHmmss}_autosave.txt", baseName, DateTime.Now);
+            var backupFileInfo = new FileInfo(Path.Combine(autosaveFolder.FullName, backupFileName));
+            PointerText.WritePointersToFile(backupFileInfo, TranslationLines.Select(l => l.PointerText).OrderBy(l => l.Address));
         }
 
         private void SavetranslationFile()
