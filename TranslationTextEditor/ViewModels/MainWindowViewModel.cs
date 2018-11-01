@@ -147,22 +147,22 @@ namespace PkmnAdvanceTranslation.ViewModels
                 case ContainFilterMode.Both:
                     foreach(var filter in _contentFilters)
                     {
-                        if (translationLine.TranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) > 0
-                            && translationLine.UnTranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) > 0)
+                        if (translationLine.TranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) >= 0
+                            && translationLine.UnTranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) >= 0)
                             return true;
                     }
                     return false;
                 case ContainFilterMode.Translated:
                     foreach (var filter in _contentFilters)
                     {
-                        if (translationLine.TranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) > 0)
+                        if (translationLine.TranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) >= 0)
                             return true;
                     }
                     return false;
                 case ContainFilterMode.Untranslated:
                     foreach (var filter in _contentFilters)
                     {
-                        if (translationLine.UnTranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) > 0)
+                        if (translationLine.UnTranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) >= 0)
                             return true;
                     }
                     return false;
