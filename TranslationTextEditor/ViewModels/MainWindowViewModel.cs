@@ -32,6 +32,7 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private String _addressFilter;
         private String _contentFilter;
+        private String[] _contentFilters;
         private Nullable<Boolean> _translatedFilter;
         private Nullable<Boolean> _unsavedFilter;
 
@@ -138,12 +139,27 @@ namespace PkmnAdvanceTranslation.ViewModels
             switch(CurrentContainsMode.FilterMode)
             {
                 case ContainFilterMode.Both:
-                    return translationLine.TranslatedSingleLine.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) > 0 
-                        && translationLine.UnTranslatedSingleLine.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) > 0;
+                    foreach(var filter in _contentFilters)
+                    {
+                        if (translationLine.TranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) > 0
+                            && translationLine.UnTranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) > 0)
+                            return true;
+                    }
+                    return false;
                 case ContainFilterMode.Translated:
-                    return translationLine.TranslatedSingleLine.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) > 0;
+                    foreach (var filter in _contentFilters)
+                    {
+                        if (translationLine.TranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) > 0)
+                            return true;
+                    }
+                    return false;
                 case ContainFilterMode.Untranslated:
-                    return translationLine.UnTranslatedSingleLine.IndexOf(ContentFilter, StringComparison.InvariantCultureIgnoreCase) > 0;
+                    foreach (var filter in _contentFilters)
+                    {
+                        if (translationLine.UnTranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) > 0)
+                            return true;
+                    }
+                    return false;
                 default:
                     return true;
             }
@@ -217,7 +233,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 if (value == _contentFilter)
                     return;
 
-                _contentFilter = value;
+                _contentFilter = value;                
                 OnPropertyChanged("ContentFilter");
                 FilterChangedAsync();
             }
@@ -236,11 +252,12 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private void filterDelayTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if ((DateTime.Now - filterStart).TotalSeconds > .3)
+            if ((DateTime.Now - filterStart).TotalSeconds > .3) //We only apply the typed filter 0.3 seconds after the user stopped typing.
             {
                 dispatcher.BeginInvoke((Action)delegate ()
                 {
                     filterDelayTimer.Stop();
+                    _contentFilters = ContentFilter.Split(new Char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
                     TranslationLinesView.Refresh();
                 });
             }
