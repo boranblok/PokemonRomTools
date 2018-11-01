@@ -589,6 +589,10 @@ namespace PkmnAdvanceTranslation.ViewModels
         private void WriteTranslationFile(FileInfo outputFile)
         {
             PointerText.WritePointersToFile(outputFile, TranslationLines.Select(l => l.PointerText).OrderBy(l => l.Address));
+            foreach(var line in TranslationLines)
+            {
+                line.HasChangesInMemory = false;
+            }
         }
     }
 }
