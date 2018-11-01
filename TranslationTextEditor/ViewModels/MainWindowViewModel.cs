@@ -23,22 +23,11 @@ namespace PkmnAdvanceTranslation.ViewModels
         private IOService _ioService;
 
         private TranslationItemViewModel _currentTranslationLineItem;
-        private ContainsViewModel _currentContainsMode;
 
         private FileInfo _translationFile;
 
         private Boolean _groupItems;
 
-        private Boolean _inverseGroupFilter;
-        private String _addressFilter;
-        private String _contentFilter;
-        private String[] _contentFilters;
-        private Nullable<Boolean> _translatedFilter;
-        private Nullable<Boolean> _unsavedFilter;
-
-        private Dispatcher dispatcher;
-        private DateTime filterStart;
-        private Timer filterDelayTimer;
         private Timer autoSaveTimer;
 
         public MainWindowViewModel(IOService ioService)
@@ -46,46 +35,27 @@ namespace PkmnAdvanceTranslation.ViewModels
             Title = "Pokémon translation editor";
             _ioService = ioService;
 
-            LoadContainsModes();
-            Groups = new ObservableCollection<String>();
-            GroupsView = CollectionViewSource.GetDefaultView(Groups);
-            GroupsView.SortDescriptions.Add(new SortDescription("", ListSortDirection.Ascending));
-            SelectedGroups = new ObservableCollection<String>();
-            SelectedGroups.CollectionChanged += SelectedGroups_CollectionChanged;
+            Filter = new FilterViewModel();
+            Filter.FilterChanged += Filter_FilterChanged;
+
             TranslationLines = new ObservableCollection<TranslationItemViewModel>();
             TranslationLinesView = CollectionViewSource.GetDefaultView(TranslationLines);
-            TranslationLinesView.Filter = (e => MatchesFilter(e as TranslationItemViewModel));
+            TranslationLinesView.Filter = (e => Filter.MatchesFilter(e as TranslationItemViewModel));
             SelectedTranslationLines = new ObservableCollection<TranslationItemViewModel>();
-
-
-            filterDelayTimer = new Timer();
-            filterDelayTimer.Interval = 50;
-            filterDelayTimer.AutoReset = true;
-            filterDelayTimer.Elapsed += FilterDelayTimer_Elapsed;
 
             autoSaveTimer = new Timer();
             autoSaveTimer.Interval = 1 * 60 * 1000;
             autoSaveTimer.AutoReset = true;
             autoSaveTimer.Elapsed += AutoSaveTimer_Elapsed;
-
-            dispatcher = Dispatcher.CurrentDispatcher;
         }
 
-        private void LoadContainsModes()
+        private void Filter_FilterChanged(object sender, EventArgs e)
         {
-            ContainsModes = new List<ContainsViewModel>();
-            foreach(var value in Enum.GetValues(typeof(ContainFilterMode)))
-            {
-                var enumValue = (ContainFilterMode)value;
-                ContainsModes.Add(new ContainsViewModel(enumValue.ToString(), enumValue));
-            }
-            _currentContainsMode = ContainsModes[0];
+            TranslationLinesView.Refresh();
         }
 
-        public ObservableCollection<String> Groups { get; private set; }
-        public ICollectionView GroupsView { get; private set; }
-        public ObservableCollection<String> SelectedGroups { get; private set; }
-        public List<ContainsViewModel> ContainsModes { get; private set; }
+        public FilterViewModel Filter { get; private set; }
+        
         public ObservableCollection<TranslationItemViewModel> TranslationLines { get; private set; }
         public ICollectionView TranslationLinesView { get; private set; }
         public ObservableCollection<TranslationItemViewModel> SelectedTranslationLines { get; private set; }
@@ -118,170 +88,6 @@ namespace PkmnAdvanceTranslation.ViewModels
             get
             {
                 return !HasCurrentTranslationItem;
-            }
-        }
-
-        private Boolean MatchesFilter(TranslationItemViewModel translationLine)
-        {
-            if (translationLine == null)
-                return false;
-            return (!TranslatedFilter.HasValue || translationLine.IsTranslated == TranslatedFilter.Value)
-                && (!EditingFilter.HasValue || translationLine.HasChangesInEditor == EditingFilter.Value)                
-                && (String.IsNullOrWhiteSpace(AddressFilter) || translationLine.Address.StartsWith(AddressFilter, StringComparison.InvariantCultureIgnoreCase))
-                && (SelectedGroups.Count == 0 || (InverseGroupFilter && !SelectedGroups.Contains(translationLine.Group)) || (!InverseGroupFilter && SelectedGroups.Contains(translationLine.Group)))
-                && MatchesContentFilter(translationLine)
-                ;
-        }
-
-        private Boolean MatchesContentFilter(TranslationItemViewModel translationLine)
-        {
-            if (String.IsNullOrWhiteSpace(ContentFilter))
-                return true;
-            switch(CurrentContainsMode.FilterMode)
-            {
-                case ContainFilterMode.Both:
-                    foreach(var filter in _contentFilters)
-                    {
-                        if (translationLine.TranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) >= 0
-                            && translationLine.UnTranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                            return true;
-                    }
-                    return false;
-                case ContainFilterMode.Translated:
-                    foreach (var filter in _contentFilters)
-                    {
-                        if (translationLine.TranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                            return true;
-                    }
-                    return false;
-                case ContainFilterMode.Untranslated:
-                    foreach (var filter in _contentFilters)
-                    {
-                        if (translationLine.UnTranslatedSingleLine.IndexOf(filter, StringComparison.InvariantCultureIgnoreCase) >= 0)
-                            return true;
-                    }
-                    return false;
-                default:
-                    return true;
-            }
-        }
-
-        public Nullable<Boolean> TranslatedFilter
-        {
-            get
-            {
-                return _translatedFilter;
-            }
-            set
-            {
-                if (value == _translatedFilter)
-                    return;
-                _translatedFilter = value;
-                OnPropertyChanged("TranslatedFilter");
-                TranslationLinesView.Refresh();
-            }
-        }
-
-        public Nullable<Boolean> EditingFilter
-        {
-            get
-            {
-                return _unsavedFilter;
-            }
-            set
-            {
-                if (value == _unsavedFilter)
-                    return;
-                _unsavedFilter = value;
-                OnPropertyChanged("EditingFilter");
-                TranslationLinesView.Refresh();
-            }
-        }
-
-        private void SelectedGroups_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            TranslationLinesView.Refresh();
-        }
-
-        public Boolean InverseGroupFilter
-        {
-            get
-            {
-                return _inverseGroupFilter;
-            }
-            set
-            {
-                if (value == _inverseGroupFilter)
-                    return;
-                _inverseGroupFilter = value;
-                OnPropertyChanged("InverseGroupFilter");
-                TranslationLinesView.Refresh();
-            }
-        }
-
-        public String AddressFilter
-        {
-            get { return _addressFilter; }
-            set
-            {
-                if (value == _addressFilter)
-                    return;
-
-                _addressFilter = value;
-                OnPropertyChanged("AddressFilter");
-                FilterChangedAsync();
-            }
-        }
-
-        public ContainsViewModel CurrentContainsMode
-        {
-            get { return _currentContainsMode;  }
-            set
-            {
-                if (value == _currentContainsMode)
-                    return;
-
-                _currentContainsMode = value;
-                OnPropertyChanged("CurrentContainsMode");
-                TranslationLinesView.Refresh();
-            }
-        }
-
-        public String ContentFilter
-        {
-            get { return _contentFilter; }
-            set
-            {
-                if (value == _contentFilter)
-                    return;
-
-                _contentFilter = value;                
-                OnPropertyChanged("ContentFilter");
-                FilterChangedAsync();
-            }
-        }
-
-        private void FilterChangedAsync()
-        {
-            filterStart = DateTime.Now;
-
-            if (!filterDelayTimer.Enabled)
-            {
-                filterDelayTimer.Enabled = true;
-                filterDelayTimer.Start();
-            }
-        }
-
-        private void FilterDelayTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            if ((DateTime.Now - filterStart).TotalSeconds > .3) //We only apply the typed filter 0.3 seconds after the user stopped typing.
-            {
-                dispatcher.BeginInvoke((Action)delegate ()
-                {
-                    filterDelayTimer.Stop();
-                    _contentFilters = ContentFilter.Split(new Char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-                    TranslationLinesView.Refresh();
-                });
             }
         }
 
@@ -358,13 +164,13 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private void ChangeLinesGroup()
         {
-            var vm = new ChangeGroupViewModel(Groups);
+            var vm = new ChangeGroupViewModel(Filter.Groups);
             DialogViewModel = vm;
             DialogViewModel.ShowDialog = true;
             if(vm.Confirmed)
             {
-                if (SelectedGroups.Count > 0 && !SelectedGroups.Contains(vm.SelectedGroup))
-                    SelectedGroups.Add(vm.SelectedGroup);
+                if (Filter.SelectedGroups.Count > 0 && !Filter.SelectedGroups.Contains(vm.SelectedGroup))
+                    Filter.SelectedGroups.Add(vm.SelectedGroup);
                 foreach(var line in SelectedTranslationLines)
                 {
                     line.Group = vm.SelectedGroup;
@@ -536,41 +342,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         private void SelectNextLine()
         {
             TranslationLinesView.MoveCurrentToNext();
-        }
-
-        public RelayCommand ClearFilterCommand
-        {
-            get
-            {
-                return new RelayCommand(ClearFilter, CanClearFilter);
-            }
-        }
-
-        private void ClearFilter()
-        {
-            _translatedFilter = null;
-            OnPropertyChanged("TranslatedFilter");
-            _unsavedFilter = null;
-            OnPropertyChanged("EditingFilter");
-            SelectedGroups.Clear();
-            _addressFilter = null;
-            OnPropertyChanged("AddressFilter");
-            _contentFilter = null;
-            OnPropertyChanged("ContentFilter");
-            _currentContainsMode = ContainsModes[0];
-            OnPropertyChanged("CurrentContainsMode");
-            TranslationLinesView.Refresh();
-        }
-
-        private bool CanClearFilter()
-        {
-            return TranslatedFilter.HasValue 
-                || EditingFilter.HasValue 
-                || SelectedGroups.Count > 0 
-                || !String.IsNullOrWhiteSpace(AddressFilter) 
-                || !String.IsNullOrWhiteSpace(ContentFilter)
-                || _currentContainsMode != ContainsModes[0];
-        }
+        }       
 
         public RelayCommand OpenTranslationFileCommand
         {
@@ -593,12 +365,12 @@ namespace PkmnAdvanceTranslation.ViewModels
         private void LoadtranslationFile(FileInfo translationSourceFile)
         {
             TranslationLines.Clear();
-            Groups.Clear();
-            SelectedGroups.Clear();
+            Filter.Groups.Clear();
+            Filter.SelectedGroups.Clear();
             foreach (var line in PointerText.ReadPointersFromFile(translationSourceFile))
             {
-                if (!Groups.Contains(line.Group))
-                    Groups.Add(line.Group);
+                if (!Filter.Groups.Contains(line.Group))
+                    Filter.Groups.Add(line.Group);
                 TranslationLines.Add(new TranslationItemViewModel(line));
             }
             autoSaveTimer.Start();

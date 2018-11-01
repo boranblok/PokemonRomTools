@@ -55,10 +55,10 @@
                 <Label Grid.Column="0" Content="Group grid:"/>
                 <CheckBox Grid.Column="1" IsChecked="{Binding GroupItems}" />                
                 <Label Grid.Column="2" Content="Address:"/>
-                <TextBox Grid.Column="3" Style="{StaticResource AddressBox}" MaxLength="6" Text="{Binding AddressFilter, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Column="3" Style="{StaticResource AddressBox}" MaxLength="6" Text="{Binding Filter.AddressFilter, UpdateSourceTrigger=PropertyChanged}" />
                 <Label Grid.Column="4" Content="Contains:"/>
-                <TextBox Grid.Column="5" Style="{StaticResource TextBoxMargin}" Text="{Binding ContentFilter, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox Grid.Column="6" Width="100" ItemsSource="{Binding ContainsModes}" SelectedItem="{Binding CurrentContainsMode}" DisplayMemberPath="Title" />
+                <TextBox Grid.Column="5" Style="{StaticResource TextBoxMargin}" Text="{Binding Filter.ContentFilter, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox Grid.Column="6" Width="100" ItemsSource="{Binding Filter.ContainsModes}" SelectedItem="{Binding Filter.CurrentContainsMode}" DisplayMemberPath="Title" />
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
@@ -72,21 +72,21 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Filter Editing:" />
-                <CheckBox Grid.Column="1" IsChecked="{Binding EditingFilter}" IsThreeState="True"/>
+                <CheckBox Grid.Column="1" IsChecked="{Binding Filter.EditingFilter}" IsThreeState="True"/>
                 <Label Grid.Column="2" Content="Filter Translated:" />
-                <CheckBox Grid.Column="3" IsChecked="{Binding TranslatedFilter}" IsThreeState="True"/>                
+                <CheckBox Grid.Column="3" IsChecked="{Binding Filter.TranslatedFilter}" IsThreeState="True"/>                
                 <Label Grid.Column="4" Content="Filter groups:" />
                 <mcb:MultiComboBox Grid.Column="5" SelectionMode="Multiple" 
                                  VerticalAlignment="Center"
                                  IsCreateNewEnabled="False"
-                                 ItemsSource="{Binding GroupsView}"
-                                 SelectedItems="{Binding SelectedGroups}">
+                                 ItemsSource="{Binding Filter.GroupsView}"
+                                 SelectedItems="{Binding Filter.SelectedGroups}">
                     <mcb:MultiComboBox.DisplaySeparator>
                         <Ellipse Margin="3,0" Height="4" Width="4" Fill="Black"/>
                     </mcb:MultiComboBox.DisplaySeparator>
                 </mcb:MultiComboBox>
-                <CheckBox Grid.Column="6" Content="Hide these groups" IsChecked="{Binding InverseGroupFilter}" />
-                <Button Grid.Column="7" Content="Clear all filters" Command="{Binding ClearFilterCommand}" />
+                <CheckBox Grid.Column="6" Content="Hide these groups" IsChecked="{Binding Filter.InverseGroupFilter}" />
+                <Button Grid.Column="7" Content="Clear all filters" Command="{Binding Filter.ClearFilterCommand}" />
             </Grid>            
             <DataGrid
                 Name="TranslationLinesGrid"

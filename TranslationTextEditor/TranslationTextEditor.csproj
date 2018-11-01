@@ -90,6 +90,7 @@
     <Compile Include="ViewModels\ChangeGroupViewModel.cs" />
     <Compile Include="ViewModels\ConfirmationDialogViewModel.cs" />
     <Compile Include="ViewModels\Design\ChangeTextModeViewModeldesign.cs" />
+    <Compile Include="ViewModels\FilterViewModel.cs" />
     <Compile Include="ViewModels\TextModeViewModel.cs" />
     <Compile Include="ViewModels\ContainsViewModel.cs" />
     <Compile Include="ViewModels\Design\ChangeGroupViewModelDesign.cs" />
