@@ -136,7 +136,20 @@
                     <DataGridTemplateColumn Width="*" Header="Translated text" SortMemberPath="TranslatedSingleLine">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding TranslatedSingleLine}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True"/>
+                                <TextBlock Text="{Binding TranslatedSingleLine}" TextTrimming="CharacterEllipsis" util:TextBlockAutoToolTip.Enabled="True">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasChangesInEditor}" Value="True">
+                                                    <Setter Property="Foreground" Value="Gray"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding HasChangesInEditor}" Value="False">
+                                                    <Setter Property="Foreground" Value="Black"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
