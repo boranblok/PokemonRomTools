@@ -153,9 +153,10 @@
             </DataGrid>
             <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="347"/>
                     <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="347"/>
                     <ColumnDefinition Width="150"/>
@@ -164,17 +165,17 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Label Grid.Column="0" Grid.Row="0" Content="Original text"/>
-                <Rectangle Grid.Column="0" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
+                <Label Grid.Column="1" Grid.Row="0" Content="Original text"/>
+                <Rectangle Grid.Column="1" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
                 <TextBox 
                     x:Name="txtUnTranslated"
-                    Grid.Column="0" 
+                    Grid.Column="1" 
                     Grid.Row="1" 
                     Grid.ColumnSpan="2" 
                     Style="{StaticResource MainTextEditBox}" 
                     Text="{Binding CurrentTranslationItem.UnTranslatedMultiLine, Mode=OneWay}" 
                     IsReadOnly="True" IsReadOnlyCaretVisible="True"/>
-                <Grid Grid.Column="3" Grid.Row="1">
+                <Grid Grid.Column="4" Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -187,11 +188,11 @@
                     <Button Grid.Row="3" Content="Restore" Command="{Binding CurrentTranslationItem.RestoreMultiLineTextCommand}" IsEnabled="{Binding HasCurrentTranslationItem}"/>
                     <Button Grid.Row="4" Content="Save to memory" Command="{Binding CurrentTranslationItem.SaveMultiLineTextCommand}" IsEnabled="{Binding HasCurrentTranslationItem}"/>
                 </Grid>
-                <Label Grid.Column="4" Grid.Row="0" Content="Translated text"/>
-                <Rectangle Grid.Column="4" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
+                <Label Grid.Column="5" Grid.Row="0" Content="Translated text"/>
+                <Rectangle Grid.Column="5" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
                 <TextBox 
                     x:Name="txtTranslated"
-                    Grid.Column="4" 
+                    Grid.Column="5" 
                     Grid.Row="1" 
                     Style="{StaticResource MainTextEditBox}" 
                     Grid.ColumnSpan="2" 
