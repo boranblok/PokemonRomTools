@@ -178,12 +178,12 @@
             <Grid Grid.Row="3">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="347"/>
+                    <ColumnDefinition Width="340"/>
                     <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="30"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="347"/>
+                    <ColumnDefinition Width="340"/>
                     <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
