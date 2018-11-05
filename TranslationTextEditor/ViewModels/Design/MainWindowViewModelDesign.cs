@@ -20,6 +20,7 @@ namespace PkmnAdvanceTranslation.ViewModels.Design
             Filter.Groups.Add("Group 1");
             Filter.Groups.Add("Group 2");
             Filter.Groups.Add("Group 3");
+            CurrentTranslationItem = TranslationLines[1];
         }
     }
 }
