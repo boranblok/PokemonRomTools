@@ -30,6 +30,8 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         private Timer autoSaveTimer;
 
+        public event EventHandler NewFileLoaded;
+
         public MainWindowViewModel(IOService ioService)
         {
             Title = "Pokémon translation editor";
@@ -53,6 +55,8 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             TranslationLinesView.Refresh();
         }
+
+        private void OnNewFileLoaded() => NewFileLoaded?.Invoke(this, new EventArgs());
 
         public FilterViewModel Filter { get; private set; }
         
@@ -374,6 +378,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 TranslationLines.Add(new TranslationItemViewModel(line));
             }
             autoSaveTimer.Start();
+            OnNewFileLoaded();
         }
 
         public RelayCommand SaveTranslationFileCommand

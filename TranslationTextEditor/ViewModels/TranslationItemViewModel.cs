@@ -14,12 +14,14 @@ namespace PkmnAdvanceTranslation.ViewModels
         private String editedMultiLineText;
         private Boolean _hasChangesInMemory;
         private Boolean _hasChangesInEditor;
+        private Double _untranslatedLineLength;
+        private Double _translatedLineLength;
 
         public TranslationItemViewModel(PointerText pointerText)
         {
             PointerText = pointerText;
         }
-
+        
         public Boolean HasChangesInMemory
         {
             get
@@ -28,7 +30,66 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
             set
             {
+                if (value == _hasChangesInMemory)
+                    return;
+
                 _hasChangesInMemory = value;
+                OnPropertyChanged("HasChangesInMemory");
+            }
+        }
+
+        public Boolean HasChangesInEditor
+        {
+            get
+            {
+                return _hasChangesInEditor;
+            }
+            set
+            {
+                if (value == _hasChangesInEditor)
+                    return;
+                _hasChangesInEditor = value;
+                OnPropertyChanged("HasChangesInEditor");
+            }
+        }
+
+        public Double UntranslatedLineLength
+        {
+            get
+            {
+                return _untranslatedLineLength;
+            }
+            set
+            {
+                if (value == _untranslatedLineLength)
+                    return;
+                _untranslatedLineLength = value;
+                OnPropertyChanged("UntranslatedLineLength");
+                OnPropertyChanged("LineLengthDifference");
+            }
+        }
+
+        public Double TranslatedLineLength
+        {
+            get
+            {
+                return _translatedLineLength;
+            }
+            set
+            {
+                if (value == _translatedLineLength)
+                    return;
+                _translatedLineLength = value;
+                OnPropertyChanged("TranslatedLineLength");
+                OnPropertyChanged("LineLengthDifference");
+            }
+        }
+
+        public Double LineLengthDifference
+        {
+            get
+            {
+                return TranslatedLineLength - UntranslatedLineLength;
             }
         }
 
@@ -147,19 +208,6 @@ namespace PkmnAdvanceTranslation.ViewModels
                     PointerText.TextMode = TextMode.Dialog;
                 OnPropertyChanged("IsSpecialDialog");                
                 HasChangesInEditor = true;
-            }
-        }
-
-        public Boolean HasChangesInEditor
-        {
-            get
-            {
-                return _hasChangesInEditor;
-            }
-            set
-            {
-                _hasChangesInEditor = value;
-                OnPropertyChanged("HasChangesInEditor");
             }
         }
 

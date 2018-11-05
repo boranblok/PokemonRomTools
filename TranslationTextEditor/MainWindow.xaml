@@ -136,6 +136,21 @@
                             <TextBlock Text="Ed." ToolTip="Has been edited and not saved to memory"/>
                         </DataGridCheckBoxColumn.Header>
                     </DataGridCheckBoxColumn>
+                    <DataGridTextColumn Width="Auto" Binding="{Binding UntranslatedLineLength, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="ULL" ToolTip="Untranslated Line Length" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="Auto" Binding="{Binding TranslatedLineLength, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="TLL" ToolTip="Translated Line Length" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="Auto" Binding="{Binding LineLengthDifference, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
+                        <DataGridTextColumn.Header>
+                            <TextBlock Text="LLD" ToolTip="Line Length Difference" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
                     <DataGridTextColumn Width="Auto" Binding="{Binding Group, Mode=OneWay}" Header="Group" Visibility="{Binding Data.NotGroupItems, Source={StaticResource proxy}, Converter={StaticResource BoolToVis}}" />
                     <DataGridTemplateColumn Width="*" Header="Original text" SortMemberPath="UnTranslatedSingleLine">
                         <DataGridTemplateColumn.CellTemplate>

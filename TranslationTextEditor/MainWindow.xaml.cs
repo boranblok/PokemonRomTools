@@ -4,6 +4,8 @@ using PkmnAdvanceTranslation.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -29,10 +31,20 @@ namespace PkmnAdvanceTranslation
         public MainWindow()
         {
             vm = new MainWindowViewModel(this);
+            vm.NewFileLoaded += Vm_NewFileLoaded;
             vm.TranslationLinesView.CurrentChanged += TranslationLinesView_CurrentChanged;
             DataContext = vm;
 
             InitializeComponent();
+        }
+
+        private void Vm_NewFileLoaded(object sender, EventArgs e)
+        {
+            foreach (var translationLine in vm.TranslationLines)
+            {
+                translationLine.UntranslatedLineLength = GetMaxLineLength(translationLine.UnTranslatedMultiLine);
+                translationLine.TranslatedLineLength = GetMaxLineLength(translationLine.TranslatedMultiLine);
+            }
         }
 
         private void TranslationLinesView_CurrentChanged(object sender, EventArgs e)
@@ -121,6 +133,34 @@ namespace PkmnAdvanceTranslation
         private void txtTranslated_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             txtUnTranslated.ScrollToVerticalOffset(txtUnTranslated.VerticalOffset + e.VerticalChange);
+        }
+
+        private Double GetMaxLineLength(String multiLine)
+        {
+            double maxLength = 0;
+            var lines = multiLine.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                var length = MeasureStringWidth(line);
+                if (length > maxLength)
+                    maxLength = length;
+            }
+            return maxLength;
+        }
+
+        private Double MeasureStringWidth(String candidate)
+        {
+            var formattedText = new FormattedText(
+                candidate,
+                CultureInfo.CurrentCulture,
+                FlowDirection.LeftToRight,
+                new Typeface(txtTranslated.FontFamily, txtTranslated.FontStyle, txtTranslated.FontWeight, txtTranslated.FontStretch),
+                txtTranslated.FontSize,
+                Brushes.Black,
+                new NumberSubstitution(),
+                1);
+
+            return formattedText.Width;
         }
     }
 }
