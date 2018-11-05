@@ -25,26 +25,16 @@ namespace PkmnAdvanceTranslation
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, IOService
+    public partial class MainWindow : Window, IOService, ILineLengthService
     {
         MainWindowViewModel vm;
         public MainWindow()
         {
-            vm = new MainWindowViewModel(this);
-            vm.NewFileLoaded += Vm_NewFileLoaded;
+            vm = new MainWindowViewModel(this, this);
             vm.TranslationLinesView.CurrentChanged += TranslationLinesView_CurrentChanged;
             DataContext = vm;
 
             InitializeComponent();
-        }
-
-        private void Vm_NewFileLoaded(object sender, EventArgs e)
-        {
-            foreach (var translationLine in vm.TranslationLines)
-            {
-                translationLine.UntranslatedLineLength = GetMaxLineLength(translationLine.UnTranslatedMultiLine);
-                translationLine.TranslatedLineLength = GetMaxLineLength(translationLine.TranslatedMultiLine);
-            }
         }
 
         private void TranslationLinesView_CurrentChanged(object sender, EventArgs e)
@@ -135,20 +125,7 @@ namespace PkmnAdvanceTranslation
             txtUnTranslated.ScrollToVerticalOffset(txtUnTranslated.VerticalOffset + e.VerticalChange);
         }
 
-        private Double GetMaxLineLength(String multiLine)
-        {
-            double maxLength = 0;
-            var lines = multiLine.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var line in lines)
-            {
-                var length = MeasureStringWidth(line);
-                if (length > maxLength)
-                    maxLength = length;
-            }
-            return maxLength;
-        }
-
-        private Double MeasureStringWidth(String candidate)
+        public Double MeasureStringWidth(String candidate)
         {
             var formattedText = new FormattedText(
                 candidate,

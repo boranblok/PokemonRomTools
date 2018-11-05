@@ -11,17 +11,20 @@ namespace PkmnAdvanceTranslation.ViewModels
     public class TranslationItemViewModel : ViewModelBase
     {
         public PointerText PointerText { get; private set; }
+        private ILineLengthService LineLengthService { get; set; }
         private String editedMultiLineText;
         private Boolean _hasChangesInMemory;
         private Boolean _hasChangesInEditor;
         private Double _untranslatedLineLength;
         private Double _translatedLineLength;
 
-        public TranslationItemViewModel(PointerText pointerText)
+        public TranslationItemViewModel(PointerText pointerText, ILineLengthService lineLengthService)
         {
             PointerText = pointerText;
+            LineLengthService = lineLengthService;
+            CalculateInitialLineLengths();
         }
-        
+
         public Boolean HasChangesInMemory
         {
             get
@@ -259,9 +262,29 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             if (editedMultiLineText == null) //BLB we're re-saving (textmode change)
                 editedMultiLineText = TranslatedMultiLine;
+            TranslatedLineLength = GetMaxLineLength(editedMultiLineText);
             TranslatedSingleLine = TextHandler.EditStringToSingleLine(editedMultiLineText, IsSpecialDialog);
             TranslatedMultiLine = null;
             HasChangesInMemory = true;
+        }
+
+        private void CalculateInitialLineLengths()
+        {
+            _untranslatedLineLength = GetMaxLineLength(UnTranslatedMultiLine);
+            _translatedLineLength = GetMaxLineLength(TranslatedMultiLine);
+        }
+
+        private Double GetMaxLineLength(String multiLine)
+        {
+            double maxLength = 0;
+            var lines = multiLine.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                var length = LineLengthService.MeasureStringWidth(line);
+                if (length > maxLength)
+                    maxLength = length;
+            }
+            return maxLength;
         }
     }
 }

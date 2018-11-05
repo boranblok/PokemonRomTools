@@ -21,6 +21,7 @@ namespace PkmnAdvanceTranslation.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         private IOService _ioService;
+        private ILineLengthService _lineLengthService;
 
         private TranslationItemViewModel _currentTranslationLineItem;
 
@@ -32,10 +33,11 @@ namespace PkmnAdvanceTranslation.ViewModels
 
         public event EventHandler NewFileLoaded;
 
-        public MainWindowViewModel(IOService ioService)
+        public MainWindowViewModel(IOService ioService, ILineLengthService lineLengthService)
         {
             Title = "Pokémon translation editor";
             _ioService = ioService;
+            _lineLengthService = lineLengthService;
 
             Filter = new FilterViewModel();
             Filter.FilterChanged += Filter_FilterChanged;
@@ -375,7 +377,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             {
                 if (!Filter.Groups.Contains(line.Group))
                     Filter.Groups.Add(line.Group);
-                TranslationLines.Add(new TranslationItemViewModel(line));
+                TranslationLines.Add(new TranslationItemViewModel(line, _lineLengthService));
             }
             autoSaveTimer.Start();
             OnNewFileLoaded();

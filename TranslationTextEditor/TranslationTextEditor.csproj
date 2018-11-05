@@ -83,8 +83,10 @@
     <Compile Include="Util\BindingProxy.cs" />
     <Compile Include="Util\DialogViewModelBase.cs" />
     <Compile Include="Util\Enums.cs" />
+    <Compile Include="Util\ILineLengthService.cs" />
     <Compile Include="Util\IOService.cs" />
     <Compile Include="Util\Mocks\IOServiceMock.cs" />
+    <Compile Include="Util\Mocks\LineLengthServiceMock.cs" />
     <Compile Include="Util\TextblockAutoToolTip.cs" />
     <Compile Include="ViewModels\ChangeTextModeViewModel.cs" />
     <Compile Include="ViewModels\ChangeGroupViewModel.cs" />
