@@ -15,8 +15,8 @@ namespace PkmnAdvanceTranslation.ViewModels
         private String editedMultiLineText;
         private Boolean _hasChangesInMemory;
         private Boolean _hasChangesInEditor;
-        private Double _untranslatedLineLength;
-        private Double _translatedLineLength;
+        private Int32 _untranslatedLineLength;
+        private Int32 _translatedLineLength;
 
         public TranslationItemViewModel(PointerText pointerText, ILineLengthService lineLengthService)
         {
@@ -56,7 +56,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        public Double UntranslatedLineLength
+        public Int32 UntranslatedLineLength
         {
             get
             {
@@ -72,7 +72,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        public Double TranslatedLineLength
+        public Int32 TranslatedLineLength
         {
             get
             {
@@ -88,7 +88,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        public Double LineLengthDifference
+        public Int32 LineLengthDifference
         {
             get
             {
@@ -274,7 +274,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             _translatedLineLength = GetMaxLineLength(TranslatedMultiLine);
         }
 
-        private Double GetMaxLineLength(String multiLine)
+        private Int32 GetMaxLineLength(String multiLine)
         {
             double maxLength = 0;
             var lines = multiLine.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
@@ -284,7 +284,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 if (length > maxLength)
                     maxLength = length;
             }
-            return maxLength;
+            return (Int32)Math.Ceiling(maxLength);
         }
     }
 }
