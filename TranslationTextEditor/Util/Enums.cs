@@ -8,6 +8,7 @@ namespace PkmnAdvanceTranslation.Util
 {
     public enum ContainFilterMode
     {
+        Either,
         Both,
         Translated,
         Untranslated
