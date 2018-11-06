@@ -41,7 +41,7 @@ namespace PkmnAdvanceTranslation
         public void WriteRomToFile(FileInfo file)
         {
             if (file.Exists)
-                throw new Exception(String.Format("Rom file {0} already not exist.", file.FullName));
+                throw new Exception(String.Format("Rom file {0} already exists.", file.FullName));
             using (var reader = new MemoryStream(RomContents))
             using (var writer = file.OpenWrite())
             {
