@@ -210,8 +210,9 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Label Grid.Column="1" Grid.Row="0" Content="Original text"/>
+                <Label Grid.Column="1" Grid.Row="0" Content="Original text"/>                
                 <Rectangle Grid.Column="1" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
+                <Rectangle Grid.Column="1" Grid.Row="1" Style="{StaticResource HalfwayLine}"/>
                 <TextBox 
                     x:Name="txtUnTranslated"
                     Grid.Column="1" 
@@ -235,6 +236,7 @@
                 </Grid>
                 <Label Grid.Column="6" Grid.Row="0" Content="Translated text"/>
                 <Rectangle Grid.Column="6" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
+                <Rectangle Grid.Column="6" Grid.Row="1" Style="{StaticResource HalfwayLine}"/>
                 <TextBox 
                     x:Name="txtTranslated"
                     Grid.Column="6" 
