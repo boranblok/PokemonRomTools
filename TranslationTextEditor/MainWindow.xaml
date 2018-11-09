@@ -51,6 +51,8 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
@@ -60,9 +62,11 @@
                 <TextBox Grid.Column="3" Style="{StaticResource AddressBox}" MaxLength="6" Text="{Binding Filter.AddressFilter, UpdateSourceTrigger=PropertyChanged}" />
                 <Label Grid.Column="4" Content="Potential overflow:"/>
                 <CheckBox Grid.Column="5" IsChecked="{Binding Filter.PotentialOverflowFilter}" />
-                <Label Grid.Column="6" Content="Contains:"/>
-                <TextBox Grid.Column="7" Style="{StaticResource TextBoxMargin}" Text="{Binding Filter.ContentFilter, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox Grid.Column="8" Width="100" ItemsSource="{Binding Filter.ContainsModes}" SelectedItem="{Binding Filter.CurrentContainsMode}" DisplayMemberPath="Title" />
+                <Label Grid.Column="6" Content="Potential issue:"/>
+                <CheckBox Grid.Column="7" IsChecked="{Binding Filter.PotentialRepointIssueFilter}" />
+                <Label Grid.Column="8" Content="Contains:"/>
+                <TextBox Grid.Column="9" Style="{StaticResource TextBoxMargin}" Text="{Binding Filter.ContentFilter, UpdateSourceTrigger=PropertyChanged}" />
+                <ComboBox Grid.Column="10" Width="100" ItemsSource="{Binding Filter.ContainsModes}" SelectedItem="{Binding Filter.CurrentContainsMode}" DisplayMemberPath="Title" />
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>

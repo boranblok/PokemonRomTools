@@ -19,6 +19,7 @@ namespace PkmnAdvanceTranslation.ViewModels
         private ContainsViewModel _currentContainsMode;
         private Boolean _inverseGroupFilter;
         private Boolean _potentialOverflowFilter;
+        private Boolean _potentialRepointIssueFilter;
         private String _addressFilter;
         private String _contentFilter;
         private String[] _contentFilters;
@@ -81,6 +82,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 && (SelectedGroups.Count == 0 || (InverseGroupFilter && !SelectedGroups.Contains(translationLine.Group)) || (!InverseGroupFilter && SelectedGroups.Contains(translationLine.Group)))
                 && MatchesContentFilter(translationLine)
                 && (!PotentialOverflowFilter || translationLine.TranslatedLineLength > 320 && translationLine.LineLengthDifference > 0)
+                && (!PotentialRepointIssueFilter || translationLine.ReferenceCount != 1 && translationLine.RemainingLength < 0)
                 ;
         }
 
@@ -195,6 +197,22 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
+        public Boolean PotentialRepointIssueFilter
+        {
+            get
+            {
+                return _potentialRepointIssueFilter;
+            }
+            set
+            {
+                if (value == _potentialRepointIssueFilter)
+                    return;
+                _potentialRepointIssueFilter = value;
+                OnPropertyChanged("PotentialRepointIssueFilter");
+                OnFilterChanged();
+            }
+        }
+
         public String AddressFilter
         {
             get { return _addressFilter; }
@@ -282,6 +300,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             _currentContainsMode = ContainsModes[0];            
             _inverseGroupFilter = false;
             _potentialOverflowFilter = false;
+            _potentialRepointIssueFilter = false;
 
             OnPropertyChanged("TranslatedFilter");
             OnPropertyChanged("EditingFilter");
@@ -290,6 +309,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             OnPropertyChanged("CurrentContainsMode");
             OnPropertyChanged("InverseGroupFilter");
             OnPropertyChanged("PotentialOverflowFilter");
+            OnPropertyChanged("PotentialRepointIssueFilter");
 
             OnFilterChanged();
         }
@@ -303,7 +323,8 @@ namespace PkmnAdvanceTranslation.ViewModels
                 || !String.IsNullOrWhiteSpace(ContentFilter)
                 || _currentContainsMode != ContainsModes[0]
                 || _inverseGroupFilter != false
-                || _potentialOverflowFilter != false;
+                || _potentialOverflowFilter != false
+                || _potentialRepointIssueFilter != false;
         }
     }
 
