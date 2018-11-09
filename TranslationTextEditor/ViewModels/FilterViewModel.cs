@@ -255,7 +255,10 @@ namespace PkmnAdvanceTranslation.ViewModels
                 dispatcher.BeginInvoke((Action)delegate ()
                 {
                     filterDelayTimer.Stop();
-                    _contentFilters = ContentFilter.Split(new Char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (String.IsNullOrEmpty(ContentFilter))
+                        _contentFilters = new String[0];
+                    else
+                        _contentFilters = ContentFilter.Split(new Char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
                     OnFilterChanged();
                 });
             }

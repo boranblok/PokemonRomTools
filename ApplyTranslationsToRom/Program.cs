@@ -132,6 +132,8 @@ namespace PkmnAdvanceTranslation
                 {
                     mergedLine.TranslatedSingleLine = line.TranslatedSingleLine;
                     mergedLine.ForceRepointReference = line.ForceRepointReference;
+                    if (line.ReferenceCount == 0 && mergedLine.AvailableLength < line.AvailableLength)
+                        mergedLine.AvailableLength = line.AvailableLength;  //HACK: Dealing with table entries needs a bit of a new approach.
                 }
                 else
                 {
@@ -176,8 +178,8 @@ namespace PkmnAdvanceTranslation
                 }
                 else
                 {
-                    if(translatedLine.ReferenceCount == 0)
-                        throw new Exception("Cannot repoint a line with 0 references, this is probably a table entry and not a string that is referenced from elsewhere. stay within the size limit.")
+                    if (translatedLine.ReferenceCount == 0)
+                        throw new Exception("Cannot repoint a line with 0 references, this is probably a table entry and not a string that is referenced from elsewhere. stay within the size limit.");
                     if (translatedLine.ForceRepointReference || forceRepointing)
                     {
                         translatedLine.ForceRepointReference = true; //in case the global forcerepoint was set, this way we can identify the lines that were forced to repoint later on.
