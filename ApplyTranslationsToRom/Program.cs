@@ -52,9 +52,9 @@ namespace PkmnAdvanceTranslation
             if (args.Length > 4 && args[4].Equals("Force", StringComparison.InvariantCultureIgnoreCase))
                 forceRepointing = true;
 
-            log.Info("Re - fetching text references and available length from rom file.");
-            Console.WriteLine("Re-fetching text references and available length from rom file.");
-            List<PointerText> translatedLines = CreateTranslatedLinesWithRom(rom, translationFileLines);
+            log.Info("Preparing translated lines.");
+            Console.WriteLine("Preparing translated lines.");
+            List<PointerText> translatedLines = PrepareTranslatedLines(translationFileLines);
             Console.WriteLine();
 
             log.Info("Searching lines that need repointing.");
@@ -98,7 +98,7 @@ namespace PkmnAdvanceTranslation
             return PointerText.ReadPointersFromFile(translationSourceFile);
         }
 
-        private static List<PointerText> CreateTranslatedLinesWithRom(RomDataWrapper rom, List<PointerText> translationFileLines)
+        private static List<PointerText> PrepareTranslatedLines(List<PointerText> translationFileLines)
         {
             var translatedLines = new List<PointerText>();
 
@@ -116,36 +116,6 @@ namespace PkmnAdvanceTranslation
             }
             
             return translatedLines;
-        }
-
-        private static void ApplyTranslationToExistingLinesTask(RomDataWrapper rom,
-            IEnumerable<PointerText> translationFileLines, List<PointerText> translatedLines, Object lockObject, Int32 totalCount)
-        {
-            foreach (var line in translationFileLines)
-            {
-                var mergedLine = rom.GetOriginalPointerInfo(line.Address);
-                if (line.IsTranslated)
-                {
-                    mergedLine.TranslatedSingleLine = line.TranslatedSingleLine;
-                    mergedLine.ForceRepointReference = line.ForceRepointReference;
-                    if (line.ReferenceCount == 0 && mergedLine.AvailableLength < line.AvailableLength)
-                        mergedLine.AvailableLength = line.AvailableLength;  //HACK: Dealing with table entries needs a bit of a new approach.
-                }
-                else
-                {
-                    mergedLine.TranslatedSingleLine = line.UntranslatedSingleLine;
-                    log.Info("Using original language text for line because no translation was provided:");
-                    log.Info(line);
-                }
-                lock (lockObject)
-                {
-                    translatedLines.Add(mergedLine);
-                    if (translatedLines.Count % 100 == 0)
-                    {
-                        Console.Write("\rProgress: {0:##0}%   ", ((Decimal)translatedLines.Count / totalCount) * 100);
-                    }
-                }
-            }
         }
 
         private static void RepointLinesIfRequired(List<PointerText> translatedLines)
