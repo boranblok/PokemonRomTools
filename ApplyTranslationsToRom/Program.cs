@@ -100,25 +100,21 @@ namespace PkmnAdvanceTranslation
 
         private static List<PointerText> CreateTranslatedLinesWithRom(RomDataWrapper rom, List<PointerText> translationFileLines)
         {
-            var sw = new Stopwatch();
-            sw.Start();
             var translatedLines = new List<PointerText>();
-            var lockObject = new Object();
-            var numThreads = Environment.ProcessorCount;
-            var numPerThread = translationFileLines.Count / numThreads;
-            var tasks = new List<Task>();
-            for (int i = 0; i < numThreads - 1; i++)
+
+            foreach (var line in translationFileLines)
             {
-                var translationFileLinesToHandle = translationFileLines.Skip(i * numPerThread).Take(numPerThread);
-                tasks.Add(Task.Run(() => ApplyTranslationToExistingLinesTask(rom, translationFileLinesToHandle, translatedLines, lockObject, translationFileLines.Count)));
+                if (!line.IsTranslated)
+                {
+                    line.TranslatedSingleLine = line.UntranslatedSingleLine;
+                    if (line.ReferenceCount == 0)
+                        line.AvailableLength = line.TranslatedSingleLineBytes.Length;
+                    log.Info("Using original language text for line because no translation was provided:");
+                    log.Info(line);
+                }
+                translatedLines.Add(line);
             }
-            var finalTranslationFileLinesToHandle = translationFileLines.Skip((numThreads - 1) * numPerThread);
-            tasks.Add(Task.Run(() => ApplyTranslationToExistingLinesTask(rom, finalTranslationFileLinesToHandle, translatedLines, lockObject, translationFileLines.Count)));
-
-            Task.WaitAll(tasks.ToArray());
-
-            sw.Stop();
-            log.DebugFormat("Applying translations to existing lines took {0}", sw.Elapsed);
+            
             return translatedLines;
         }
 

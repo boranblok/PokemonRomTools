@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StripDuplicatesInTranslatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LineSplitter", "LineSplitter\LineSplitter.csproj", "{3E84527F-5161-4B07-B5C5-F416EC9DA627}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetTextPointersForRom", "GetTextPointersForRom\GetTextPointersForRom.csproj", "{C32ED23A-BDE2-4A6E-A9E3-943F1A32AD2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -141,6 +143,14 @@ Global
 		{3E84527F-5161-4B07-B5C5-F416EC9DA627}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3E84527F-5161-4B07-B5C5-F416EC9DA627}.Release|x86.ActiveCfg = Release|Any CPU
 		{3E84527F-5161-4B07-B5C5-F416EC9DA627}.Release|x86.Build.0 = Release|Any CPU
+		{C32ED23A-BDE2-4A6E-A9E3-943F1A32AD2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C32ED23A-BDE2-4A6E-A9E3-943F1A32AD2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C32ED23A-BDE2-4A6E-A9E3-943F1A32AD2F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C32ED23A-BDE2-4A6E-A9E3-943F1A32AD2F}.Debug|x86.Build.0 = Debug|Any CPU
+		{C32ED23A-BDE2-4A6E-A9E3-943F1A32AD2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C32ED23A-BDE2-4A6E-A9E3-943F1A32AD2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C32ED23A-BDE2-4A6E-A9E3-943F1A32AD2F}.Release|x86.ActiveCfg = Release|Any CPU
+		{C32ED23A-BDE2-4A6E-A9E3-943F1A32AD2F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

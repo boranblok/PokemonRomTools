@@ -72,7 +72,6 @@ namespace PkmnAdvanceTranslation
         }
 
         public String UntranslatedSingleLine { get; set; }
-
         public Boolean ForceRepointReference { get; set; }
         public Int32 AvailableLength { get; set; }
 
@@ -104,8 +103,19 @@ namespace PkmnAdvanceTranslation
 
         public override String ToString()
         {
-            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}|{5,-40}|{6}|{7}", 
-                Address, ReferenceCount, AvailableLength, ForceRepointReference ? 1 : 0,TextMode.ToString()[0], Group, UntranslatedSingleLine, TranslatedSingleLine);
+            return String.Format("{0:X6}|{1,2:#0}|{2,3:##0}|{3}|{4}|{5,-40}|{6}|{7}|{8}", 
+                Address, ReferenceCount, AvailableLength, ForceRepointReference ? 1 : 0, TextMode.ToString()[0], Group, UntranslatedSingleLine, TranslatedSingleLine, GetReferencesAsString());
+        }
+
+        private String GetReferencesAsString()
+        {
+            return String.Join(";", References);
+        }
+
+        private static List<TextReference> GetReferencesFromString(String refString)
+        {
+            var parts = refString.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            return parts.Select(p => TextReference.FromString(p)).ToList();
         }
 
         public static PointerText FromString(String pointerTextString)
@@ -113,8 +123,8 @@ namespace PkmnAdvanceTranslation
             var result = new PointerText();
 
             var parts = pointerTextString.Split('|');
-            if (parts.Length != 8)
-                throw new Exception(String.Format("A PointerText value has 8 segments separated by a | char. {0} is not valid", pointerTextString));
+            if (parts.Length != 9)
+                throw new Exception(String.Format("A PointerText value has 9 segments separated by a | char. {0} is not valid", pointerTextString));
 
             if (Int32.TryParse(parts[0], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var address))
                 result.Address = address;
@@ -160,6 +170,8 @@ namespace PkmnAdvanceTranslation
             result.UntranslatedSingleLine = parts[6];
 
             result.TranslatedSingleLine = parts[7];
+
+            result.References = GetReferencesFromString(parts[8]);
 
             return result;
         }
