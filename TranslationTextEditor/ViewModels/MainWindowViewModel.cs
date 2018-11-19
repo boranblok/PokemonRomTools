@@ -242,6 +242,33 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
+        public RelayCommand TrimLinesToFitCommand
+        {
+            get
+            {
+                return new RelayCommand(TrimLinestoFit, IsAtLeastOneLineSelected);
+            }
+        }
+
+        private void TrimLinestoFit()
+        {
+            var vm = new ConfirmationDialogViewModel("Are you sure?", "Are you sure you want to trim the selected lines?");
+            DialogViewModel = vm;
+            DialogViewModel.ShowDialog = true;
+            if (vm.Confirmed)
+            {
+                foreach (var line in SelectedTranslationLines)
+                {
+                    if (line.RemainingLength < 0)
+                        line.TranslatedMultiLine = line.TranslatedMultiLine.Substring(line.RemainingLength * -1).Trim();
+                    line.SaveMultiLineTextCommand.Execute(null);
+                    if (line.RemainingLength < 0)
+                        line.TranslatedMultiLine = line.TranslatedMultiLine.Substring(line.RemainingLength * -1).Trim();
+                    line.SaveMultiLineTextCommand.Execute(null);
+                }
+            }
+        }
+
         public RelayCommand DeleteSelectedLinesCommand
         {
             get

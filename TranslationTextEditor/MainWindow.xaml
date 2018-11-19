@@ -33,6 +33,7 @@
                 <MenuItem Header="Discard current edit(s)" Command="{Binding DiscardEditedLinesCommand}"/>
                 <MenuItem Header="Save all edits to memory" Command="{Binding SaveEditedLinesCommand}"/>
                 <MenuItem Header="Delete selected lines" Command="{Binding DeleteSelectedLinesCommand}"/>
+                <MenuItem Header="Trim selected lines to fit" Command="{Binding TrimLinesToFitCommand}"/>
             </MenuItem>
         </Menu>
         <Grid>
