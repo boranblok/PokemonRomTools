@@ -12,16 +12,18 @@ namespace PkmnAdvanceTranslation.ViewModels
     {
         public PointerText PointerText { get; private set; }
         private ILineLengthService LineLengthService { get; set; }
+        private IDialogService DialogService { get; set; }
         private String editedMultiLineText;
         private Boolean _hasChangesInMemory;
         private Boolean _hasChangesInEditor;
         private Int32 _untranslatedLineLength;
         private Int32 _translatedLineLength;
 
-        public TranslationItemViewModel(PointerText pointerText, ILineLengthService lineLengthService)
+        public TranslationItemViewModel(PointerText pointerText, ILineLengthService lineLengthService, IDialogService dialogService)
         {
             PointerText = pointerText;
             LineLengthService = lineLengthService;
+            DialogService = dialogService;
             CalculateInitialLineLengths();
         }
 
@@ -109,6 +111,14 @@ namespace PkmnAdvanceTranslation.ViewModels
             get
             {
                 return PointerText.ReferenceCount;
+            }
+        }
+
+        public List<ReferenceViewModel> References
+        {
+            get
+            {
+                return PointerText.References.Select(r => new ReferenceViewModel(r)).ToList();
             }
         }
 
@@ -212,6 +222,23 @@ namespace PkmnAdvanceTranslation.ViewModels
                 OnPropertyChanged("IsSpecialDialog");                
                 HasChangesInEditor = true;
             }
+        }
+
+        public RelayCommand EditReferencesCommand
+        {
+            get
+            {
+                return new RelayCommand(EditReferences);
+            }
+        }
+
+        private void EditReferences()
+        {
+            var dialog = new ReferencesDialogViewModel();
+            foreach (var reference in References)
+                dialog.References.Add(reference);
+            DialogService.DialogViewModel = dialog;
+            dialog.ShowDialog = true;
         }
 
         public RelayCommand CopyUntranslatedToTranslatedCommand

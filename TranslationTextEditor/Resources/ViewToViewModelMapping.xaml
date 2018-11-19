@@ -11,4 +11,7 @@
     <DataTemplate DataType="{x:Type vm:ConfirmationDialogViewModel}">
         <v:ConfirmationDialog />
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ReferencesDialogViewModel}">
+        <v:ReferencesDialog />
+    </DataTemplate>
 </ResourceDictionary>

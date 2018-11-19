@@ -120,11 +120,16 @@
                 </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="Auto" Header="Address" Binding="{Binding Address, Mode=OneWay}" ElementStyle="{StaticResource AddressCell}"/>
-                    <DataGridTextColumn Width="Auto" Binding="{Binding ReferenceCount, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
-                        <DataGridTextColumn.Header>
+                    <DataGridTemplateColumn Width="Auto" SortMemberPath="ReferenceCount">
+                        <DataGridTemplateColumn.Header>
                             <TextBlock Text="Ref#" ToolTip="Number of references" />
-                        </DataGridTextColumn.Header>
-                    </DataGridTextColumn>
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding ReferenceCount}" Command="{Binding EditReferencesCommand}" Margin="-2" Padding="0 0 3 0" HorizontalContentAlignment="Right"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Width="Auto" Binding="{Binding AvailableLength, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
                         <DataGridTextColumn.Header>
                             <TextBlock Text="Avl." ToolTip="Available bytes" />

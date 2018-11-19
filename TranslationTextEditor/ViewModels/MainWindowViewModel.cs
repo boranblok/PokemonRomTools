@@ -18,7 +18,7 @@ using System.Windows.Threading;
 
 namespace PkmnAdvanceTranslation.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : ViewModelBase, IDialogService
     {
         private IOService _ioService;
         private ILineLengthService _lineLengthService;
@@ -404,7 +404,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             {
                 if (!Filter.Groups.Contains(line.Group))
                     Filter.Groups.Add(line.Group);
-                TranslationLines.Add(new TranslationItemViewModel(line, _lineLengthService));
+                TranslationLines.Add(new TranslationItemViewModel(line, _lineLengthService, this));
             }
             autoSaveTimer.Start();
             OnNewFileLoaded();
