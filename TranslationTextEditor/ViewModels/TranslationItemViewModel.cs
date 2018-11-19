@@ -2,6 +2,7 @@
 using PkmnAdvanceTranslation.Util;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -118,20 +119,34 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             get
             {
-                return PointerText.References.Select(r => new ReferenceViewModel(r)).ToList();
+                var refs = new List<ReferenceViewModel>();
+                foreach(var r in PointerText.References)
+                {
+                    var refvm = new ReferenceViewModel(r);
+                    refvm.PropertyChanged += Refvm_PropertyChanged;
+                    refs.Add(refvm);
+                }
+                return refs;
             }
+        }
+
+        private void Refvm_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            HasChangesInMemory = true;
+            OnPropertyChanged("AverageRefDistance");
+            OnPropertyChanged("MaxRefDistance");
         }
 
         public Int32 AverageRefDistance
         {
             get
             {
-                if (PointerText.References.Count < 2)
+                if (PointerText.References.Where(r => r.Repoint).Count() < 2)
                     return 0;
 
-                var start = PointerText.References.OrderBy(r => r.Address).First().Address;
+                var start = PointerText.References.Where(r => r.Repoint).OrderBy(r => r.Address).First().Address;
                 var distance = 0;
-                foreach(var reference in PointerText.References.OrderBy(r => r.Address).Skip(1))
+                foreach(var reference in PointerText.References.Where(r => r.Repoint).OrderBy(r => r.Address).Skip(1))
                 {
                     distance += reference.Address - start;
                     start = reference.Address;
@@ -144,12 +159,12 @@ namespace PkmnAdvanceTranslation.ViewModels
         {
             get
             {
-                if (PointerText.References.Count < 2)
+                if (PointerText.References.Where(r => r.Repoint).Count() < 2)
                     return 0;
 
-                var start = PointerText.References.OrderBy(r => r.Address).First().Address;
+                var start = PointerText.References.Where(r => r.Repoint).OrderBy(r => r.Address).First().Address;
                 var max = 0;
-                foreach (var reference in PointerText.References.OrderBy(r => r.Address).Skip(1))
+                foreach (var reference in PointerText.References.Where(r => r.Repoint).OrderBy(r => r.Address).Skip(1))
                 {
                     var distance = reference.Address - start;
                     if (distance > max)

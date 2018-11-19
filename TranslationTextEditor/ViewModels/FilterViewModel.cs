@@ -82,7 +82,7 @@ namespace PkmnAdvanceTranslation.ViewModels
                 && (SelectedGroups.Count == 0 || (InverseGroupFilter && !SelectedGroups.Contains(translationLine.Group)) || (!InverseGroupFilter && SelectedGroups.Contains(translationLine.Group)))
                 && MatchesContentFilter(translationLine)
                 && (!PotentialOverflowFilter || translationLine.TranslatedLineLength > 320 && translationLine.LineLengthDifference > 0)
-                && (!PotentialRepointIssueFilter || translationLine.ReferenceCount != 1 && translationLine.RemainingLength < 0)
+                && (!PotentialRepointIssueFilter || translationLine.RemainingLength < 0 && translationLine.PointerText.References.Where(r => r.Repoint).Count() != 1)
                 ;
         }
 

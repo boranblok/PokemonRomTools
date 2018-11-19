@@ -40,6 +40,6 @@
                 <DataGridTextColumn Width="Auto" Header="Address" Binding="{Binding Address, Mode=OneWay}" ElementStyle="{StaticResource AddressCell}"/>
             </DataGrid.Columns>
         </DataGrid>
-        <Button Grid.Row="2" Grid.Column="2" Content="Close" Command="{Binding OkCommand}"/>
+        <Button Grid.Row="2" Grid.Column="2" Content="Close" Command="{Binding CloseDialogCommand}"/>
     </Grid>
 </UserControl>
