@@ -140,6 +140,26 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
+        public Int32 MaxRefDistance
+        {
+            get
+            {
+                if (PointerText.References.Count < 2)
+                    return 0;
+
+                var start = PointerText.References.OrderBy(r => r.Address).First().Address;
+                var max = 0;
+                foreach (var reference in PointerText.References.OrderBy(r => r.Address).Skip(1))
+                {
+                    var distance = reference.Address - start;
+                    if (distance > max)
+                        max = distance;
+                    start = reference.Address;
+                }
+                return max;
+            }
+        }
+
         public Int32 AvailableLength
         {
             get

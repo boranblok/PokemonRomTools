@@ -130,9 +130,9 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Width="Auto" Binding="{Binding AverageRefDistance, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
+                    <DataGridTextColumn Width="Auto" Binding="{Binding MaxRefDistance, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
                         <DataGridTextColumn.Header>
-                            <TextBlock Text="RefDist" ToolTip="Average reference distance" />
+                            <TextBlock Text="RefDist" ToolTip="Maximum reference distance" />
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                     <DataGridTextColumn Width="Auto" Binding="{Binding AvailableLength, Mode=OneWay}" ElementStyle="{StaticResource AlignRight}">
