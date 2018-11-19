@@ -44,11 +44,11 @@ namespace PkmnAdvanceTranslation
 
         private String _translatedSingleLine;
         private Byte[] _translatedSingleLineBytes;
-        private List<int> _references;
+        private List<TextReference> _references;
         
         public Int32 Address { get; set; }
 
-        public List<Int32> References { get => _references; set { _references = value; ReferenceCount = value.Count;  } }
+        public List<TextReference> References { get => _references; set { _references = value; ReferenceCount = value.Count;  } }
         public Int32 ReferenceCount { get; set; }
         public String TranslatedSingleLine
         {

@@ -86,13 +86,13 @@ namespace PkmnAdvanceTranslation
             }
         }
 
-        public void ModifyTextReferences(Int32 newTextPointer, List<Int32> references)
+        public void ModifyTextReferences(Int32 newTextPointer, List<TextReference> references)
         {
             var newTextPointerValue = stringPointerInt + newTextPointer;
             var newTextPointerValueBytes = BitConverter.GetBytes(newTextPointerValue);
-            foreach(var reference in references)
+            foreach(var reference in references.Where(r => r.Repoint))
             {
-                WriteBytes(reference, newTextPointerValueBytes);
+                WriteBytes(reference.Address, newTextPointerValueBytes);
             }
         }
 
@@ -113,12 +113,12 @@ namespace PkmnAdvanceTranslation
             return byteLength;
         }
 
-        public List<Int32> FindTextReferences(Int32 textPointer)
+        public List<TextReference> FindTextReferences(Int32 textPointer)
         {
             var textPointerValue = stringPointerInt + textPointer;
             var textPointerBytes = BitConverter.GetBytes(textPointerValue);
             var result = ByteBinarySearcher.FindMatches(textPointerBytes, RomContents);
-            return result;
+            return result.Select(i => new TextReference() { Address = i, Repoint = true }).ToList();
         }
 
         public Boolean IsTextReference(Int32 textPointer)
