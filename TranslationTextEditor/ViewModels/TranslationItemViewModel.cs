@@ -122,6 +122,24 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
+        public Int32 AverageRefDistance
+        {
+            get
+            {
+                if (PointerText.References.Count < 2)
+                    return 0;
+
+                var start = PointerText.References.OrderBy(r => r.Address).First().Address;
+                var distance = 0;
+                foreach(var reference in PointerText.References.OrderBy(r => r.Address).Skip(1))
+                {
+                    distance += reference.Address - start;
+                    start = reference.Address;
+                }
+                return distance / (PointerText.References.Count - 1);
+            }
+        }
+
         public Int32 AvailableLength
         {
             get
