@@ -11,15 +11,20 @@
         xmlns:mcb="clr-namespace:DonaldWindgate.CodeProject;assembly=MultiComboBox"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance dvm:MainWindowViewModelDesign, IsDesignTimeCreatable=True}"
-        Title="{Binding Title}" Height="500" Width="1150" MinWidth="1150" MinHeight="500">
+        Title="{Binding Title}" Height="550" Width="1150" MinWidth="1150" MinHeight="550">
     <Window.InputBindings>
         <KeyBinding Command="{Binding SelectPreviousLineCommand}" Key="Tab" Modifiers="Shift"/>
         <KeyBinding Command="{Binding SelectNextLineCommand}" Key="Tab"/>
         <KeyBinding Command="{Binding CurrentTranslationItem.CopyUntranslatedToTranslatedCommand}" Key="K" Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding SaveEditedLinesCommand}" Key="S" Modifiers="Ctrl"/>
     </Window.InputBindings>
-    <DockPanel>
-        <Menu DockPanel.Dock="Top">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
             <MenuItem Header="_File">
                 <MenuItem Header="Open" Command="{Binding OpenTranslationFileCommand}"/>
                 <MenuItem Header="Save to disk" Command="{Binding SaveTranslationFileCommand}"/>
@@ -36,7 +41,7 @@
                 <MenuItem Header="Trim selected lines to fit" Command="{Binding TrimLinesToFitCommand}"/>
             </MenuItem>
         </Menu>
-        <Grid>
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -58,7 +63,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Content="Group grid:"/>
-                <CheckBox Grid.Column="1" IsChecked="{Binding GroupItems}" />                
+                <CheckBox Grid.Column="1" IsChecked="{Binding GroupItems}" />
                 <Label Grid.Column="2" Content="Address:"/>
                 <TextBox Grid.Column="3" Style="{StaticResource AddressBox}" MaxLength="6" Text="{Binding Filter.AddressFilter, UpdateSourceTrigger=PropertyChanged}" />
                 <Label Grid.Column="4" Content="Potential overflow:"/>
@@ -83,7 +88,7 @@
                 <Label Grid.Column="0" Content="Filter Editing:" />
                 <CheckBox Grid.Column="1" IsChecked="{Binding Filter.EditingFilter}" IsThreeState="True"/>
                 <Label Grid.Column="2" Content="Filter Translated:" />
-                <CheckBox Grid.Column="3" IsChecked="{Binding Filter.TranslatedFilter}" IsThreeState="True"/>                
+                <CheckBox Grid.Column="3" IsChecked="{Binding Filter.TranslatedFilter}" IsThreeState="True"/>
                 <Label Grid.Column="4" Content="Filter groups:" />
                 <mcb:MultiComboBox Grid.Column="5" SelectionMode="Multiple" 
                                  VerticalAlignment="Center"
@@ -96,7 +101,7 @@
                 </mcb:MultiComboBox>
                 <CheckBox Grid.Column="6" Content="Hide these groups" IsChecked="{Binding Filter.InverseGroupFilter}" />
                 <Button Grid.Column="7" Content="Clear all filters" Command="{Binding Filter.ClearFilterCommand}" />
-            </Grid>            
+            </Grid>
             <DataGrid
                 Name="TranslationLinesGrid"
                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
@@ -225,7 +230,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Label Grid.Column="1" Grid.Row="0" Content="Original text"/>                
+                <Label Grid.Column="1" Grid.Row="0" Content="Original text"/>
                 <Rectangle Grid.Column="1" Grid.Row="1" Style="{StaticResource MainTextEditOverlay}" />
                 <Rectangle Grid.Column="1" Grid.Row="1" Style="{StaticResource HalfwayLine}"/>
                 <TextBox 
@@ -240,7 +245,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>                        
+                        <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
@@ -271,5 +276,24 @@
                             IsOpen="{Binding Path=ShowDialog}">
             </util:BindableDialog>
         </Grid>
-    </DockPanel>
+        <StatusBar Grid.Row="2" BorderThickness="0,1,0,0" BorderBrush="DarkGray">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem Grid.Column="0">
+                <TextBlock Text="{Binding StatusMessage}" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="2" HorizontalAlignment="Right">
+                <TextBlock Text="{Binding CurrentLineMessage}" />
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
 </Window>

@@ -24,12 +24,12 @@ namespace PkmnAdvanceTranslation.ViewModels
         private ILineLengthService _lineLengthService;
 
         private TranslationItemViewModel _currentTranslationLineItem;
-
         private FileInfo _translationFile;
-
         private Boolean _groupItems;
-
+        private String _statusMessage;
+        private String _currentLineMessage;
         private Timer autoSaveTimer;
+        private Timer statusClearTimer;
 
         public event EventHandler NewFileLoaded;
 
@@ -51,11 +51,20 @@ namespace PkmnAdvanceTranslation.ViewModels
             autoSaveTimer.Interval = 1 * 60 * 1000;
             autoSaveTimer.AutoReset = true;
             autoSaveTimer.Elapsed += AutoSaveTimer_Elapsed;
+
+            statusClearTimer = new Timer();
+            statusClearTimer.Interval = 10 * 1000;
+            statusClearTimer.AutoReset = false;
+            statusClearTimer.Elapsed += StatusClearTimer_Elapsed;
         }
+
+        private void AutoSaveTimer_Elapsed(object sender, ElapsedEventArgs e) => AutoSavetranslationFile();
+        private void StatusClearTimer_Elapsed(object sender, ElapsedEventArgs e) => StatusMessage = String.Empty;
 
         private void Filter_FilterChanged(object sender, EventArgs e)
         {
             TranslationLinesView.Refresh();
+            CurrentLineMessage = String.Format("{0} Lines", TranslationLinesView.Cast<TranslationItemViewModel>().Count());
         }
 
         private void OnNewFileLoaded() => NewFileLoaded?.Invoke(this, new EventArgs());
@@ -65,6 +74,43 @@ namespace PkmnAdvanceTranslation.ViewModels
         public ObservableCollection<TranslationItemViewModel> TranslationLines { get; private set; }
         public ICollectionView TranslationLinesView { get; private set; }
         public ObservableCollection<TranslationItemViewModel> SelectedTranslationLines { get; private set; }
+
+        public String StatusMessage
+        {
+            get
+            {
+                return _statusMessage;
+            }
+            set
+            {
+                if (value == _statusMessage)
+                    return;
+
+                _statusMessage = value;
+                OnPropertyChanged("StatusMessage");
+                if (!String.IsNullOrWhiteSpace(_statusMessage))
+                {
+                    statusClearTimer.Stop();
+                    statusClearTimer.Start();
+                }
+            }
+        }
+
+        public String CurrentLineMessage
+        {
+            get
+            {
+                return _currentLineMessage; // 
+            }
+            set
+            {
+                if (value == _currentLineMessage)
+                    return;
+
+                _currentLineMessage = value;
+                OnPropertyChanged("CurrentLineMessage");
+            }
+        }
 
         public TranslationItemViewModel CurrentTranslationItem
         {
@@ -407,6 +453,8 @@ namespace PkmnAdvanceTranslation.ViewModels
                 TranslationLines.Add(new TranslationItemViewModel(line, _lineLengthService, this));
             }
             autoSaveTimer.Start();
+            StatusMessage = String.Format("Loaded {0}", translationSourceFile.Name);
+            CurrentLineMessage = String.Format("{0} Lines", TranslationLinesView.Cast<TranslationItemViewModel>().Count());
             OnNewFileLoaded();
         }
 
@@ -452,10 +500,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             }
         }
 
-        private void AutoSaveTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            AutoSavetranslationFile();
-        }
+        
 
         private void AutoSavetranslationFile()
         {
@@ -496,6 +541,7 @@ namespace PkmnAdvanceTranslation.ViewModels
             {
                 line.HasChangesInMemory = false;
             }
+            StatusMessage = String.Format("Saved translation to {0}", outputFile.Name);
         }
     }
 }
