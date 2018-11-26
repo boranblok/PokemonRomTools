@@ -216,8 +216,8 @@ namespace PkmnAdvanceTranslation
             }
             foreach(var translatedLine in translatedLines.Where(l => !l.MustRepointReference))
             {
-                rom.WriteBytes(translatedLine.Address, translatedLine.TranslatedSingleLineBytes);
-                rom.ClearByteRange(translatedLine.Address + translatedLine.TranslatedSingleLineBytes.Length, translatedLine.AvailableLength - translatedLine.TranslatedSingleLineBytes.Length);
+                rom.WriteBytes(translatedLine.Address, translatedLine.TranslatedSingleLineBytes);                
+                rom.ClearByteRange(translatedLine.Address + translatedLine.TranslatedSingleLineBytes.Length, 1);                
             }
         }
 
